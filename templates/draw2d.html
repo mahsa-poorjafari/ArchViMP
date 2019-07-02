@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load bootstrap4 %}
+<!-- This code is for demonstration purposes only.  You should not hotlink to Github, Rawgit, or files from the Cytoscape.js documentation in your production apps. -->
+<html>
+<head>
+    {% bootstrap_javascript jquery='full' %}
+    <link href="{% static 'css/example.css' %}" rel="stylesheet" />
+    <meta charset=utf-8 />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+    <title>connection decoration</title>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+
+    <script src="{% static 'js/draw2d.js' %}"></script>
+    <script src="{% static 'js/draw2d.js.map' %}"></script>
+
+</head>
+<body>
+{% include "main_menu.html" %}
+<div id="len_shared_variables">{{shared_variables}}</div>
+ <div  onselectstart="javascript:/*IE8 hack*/return false" id="gfx_holder" style="width:1500px; height:1500px; ">
+   </div>
+<!-- Load application code at the end to ensure DOM is loaded -->
+
+</body>
+<script type="text/javascript">
+
+let canvas = null;
+
+document.addEventListener("DOMContentLoaded",function () {
+
+
+	     // Create the paint area. The id in the constructor must be
+	     // an existing DIV
+		 canvas = new draw2d.Canvas("gfx_holder");
+
+	     // create and add two nodes which contains Ports (In and OUT)
+	     //
+         let len_shared_variables = document.getElementById("len_shared_variables").innerHTML;
+         var i;
+         let s = 1;
+         let e = 150;
+         var t = "";
+         for (i = 0; i < len_shared_variables; i++) {
+             s = s + 50;
+             e = e + 100;
+             t = "element" + i;
+             let start = new draw2d.shape.node.Start({x:s, y:e, text: t});
+             let end   = new draw2d.shape.node.End({x:430, y:150, text: t});
+             canvas.add( start);
+             canvas.add( end);
+             var c = new draw2d.Connection({
+                 sourceDecorator: new draw2d.decoration.connection.BarDecorator(),
+                 targetDecorator: new draw2d.decoration.connection.DiamondDecorator(),
+                 source: start.getOutputPort(0),
+                 target:end.getInputPort(0)
+             });
+             canvas.add(c);
+         }
+		 // let start = new draw2d.shape.node.Start({x:50, y:250});
+		 // let end   = new draw2d.shape.node.End({x:430, y:150});
+         //
+		 // // ...add it to the canvas
+		 // canvas.add( start);
+		 // canvas.add( end);
+         //
+		 // // Create a Connection and connect the Start and End node
+		 // //
+		 // let c = new draw2d.Connection({
+		 //     sourceDecorator: new draw2d.decoration.connection.BarDecorator(),
+		 //     targetDecorator: new draw2d.decoration.connection.DiamondDecorator(),
+		 //     source: start.getOutputPort(0),
+		 //     target:end.getInputPort(0)
+		 // });
+         //
+		 // // and finally add the connection to the canvas
+		 // canvas.add(c);
+
+	     c.toFront();
+
+		 // Add another source/target/connection combination with
+		 // another connection router
+		 // create and add two nodes which contains Ports (In and OUT)
+	     //
+		 start = new draw2d.shape.node.Start({x:50, y:450});
+		 end   = new draw2d.shape.node.End({x:430, y:350});
+		 canvas.add( start);
+		 canvas.add( end);
+
+		 c = new draw2d.Connection({
+		     router:new draw2d.layout.connection.DirectRouter(),
+             sourceDecorator: new draw2d.decoration.connection.BarDecorator(),
+             targetDecorator: new draw2d.decoration.connection.DiamondDecorator(),
+             source: start.getOutputPort(0),
+             target:end.getInputPort(0)
+		 });
+		 canvas.add(c);
+
+		 /////////////////////////////////////////////////////////////////////
+		 // THIS IS ONLY FOR THE ARROW AND THE POST-IT
+		 /////////////////////////////////////////////////////////////////////
+
+		 let msg = new draw2d.shape.note.PostIt({text:"Add to the standard connector some endpoint decorations."});
+		 canvas.add(msg, 20,20);
+
+		 $("body").scrollTop(0)
+		          .scrollLeft(0);
+});
+
+</script>
+</html>

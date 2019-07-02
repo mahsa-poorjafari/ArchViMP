@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% load bootstrap4 %}
+{% load staticfiles %}
+<html lang="en">
+<head>
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+    <link href="{% static 'css/global.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
+<!--    <script src="{% static 'js/jquery.html-svg-connect.js'%} "></script>-->
+    <script src="{% static 'js/go-debug.js'%} "></script>
+    <script src="{% static 'js/global.js'%} "></script>
+    <meta charset="UTF-8">
+    <title>HomePage</title>
+</head>
+<body onload="init()">
+    {% include "main_menu.html" %}
+    <div class="content container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="myDiagramDiv" style="width:400px; height:150px; background-color: #DAE4E4;"></div>
+</div>
+        </div>
+    </div>
+
+</body>
+<script>
+    function init() {
+            var $ = go.GraphObject.make;
+            var myDiagram =  $(go.Diagram, "myDiagramDiv",
+                {
+                    "undoManager.isEnabled": true // enable Ctrl-Z to undo and Ctrl-Y to redo
+                });
+
+            // in the model data, each node is represented by a JavaScript object:
+            var nodeDataArray = [
+                { key: "Alpha" },
+                { key: "Beta" },
+                { key: "Gamma" }
+            ];
+            var linkDataArray = [
+                { to: "Alpha", from:"Beta"  },
+                { to: "Gamma", from:"Beta"  }
+
+            ]
+            myDiagram.model = new go.GraphLinksModel(nodeDataArray,linkDataArray);
+        }
+</script>
+</html>

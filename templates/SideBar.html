@@ -1,0 +1,38 @@
+<div class="wrapper content col-md-2" style="overflow-wrap: break-word;">
+    <!-- Sidebar  -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>Further Info</h3>
+            <strong>FI</strong>
+        </div>
+
+        <ul class="list-unstyled components">
+            <li class="active">
+                <a href="#shared_variables" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fas fa-memory"></i>
+                    Shared Variables
+                    <span>( {{ shared_variables|length }} )</span>
+                </a>
+                <ul class="collapse list-unstyled" id="shared_variables">
+                    {% for v in shared_variables %}
+                        <li>{{v}}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fas fa-dice-d20"></i>
+                    Threads
+                    <span>( {{ thread_ids|length }} )</span>
+                </a>
+
+                <ul class="collapse list-unstyled" id="pageSubmenu">
+                    {% for t in thread_ids %}
+                        <li>{{ t }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+
+    </nav>
+</div>

@@ -1,0 +1,116 @@
+<!-- Sidebar Holder -->
+<nav id="sidebar" >
+
+    <div class="sidebar-header row">
+        <h3>Interactive Visualization</h3>
+        <strong>IV</strong>
+
+    </div>
+
+    <ul class="list-unstyled components">
+        <li class="active row">
+            <a href="" >
+                <i class="fa fa-home col-2" aria-hidden="true"></i>
+                <span class="col-9"> Dashboard </span>
+            </a>
+        </li>
+        <li class="row">
+            <a href="/#" >
+                <i class="fa fa-upload col-2"></i>
+                <span class="col-9"> Upload Trace </span>
+
+            </a>
+        </li>
+        <li class="row">
+            <a href="#">
+                <i class="fa fa-upload col-2"></i>
+                <span class="col-9"> Upload Code Block Trace </span>
+
+            </a>
+        </li>
+        <li class="row">
+            <a href="#">
+                <i class="fa fa-upload col-2"></i>
+                <span class="col-9"> Upload Code </span>
+
+            </a>
+        </li>
+        <li class="row">
+            <a href="#">
+                <i class="fa fa-upload col-2"></i>
+                <span class="col-9"> Upload Execution Path </span>
+
+            </a>
+        </li>
+        <li class="row">
+            <a href="#">
+                <i class="fa fa-upload col-2"></i>
+                <span class="col-9"> Upload Non-Execution Path </span>
+
+            </a>
+        </li>
+        <li class="row">
+            <a href="#">
+                <i class="fa fa-upload col-2"></i>
+                <span class="col-9"> Upload Shared Var Trace </span>
+
+            </a>
+        </li><hr/>
+
+        <li class="row">
+            <a href="#">
+                <!-- <i class="glyphicon glyphicon-chevron-down"></i> -->
+                <i class="fa fa-cogs col-2 " ></i>
+                <span class="col-9"> Trace Vis.</span>
+
+
+            </a>
+        </li><hr/>
+        <li class="row traceVisCollapse">
+            <a href="#SubViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
+                <i class="fa fa-window-restore col-2" aria-hidden="true"></i>
+                <span class="col-6"> Sub Views</span>
+                <i class="fa fa-chevron-down col-1 submenu-arrow" aria-hidden="true"></i>
+
+            </a>
+            <ul class="collapse list-unstyled components" id="SubViewsSubmenu">
+                <li class="row">
+                    <a  href="Logical_Data_L0">
+                        <span class="col-12"> Logical Data (Level 0)</span>
+                    </a>
+                </li>
+                <li class="row">
+                    <a  href="Logical_Data_L1">
+                        <span class="col-12"> Logical Data (Level 1)</span>
+                    </a>
+                </li>
+                <li class="row">
+                    <a  href="logical_comp">
+                        <span class="col-12"> Logical Component (Level 0)</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="row traceVisCollapse">
+            <a href="#MainViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
+                <i class="fa fa-window-maximize col-2" aria-hidden="true"></i>
+                <span class="col-6"> Main Views</span>
+                <i class="fa fa-chevron-down col-1 submenu-arrow" aria-hidden="true"></i>
+            </a>
+              <ul class="collapse list-unstyled components" id="MainViewsSubmenu">
+                  <li class="row">
+                      <a href="#">
+                          <span class="col-12"> Time Line View</span>
+
+                      </a>
+                  </li>
+                  <li class="row">
+                      <a  href="#">
+                          <span class="col-12"> Structure View</span>
+
+                      </a>
+                  </li>
+              </ul>
+        </li>
+    </ul>
+</nav>

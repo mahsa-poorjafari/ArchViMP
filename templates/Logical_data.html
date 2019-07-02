@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="col-md-12" id="svgContainer">
+        <h3>Logical Data Sub Views</h3>
+        <div class="col-md-12 well" id="Logical_data">
+            <h4> Logical Data</h4>
+            <div class="func_notation">
+                {% for f in function_names %}
+                    <span id="func_{{forloop.counter}}">{{f}}</span>
+                {% endfor %}
+            </div>
+
+        </div>
+        <div class="col-md-12 well" id="tech_data">
+            <h4>Technical Data</h4>
+            <div class="var_notation">
+                {% for v in shared_variables %}
+                    <span id="var_{{forloop.counter}}">{{v}} </span>
+                {% endfor %}
+                {% for k,v in shared_struct.items %}
+                    <div id="struct_{{forloop.counter}}" name="{{k}}">{{k}}
+                    <p>
+                        {% for i in v %}
+                            <span id="struct_var{{forloop.counter}}" class="struct_var {{k}}">{{i}} </span>
+                        {% endfor %}
+                    </p></div>
+
+                {% endfor %}
+                </div>
+        </div>
+    </div>
+{% endblock %}

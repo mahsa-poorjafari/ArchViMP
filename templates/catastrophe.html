@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="wrapper content col-md-2" style="overflow-wrap: break-word;">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Further Info</h3>
+                <strong>FI</strong>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="#shared_variables" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-memory"></i>
+                        Shared Variables
+                        <span>( {{ shared_variables|length }} )</span>
+                    </a>
+                    <ul class="collapse list-unstyled action_list" id="shared_variables">
+                        {% for v in shared_variables %}
+                            <li>{{v}}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-dice-d20"></i>
+                        Threads
+                        <span>( {{ thread_ids|length }} )</span>
+                    </a>
+
+                    <ul class="collapse list-unstyled action_list threads" id="pageSubmenu">
+                        {% for t in thread_ids %}
+                            <li>{{ t }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+
+        </nav>
+    </div>
+    <div class="col-md-10">
+        <h3>Overall view - Thread access shared memory</h3>
+        <div class="tabs">
+          <div class="tab-button-outer">
+            <ul id="tab-button">
+              <li><a href="#tab01">Diagram</a></li>
+              <li><a href="#tab02">Textual</a></li>
+            </ul>
+          </div>
+            <div class="tab-select-outer">
+                <select id="tab-select">
+                    <option value="#tab01">Diagram</option>
+                    <option value="#tab02">Textual</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div id="tab01" class="tab-contents">
+            <div class="col-md-12 well" id="catastrophe_diagram"></div>
+        </div>
+        <div id="tab02" class="tab-contents">
+            <div class="col-md-12 well" id="catastrophe_textual">
+                <ul id="var_list" >
+                    {% for vK, vV in t_v_op.items %}
+                        <li class="col-md-3 set_var_id"
+                            style="border-right: solid 1px #337ab7;
+                            border-top: solid 1px #337ab7; word-wrap: break-word">
+                            <span style="font-weight: bold;">{{ vK }}</span>
+                            <ol class="var_child">
+                            {% for tK, tV in vV.items %}
+                                <li>
+                                    <span>{{ tK }}</span>
+                                    <ul class="thr_op">
+                                        {% for opV in tV %}
+                                            <lo>{{ opV }}</lo>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+
+                            {% endfor %}
+                            </ol>
+                        </li>
+
+                    {% endfor %}
+
+
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{% static 'js/catas_dig.js' %}" type="text/javascript"></script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+    {% with thread_ids=thread_ids %}
+    {% with shared_variables=shared_variables %}
+        {% include 'SideBar.html' %}
+    {% endwith %}
+    {% endwith %}
+
+    <div class="col-md-10">
+        <h3>Logical Data Level 0 - Technical Data</h3>
+        <div class="tabs">
+          <div class="tab-button-outer">
+            <ul id="tab-button">
+              <li><a href="#tab01">Diagram</a></li>
+              <li><a href="#tab02">Textual</a></li>
+            </ul>
+          </div>
+            <div class="tab-select-outer">
+                <select id="tab-select">
+                    <option value="#tab01">Diagram</option>
+                    <option value="#tab02">Textual</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div id="tab01" class="tab-contents">
+            <div class="col-md-12 well diagram_container" id="logical_data_l2_diagram"></div>
+        </div>
+        <div id="tab02" class="tab-contents">
+            <div class="col-md-12 well textual_container" id="logical_data_l2_textual">
+                <ul class="shared_struct">
+                    {% for sK, sV in struct_vars.items %}
+                        <li>
+                            <span>{{ sK }}</span>
+                            <ul class="thr_op">
+                                {% for v in sV %}
+                                    <lo>{{ v }} </lo>
+                                {% endfor %}
+                            </ul>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+     </div>
+
+{% endblock %}

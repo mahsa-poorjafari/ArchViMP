@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load bootstrap4 %}
+<!-- This code is for demonstration purposes only.  You should not hotlink to Github, Rawgit, or files from the Cytoscape.js documentation in your production apps. -->
+<html>
+<head>
+    {% bootstrap_css %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <meta charset=utf-8 />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
+    <title>Compound nodes</title>
+    <script src="{% static 'js/cytoscape.min.js' %}"></script>
+</head>
+<body>
+{% include "main_menu.html" %}
+<div id="cy" style="z-index: 100;"></div>
+<div class="col-md-3 well" id="tech_data">
+        <h4>Technical Data</h4>
+        <div class="var_notation" >
+            <ul id="shared_variables" style="visibility: hidden">
+                {% for v in shared_variables %}
+                    <li>{{v}}</li>
+                {% endfor %}
+            </ul>
+            <ul id="shared_struct" style="visibility: hidden">
+                {% for k,v in shared_struct.items %}
+                    <li>{{k}}</li>
+                    <ul id="{{k}}_child">
+                        {% for i in v %}
+                            <lo>{{i}}</lo>
+
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+
+<!-- Load application code at the end to ensure DOM is loaded -->
+<script src="{% static 'js/code.js' %}"></script>
+</body>
+</html>

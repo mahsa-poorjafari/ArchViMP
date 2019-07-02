@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+     <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <h4>Technical Data Level 0 - Shared Variables and their Data Types</h4>
+        </div>
+    </nav>
+
+    <div class="tabs">
+      <div class="tab-button-outer">
+        <ul id="tab-button">
+          <li><a href="#tab01">Diagram</a></li>
+          <li><a href="#tab02">Textual</a></li>
+        </ul>
+      </div>
+        <div class="tab-select-outer">
+            <select id="tab-select">
+                <option value="#tab01">Diagram</option>
+                <option value="#tab02">Textual</option>
+            </select>
+        </div>
+    </div>
+    <div id="tab01" class="tab-contents">
+        <div class="col-md-12 well diagram_container" id="logical_data_l0_diagram"></div>
+    </div>
+    <div id="tab02" class="tab-contents">
+        <div class="col-md-12 well textual_container" id="logical_data_l0_textual">
+            <ul class="shared_struct">
+                {% for sK, sV in data_types.items %}
+                    <hr/>
+                    <li>
+                        <span>{{ sK }}</span>
+                        <ul class="thr_op">
+
+                            {% for v in sV %}
+                                <lo>{{ v }} </lo>
+                            {% endfor %}
+
+                        </ul>
+                    </li>
+
+                {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+
+    <script src="{% static 'js/LD_L0.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+
+
+
+
