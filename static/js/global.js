@@ -62,64 +62,84 @@ function setNodeSize(nodeText, nodeIdStyle){
     return nodeStyle;
 }
 
-function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill ){
+function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill, nthChild){
+    let graphCells = graph.getChildVertices(graph.getDefaultParent());
+    let count = 0;
+    let pX = 1000;
+    let pY =200;
+    let targetName = pNode['value'];
+    // console.log(targetName);
+    if (pNode !== null){
+        pX = pNode['geometry']['x'];
+        pY = pNode['geometry']['y'];
+    }
+    // for (let i = 0 ; i < graphCells.length; i++){
+    //     if (graphCells[i].target !== null && graphCells[i].target['value'] === targetName) {
+    //         pX = graphCells[i]['geometry']['x'];
+    //         pY = graphCells[i]['geometry']['y'];
+    //         count++;
+    //     }else if (pNode !== null){
+    //         pX = pNode['geometry']['x'];
+    //         pY = pNode['geometry']['y'];
+    //     }
+    //
+    // }
+    let Text = element.innerHTML;
+    // console.log("count " + count);
+    let values = [];
+    if (Text.length > 20){
+        console.log("----BigBox-----");
+        values = setLDPositionBig(pX, pY, nthChild);
+    }else{
+        values = setLDPosition(pX, pY, nthChild);
+    }
+    let chX = values[0];
+    let chY = values[1];
+
+    console.log(pNode['value'] + ": " + Text + ":  " + chX +" , "+ chY);
+    let nodeSize = setNodeSize(Text, 'logicalData');
+    nodeStyle(graph, nodeSize['nodeIdText']);
+    let chNode = graph.insertVertex(parent, Text, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+    chNode.target = pNode;
+    graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=' + endArrowShape + ';sourcePerimeterSpacing=0;startFill=0;endFill=' + endArrowFill + ';');
+
+
+}
+
+
+
+function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill, nodeIdStyle ){
     let nodeSize = {};
-    let pX = pNode['geometry']['x'];
-    let pY = pNode['geometry']['y'];
-    let chX = pX;
-    let chY = pY;
+    let pX = 1000;
+    let pY = 200;
+    if (pNode !== null){
+        pX = pNode['geometry']['x'];
+        pY = pNode['geometry']['y'];
+    }
+    // let chX = pX;
+    // let chY = pY;
     for (let j = 0; j < childList.length; j++) {
         let Text = childList[j].innerHTML;
         nodeSize = {};
-        nodeSize = setNodeSize(Text, 'variable' );
+
+        nodeSize = setNodeSize(Text, nodeIdStyle );
+        console.log(nodeSize['nodeIdText']);
         let nodeId = 'var_' + j;
         nodeStyle(graph, nodeSize['nodeIdText']);
-        switch (j) {
-            case 0:
-                chX = pX - 200;
-                chY = pY;
-                break;
-            case 1:
-                chY -= 100;
-                break;
-            case 2:
-                chX = pX - 50;
-                chY = pY - 150;
-                break;
-            case 3:
-                chX = pX + 100;
-                break;
-            case 4:
-                chX = pX + 250;
-                chY = pY - 100;
-                break;
-            case 5:
-                chX = pX + 250;
-                chY = pY;
-                break;
-            case 6:
-                chX = pX + 250;
-                chY = pY + 100;
-                break;
-            case 7:
-                chX = pX + 100;
-                chY = pY + 150;
-                break;
-            case 8:
-                chX = pX - 50;
-                chY = pY + 150;
-                break;
-            case 9:
-                chX = pX - 200;
-                chY = pY + 150;
-                break;
-            default:
-                chX = pX + 100;
-                chY = pY + 100;
-                break;
+        let values = [];
+        if (Text.length > 20){
+            console.log("----BigBox-----");
+            values = setPositionBig(pX, pY, j);
+        }else{
+            values = setPosition(pX, pY, j);
         }
+        let chX = values[0];
+        let chY = values[1];
+
+
         let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-        graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow='+endArrowShape+';sourcePerimeterSpacing=0;startFill=0;endFill='+endArrowFill+';');
+        chNode.target = pNode;
+        graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=' + endArrowShape + ';sourcePerimeterSpacing=0;startFill=0;endFill=' + endArrowFill + ';');
 
     }
 

@@ -4,22 +4,42 @@ from logical_vis.dynamic_analysis import *
 from operator import is_not
 from functools import partial
 import csv
+from django.conf import settings
+from django.utils import timezone
 # Create your views here.
+
+settings.CURRENT_TIME = str(timezone.now()).replace(" ", "")
+print("CURRENT_TIME: ", settings.CURRENT_TIME)
 
 
 def index(request):
+
     return render(request, 'Home.html')
 
+
 def home(request):
+
     return render(request, 'home.html')
 
+
+def write_to_csv_file(data, data_name):
+    print("-----------------write_to_csv_file-------------------")
+    file_name = data_name + '_' + settings.CURRENT_TIME
+    with open('output_csv/' + file_name + '.csv', 'w', encoding='utf-8') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        for key, value in data.items():
+            csv_writer.writerow([key, list(value)])
+    csv_file.close()
+
+
 def get_shared_var_names():
-    with open('logical_vis/shared_variables.txt') as csv_file:
+    with open('logical_vis/shared_variables.txt', 'r') as csv_file:
         csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         var_names = map(lambda var: var[0], csv_reader)
         shared_variables_names = list(var_names)
         # print("Number of Shared Variables: ", shared_variables_names)
+    csv_file.close()
     return shared_variables_names
 
 
@@ -48,7 +68,7 @@ def get_var_struct(shared_vars):
 def get_first_function(t, indx):
 
     print("=========>", t, " - ", indx)
-    with open('logical_vis/PowerWindowRosace.txt') as csv_file:
+    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
         csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         if "Main_" in t:
@@ -60,25 +80,28 @@ def get_first_function(t, indx):
 
         else:
             thread_functioncall_filter = filter(lambda row: row[2] == "FUNCTIONCALL" and row[1] == t
-                                                and (row[5] == "CONSTANT;LOCAL;" or row[5] == "LOCAL;CONSTANT;"),
+                                                            and (row[5] == "CONSTANT;LOCAL;" or row[5] == "LOCAL;CONSTANT;"),
                                                 csv_reader)
-            thread_functioncall_list = list(thread_functioncall_filter)[indx-1]
+            thread_functioncall_list = list(thread_functioncall_filter)[-1]
+            print("list(thread_functioncall_filter)=  ", thread_functioncall_list)
 
-            thread_function= {t: thread_functioncall_list[3]}
-        print(t, "=>  ", thread_function)
-        return thread_function
+            thread_function = {t: thread_functioncall_list[3]}
+    csv_file.close()
+    print(t, "=>  ", thread_function)
+    return thread_function
 
 
 def get_records():
     with open('logical_vis/PowerWindowRosace.txt') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
+    csv_file.close()
     print("csv_reader=>  ", type(csv_reader))
     return csv_reader
 
 
 def get_threads():
     # get_records()
-    with open('logical_vis/PowerWindowRosace.txt') as csv_file:
+    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         main_thread_filter = filter(lambda row: row[2] == "FUNCTIONCALL" and row[3] == "main", csv_reader)
         main_thread_list = list(main_thread_filter)
@@ -92,7 +115,8 @@ def get_threads():
         threads = ['Main_' + item if item == main_thread_id else item for item in thread_list]
         # threads = {"threads": thread_list, "Main": main_thread_id}
         # print(threads)
-        return threads
+    csv_file.close()
+    return threads
 
 
 def thread_per_vars(shared_variables, thread_ids):
@@ -100,7 +124,7 @@ def thread_per_vars(shared_variables, thread_ids):
     thread_op = dict()
     # print("\n shared_variables=> ", shared_variables)
     # print("\n thread_ids=> ", thread_ids)
-    with open('logical_vis/PowerWindowRosace.txt') as csv_file:
+    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
         # csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         for v in shared_variables:
@@ -113,7 +137,8 @@ def thread_per_vars(shared_variables, thread_ids):
                 thread_op.update({t: None if not op_list else op_list})
 
             thread_vars_op.update({v: thread_op})
-        # print("\n => ", thread_vars)
+    csv_file.close()
+    # print("\n => ", thread_vars)
     return thread_vars_op
 
 
@@ -143,7 +168,9 @@ def logical_data_l0(request):
     shared_variables = get_shared_var_names()
     data_types_vars = get_data_types()
     # struct_vars_groups = get_var_struct(shared_variables)
-    # print(struct_vars_groups)
+    # data_types_vars = list(filter(None, data_types_vars))
+    # print("data_types_vars=>  ", data_types_vars)
+    write_to_csv_file(data_types_vars, "data_types_vars")
     # threads = get_threads()
 
     return render(request, 'logical_data_L0.html', {'data_types': data_types_vars,
@@ -152,6 +179,7 @@ def logical_data_l0(request):
 
 def logical_comp(request):
     thread_list = get_threads()
+    print("thread_list=  ", thread_list)
     thr_func_dict = {}
     for indx, t in enumerate(thread_list):
         thr_func = get_first_function(t, indx)
@@ -166,13 +194,14 @@ def logical_data_l1(request):
     shared_variables_names = get_shared_var_names()
     threads = get_threads()
     struct_vars_groups = get_var_struct(shared_variables_names)
-    return render(request, 'logical_data_L1.html', {'shared_variables': shared_variables_names,
-                                                    'thread_ids': threads,
-                                                    'struct_vars': struct_vars_groups})
+    # print("struct_vars_groups   =>  ", struct_vars_groups)
+    write_to_csv_file(struct_vars_groups, "struct_vars")
+    return render(request, 'logical_data_L1.html', {'struct_vars': struct_vars_groups})
 
 
 def logical_data_l2(request):
     shared_variables_names = get_shared_var_names()
+    struct_vars_groups = get_var_struct(shared_variables_names)
     threads = get_threads()
     thread_var_op = {}
 
@@ -188,7 +217,7 @@ def logical_data_l2(request):
                 thread_vars_filter = map(lambda row: [row[3], row[0], row[1], row[2]] if row[3] != '' else None,
                                          thread_vars_filter)
 
-                thread_var_not_none = filter(partial(is_not, None), thread_vars_filter)
+                thread_var_not_none = filter(partial(is_not, None), list(thread_vars_filter))
                 thread_var_list = list(thread_var_not_none)
                 thread_var_op.update({t: thread_var_list})
             csv_file.seek(0, 0)
@@ -198,6 +227,7 @@ def logical_data_l2(request):
             for var in v:
                 if v[0] not in var_order:
                     var_order.append(v[0])
+    csv_file.close()
 
     return render(request, 'logical_data_L2.html', {'shared_variables': shared_variables_names,
                                                     'thread_ids': threads})

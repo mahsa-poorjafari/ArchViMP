@@ -9,8 +9,8 @@
     <div class="tabs">
       <div class="tab-button-outer">
         <ul id="tab-button">
-          <li><a href="#tab01">Diagram</a></li>
-          <li><a href="#tab02">Textual</a></li>
+          <li><a href="#tab01" class="btn-info">Diagram</a></li>
+          <li><a href="#tab02" class="btn-warning">Textual</a></li>
         </ul>
       </div>
         <div class="tab-select-outer">
@@ -29,7 +29,7 @@
         <div class="col-md-12 well textual_container" id="logical_data_l1_textual">
             <ul class="shared_struct">
                 {% for sK, sV in struct_vars.items %}
-                    <hr/>
+
                     <li>
                         <span>{{ sK }}</span>
                         <ul class="thr_op">
@@ -38,6 +38,7 @@
                             {% endfor %}
                         </ul>
                     </li>
+                    <hr/>
 
                 {% endfor %}
             </ul>

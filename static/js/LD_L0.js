@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     main(graphContainer);
 });
 
+
 function main(container){
     // Checks if the browser is supported
     if (!mxClient.isBrowserSupported())
@@ -43,49 +44,47 @@ function main(container){
             let dtY = null;
 
             configEdgeStyle(graph, "#888");
-            let dataTypes = document.getElementById("logical_data_l0_textual").getElementsByClassName("shared_struct")[0].getElementsByTagName("li");
+            let dataTypes = document.getElementById("logical_data_l0_textual").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
             let nodeSize = {};
+            // console.log(dataTypes);
             for (let i = 0; i < dataTypes.length; i++) {
                 let dtId = 'dT'+i;
-                let dtText = dataTypes[i].getElementsByTagName("span")[0].innerHTML;
-                let dtVarList = dataTypes[i].getElementsByTagName("lo");
-                nodeSize = setNodeSize(dtText, 'dataType' );
+                let dtFirstElement = dataTypes[i].firstElementChild;
+                let dtText = dtFirstElement.innerHTML;
+                // let dtText = dataTypes[i].getElementsByTagName("span")[0].innerHTML;
+                let dtStList = dataTypes[i].getElementsByClassName("list_level1")[0].getElementsByClassName('li-list_level1');
 
+                nodeSize = setNodeSize(dtText, 'dataType' );
                 nodeStyle(graph, 'dataType');
-                    if (i === 0){
-                        dtX = 200;
-                        dtY = 150;
+                if (i === 0){
+                    // dtStList.forEach();
+                    dtX = 200;
+                    dtY = 250;
                     }
-                    else if (i !== 0 && dtVarList.length <= 4){
-                        dtX += 500;
-                    }
-                    else if (i !== 0 && dtVarList.length > 4 && (i-1)%2 === 0){
-                        dtX += 700;
+                    else if (i !== 0 && (i-1)%2 === 0){
+                        dtX += 800;
+                        dtY += 200;
                     }else{
                         dtY += 400;
                         dtX = 200;
                     }
-                // stX += 200;
+
                 let dtNode = graph.insertVertex(parent, dtId, dtText, dtX, dtY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                drawChild(graph, parent, dtNode, dtVarList, 'block', '0');
-                // for (let j = 0; j < dtVarList.length; j++) {
-                //     if (j !== 0 && ((j/8)% 1) === 0){
-                //         varH += 100;
-                //         varW = 20;
-                //     }
-                //     let varId = 'dT'+i+'_var'+ j;
-                //     // sharedVarStyle(graph, varId);
-                //     // Specify edges for each data type
-                //
-                //     nodeStyle(graph, 'variable');
-                //     let v = graph.insertVertex(parent, varId, dtVarList[j].innerHTML, varW, varH, 100, 50, 'variable');
-                //     // console.log(i);
-                //
-                //     graph.insertEdge(parent, null, '', v, dt, 'dashed=0;'+
-                //     'endArrow=block;sourcePerimeterSpacing=0;startFill=0;endFill=0;');
-                //     varX +=150;
-                //     varY += 10;
-                // }
+                // let dtStList = dataTypes[i].getElementsByClassName("list_level1")[0].getElementsByClassName('li-list_level1');
+
+                for(let j = 0; j < dtStList.length; j++){
+                    let firstElement = dtStList[j].firstElementChild;
+                    let stText = firstElement.innerHTML;
+
+                    if (stText !== "variables" && stText !== "variables ") {
+                        drawChildLD(graph, parent, dtNode, firstElement, 'block', '0', j);
+                    }else{
+                        let varList = dtStList[j].getElementsByClassName("list_level2")[0].getElementsByTagName("li");
+                        drawChild(graph, parent, dtNode, varList, 'block', '0', 'variable');
+                    }
+
+                }
+
 
             }
 

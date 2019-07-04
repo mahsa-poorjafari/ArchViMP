@@ -1,6 +1,7 @@
 import csv
 from operator import is_not
 from functools import partial
+from logical_vis import views
 
 
 def remove_dups(a_list):
@@ -42,7 +43,11 @@ def get_data_types():
             csv_file.seek(0, 0)
             var_names = map(lambda var: var[3] if var[5] == t else None, csv_reader)
             var_names_not_none = filter(partial(is_not, None), var_names)
+            var_names_not_none = filter(partial(is_not, ''), var_names_not_none)
             var_names = remove_dups(list(var_names_not_none))
-            data_types_vars.update({t: list(var_names)})
-        # print("data_types_vars=> ", data_types_vars)
+            var_list = list(var_names)
+            var_struct_list = views.get_var_struct(var_list)
+            # print(t, "  var_names  ", var_struct_list)
+            data_types_vars.update({t: var_struct_list})
+
     return data_types_vars

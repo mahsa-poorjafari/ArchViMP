@@ -147,7 +147,7 @@ i, span {
     background: #474747;
 }
 #sidebar ul li a i {
-    margin-left: 10px;
+    margin-left: 1em;
 }
 #sidebar ul li a span {font-size: smaller; height: 100%}
 

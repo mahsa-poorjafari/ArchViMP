@@ -47,9 +47,9 @@ function main(container) {
                 if (stText !== "variables") {
                     let stId = 'st' + i;
                     nodeStyle(graph, nodeSize['nodeIdText']);
-                    if (i === 0){
+                    if (i === 0 || i === 1){
                         stX = 200;
-                        stY = 150;
+                        stY = 200;
                     }
                     else if (i !== 0 && structList.length <= 4){
                         stX += 500;
@@ -62,10 +62,12 @@ function main(container) {
                     }
                     // stX += 200;
                     stNode = graph.insertVertex(parent, stId, stText, stX, stY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                    drawChild(graph, parent, stNode, stVarList, 'diamondThin', '1');
+                    drawChild(graph, parent, stNode, stVarList, 'diamondThin', '1', 'variable');
 
                 }else{
                     //varW = 20;
+
+                    drawChild(graph, parent, null, stVarList, 'diamondThin', '1', 'variable');
                 }
 
 

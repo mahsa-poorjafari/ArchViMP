@@ -16,8 +16,8 @@
       </div>
         <div class="tab-select-outer">
             <select id="tab-select">
-                <option value="#tab01">Diagram</option>
-                <option value="#tab02">Textual</option>
+                <option value="#tab01" class="shadow-sm rounded">Diagram</option>
+                <option value="#tab02" class="shadow-sm rounded">Textual</option>
             </select>
         </div>
     </div>
@@ -26,19 +26,25 @@
     </div>
     <div id="tab02" class="tab-contents">
         <div class="col-md-12 well textual_container" id="logical_data_l0_textual">
-            <ul class="shared_struct">
-                {% for sK, sV in data_types.items %}
-                    <hr/>
-                    <li>
-                        <span>{{ sK }}</span>
-                        <ul class="thr_op">
-
-                            {% for v in sV %}
-                                <lo>{{ v }} </lo>
+            <ul class="list_level0">
+                {% for dK, dV in data_types.items %}
+                    <li class="li-list_level0">
+                        <span>{{ dK }}</span>
+                        <ul class="list_level1">
+                            {% for sK, sV in dV.items %}
+                                <li class="li-list_level1">
+                                    <span>{{ sK }} </span>
+                                    <ul class="list_level2">
+                                        {% for v in sV %}
+                                            <li class="li-list_level2">{{ v }} </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
                             {% endfor %}
 
                         </ul>
                     </li>
+                    <hr/>
 
                 {% endfor %}
             </ul>
