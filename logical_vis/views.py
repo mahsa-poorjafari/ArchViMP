@@ -253,9 +253,27 @@ def logical_data_l2(request):
 
             # print("\n thread_vars_list =>  ", thread_var_dict)
             print("Thread \n", t_id, "...", fV, "  -----  ", len(thread_var_dict))
-            # print(thread_var_op)
-
     csv_file.close()
-
+    # print("thread_var_op =>>  ", thread_var_op)
+    ld_l2_group = {}
+    group_members = []
+    group_name = "Input_"
+    for ldK, ldvV in thread_var_op.items():
+        if not ld_l2_group:
+            group_name += ldK
+            group_members.append({k for k, v in ldvV.items()})
+            # print("group_members---  ", group_members)
+            ld_l2_group.update({group_name: group_members})
+        else:
+            group_name += "-" + ldK
+            print("\n ---------------group_name-----------------", group_name)
+            print("group_members---  ", group_members)
+            print("\n ld_l2_group---  ", ld_l2_group)
+            a = {k if str(group_members) == str(v) else None for k, v in ld_l2_group.items()}
+            print("---------------a-----------------", a)
+            # b = ld_l2_group.pop({k: if group_members == ld_l2_group[k] else None for k in ld_l2_group})
+            b = {k if group_members == ld_l2_group[k] else None for k in ld_l2_group}
+            print("-----------------b---------------", b)
+            # ld_l2_group[group_name]
     return render(request, 'logical_data_L2.html', {'thread_var_op': thread_var_op,
                                                     'benchmark_name': benchmark_name})
