@@ -1,0 +1,8 @@
+INT;LOCAL;,"['wp', 'variables']"
+DOUBLE;CONSTANT;,"['Va_control_50', 'engine', 'variables', 'Vz_filter_100']"
+DOUBLE;LOCAL;,['variables']
+POINTER;POINTER;,"['variables', 'run_rosace']"
+POINTER;,['variables']
+INT;CONSTANT;,"['delta_th_c0_fun', 'variables', 'Vz_filter_100452_fun', 'Va_c0_fun', 'engine486_fun', 'ROSACE_write_outputs', 'Vz_filter_100', 'Va_control_50474_fun']"
+POINTER;CONSTANT;,['variables']
+POINTER;LOCAL;,"['variables', 'wp', 'struct']"

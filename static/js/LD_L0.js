@@ -76,6 +76,7 @@ function main(container){
                     let firstElement = dtStList[j].firstElementChild;
                     let stText = firstElement.innerHTML;
 
+
                     if (stText !== "variables" && stText !== "variables ") {
                         drawChildLD(graph, parent, dtNode, firstElement, 'block', '0', j);
                     }else{

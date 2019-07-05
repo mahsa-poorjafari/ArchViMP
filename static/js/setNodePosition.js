@@ -220,3 +220,21 @@ function setLDPositionBig(pX, pY, switchVar) {
 
     return [chX, chY];
 }
+
+
+function setPositionVars(pX, pY, j) {
+    let chX = pX;
+    let chY = pY;
+    if (j === 0){
+        chX = 0;
+        chY = pY;
+    }
+    else if (j%6 === 0){
+        chX = 0;
+        chY = chY + 250;
+    }else {
+        chX = chX + 250;
+        chY = pY;
+    }
+    return [chX, chY];
+}

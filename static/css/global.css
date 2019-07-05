@@ -102,6 +102,12 @@
   max-width: 640px;
   padding: 0 20px;
 }
+.tabs.three-tabs {
+    max-width: 800px;
+    padding: 0 20px;}
+.tabs.four-tabs {
+    max-width: 1000px;
+    padding: 0 20px;}
 #tab-button {
   display: table;
   table-layout: fixed;
@@ -168,8 +174,8 @@
     margin-top: 0;
   }
 }
-.textual_container ul{
-    list-style-type: disc;
+.textual_container ul.list_level0{
+    list-style-type: number;
     margin-left: 0; padding-left: 1em;
 }
 .textual_container ul.list_level1{

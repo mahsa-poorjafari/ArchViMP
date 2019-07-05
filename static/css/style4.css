@@ -149,7 +149,7 @@ i, span {
 #sidebar ul li a i {
     margin-left: 1em;
 }
-#sidebar ul li a span {font-size: smaller; height: 100%}
+#sidebar ul li a span {font-size: smaller; height: 100%; padding-top: 1.5em;}
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
     color: #fff;
@@ -157,6 +157,17 @@ i, span {
 }
 #sidebar .navbar-header  {text-align: right}
 #sidebar .navbar-header button#sidebarCollapse {border-radius: 0; text-align: center}
+#sidebar .row i.benchmark-icon {color: #17a2b8}
+
+#sidebar.active li.traceVisCollapse span.fix-height {height: 10px}
+
+#sidebar .dynamic-size span{text-align: left; padding:1em; margin-left: 2em}
+#sidebar .dynamic-size .traceVisCollapse span,
+#sidebar .dynamic-size .traceVisCollapse i{ margin-left: 0}
+#sidebar.active .dynamic-size span{padding: 0.5em; text-align: left; width: 70%}
+#sidebar.active .dynamic-size .traceVisCollapse span,
+#sidebar.active .dynamic-size .traceVisCollapse i{margin-left: 0; width: 70%}
+#sidebar .dynamic-size .traceVisCollapse .dynamic-size{margin-left: 2em; width: 70%}
 
 a[data-toggle="collapse"] {
     position: relative;
@@ -216,6 +227,8 @@ a.article, a.article:hover {
     padding: 20px;
     min-height: 100vh;
     transition: all 0.3s;
+    min-width: 1600px;
+    max-width: 1600px;
 }
 #content .tg-btn-menu {position: absolute;top: 1.5em;z-index: 1; border-radius: 0; left: 60px; transition: all 0.3s;}
 #content .tg-btn-menu.opened {left: 210px; }

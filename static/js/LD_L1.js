@@ -33,7 +33,7 @@ function main(container) {
 
             configEdgeStyle(graph, "#000000");
 
-            let structList = document.getElementById("logical_data_l1_textual").getElementsByClassName("shared_struct")[0].getElementsByTagName("li");
+            let structList = document.getElementById("logical_data_l1_textual").getElementsByClassName("list_level0")[0].getElementsByTagName("li");
             // console.table(structList);
             let stNode = null;
             let nodeSize = {};
@@ -49,7 +49,7 @@ function main(container) {
                     nodeStyle(graph, nodeSize['nodeIdText']);
                     if (i === 0 || i === 1){
                         stX = 200;
-                        stY = 200;
+                        stY = 300;
                     }
                     else if (i !== 0 && structList.length <= 4){
                         stX += 500;

@@ -1,0 +1,72 @@
+<!-- Sidebar subnav for Benchmarks Holder -->
+<li class="row traceVisCollapse l1">
+    <a href="#{{ href_id }}SubViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
+        <i class="fa fa-window-restore col-2 benchmark-icon" aria-hidden="true"></i>
+        <span class="col-6 mv-title"> Sub Views</span>
+        <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
+
+    </a>
+    <ul class="collapse list-unstyled components dynamic-size" id="{{ href_id }}SubViewsSubmenu">
+        <li class="row">
+            <a  href="Logical_Data_L0?b={{ href_id }}">
+                <span class="col-12"> Logical Data (Level 0)</span>
+            </a>
+        </li>
+        <li class="row">
+            <a  href="Logical_Data_L1?b={{ href_id }}">
+                <span class="col-12"> Logical Data (Level 1)</span>
+            </a>
+        </li>
+        <li class="row">
+            <a  href="Logical_Data_L2?b={{ href_id }}">
+                <span class="col-12"> Logical Data (Level 2) - I</span>
+            </a>
+        </li>
+        <li class="row">
+            <a  href="Logical_Data_L2?b={{ href_id }}">
+                <span class="col-12"> Logical Data (Level 2) - O</span>
+            </a>
+        </li>
+        <li class="row">
+            <a  href="Logical_Data_L2?b={{ href_id }}">
+                <span class="col-12"> Logical Data (Level 2) - P</span>
+            </a>
+        </li>
+        <li class="row">
+            <a  href="logical_comp?b={{ href_id }}">
+                <span class="col-12"> Logical Component (Level 0)</span>
+            </a>
+        </li>
+    </ul>
+</li>
+<li class="row traceVisCollapse l1">
+    <a href="#MainViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
+        <i class="fa fa-window-maximize col-2 benchmark-icon" aria-hidden="true"></i>
+        <span class="col-6 mv-title"> Main Views</span>
+        <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
+
+    </a>
+    <ul class="collapse list-unstyled components dynamic-size" id="MainViewsSubmenu">
+          <li class="row">
+              <a href="#">
+                  <span class="col-12"> Time Line View</span>
+
+              </a>
+          </li>
+          <li class="row">
+              <a  href="#">
+                  <span class="col-12"> Structure View</span>
+
+              </a>
+          </li>
+      </ul>
+</li>
+<li class="row traceVisCollapse l1">
+    <a href="catastrophe?b={{ href_id }}" >
+        <i class="fas fa-draw-polygon col-2 benchmark-icon" aria-hidden="true"></i>
+        <span class="col-9"> Raw Vis.</span>
+
+
+    </a>
+
+</li>

@@ -3,6 +3,7 @@
 {% block content %}
      <nav class="navbar navbar-default">
         <div class="container-fluid">
+            <h2>{{ benchmark_name }} Benchmark</h2>
             <h4>Logical Data Level 0 - Technical Data</h4>
         </div>
     </nav>
@@ -27,7 +28,7 @@
     </div>
     <div id="tab02" class="tab-contents">
         <div class="col-md-12 well textual_container" id="logical_data_l1_textual">
-            <ul class="shared_struct">
+            <ul class="list_level0">
                 {% for sK, sV in struct_vars.items %}
 
                     <li>

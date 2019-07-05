@@ -63,13 +63,18 @@
                 $('#sidebar').toggleClass('active');
                 $(this).toggleClass('opened');
                 $(this).find('.fa').toggleClass('fa-angle-double-right');
-                $('.traceVisCollapse span.mv-title').toggleClass('col-6');
+                $('.traceVisCollapse span.mv-title').toggleClass('col-9');
+                $('.traceVisCollapse span.mv-title').toggleClass('fix-height');
             });
 
-            $('.traceVisCollapse').on('click', function () {
+            $('.traceVisCollapse.l0').on('click', function () {
                 $(this).find('.submenu-arrow').toggleClass('fa-chevron-up');
-
             });
+            $('.traceVisCollapse.l0 .traceVisCollapse.l1').on('click', function () {
+                $(this).find('.submenu-l1-arrow').toggleClass('fa-chevron-up');
+            });
+
+
         });
     </script>
 </body>
