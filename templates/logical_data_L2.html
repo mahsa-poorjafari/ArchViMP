@@ -32,7 +32,28 @@
         <div class="col-md-12 well diagram_container" id="logical_data_l2_Grouped"></div>
     </div>
     <div id="tab02" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l2_txt_Grouped"></div>
+        <div class="col-md-12 well diagram_container" id="logical_data_l2_txt_Grouped">
+            <ul class="list_level0">
+                {% for ldK, ldV in ld_input_lc.items %}
+                    <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
+                        <span>{{ ldK }}</span>
+                        <ul class="list_level1">
+                            {% for vK, vV in ldV.items %}
+                                <li class="li-list_level1">
+                                    <span>{{ vK }} </span>
+
+                                    <ul class="list_level2">
+                                        {% for v in vV %}
+                                            <li class="li-list_level2">{{ v }} </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
     <div id="tab03" class="tab-contents">
         <div class="col-md-12 well diagram_container" id="logical_data_l2_diagram"></div>

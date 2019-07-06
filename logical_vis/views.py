@@ -250,30 +250,34 @@ def logical_data_l2(request):
             # remove duplicate rows
             thread_var_dict = {i[0]: [i[1], i[2], i[3], i[4]] for i in thread_vars_list}
             thread_var_op.update({fV: thread_var_dict})
-
-            # print("\n thread_vars_list =>  ", thread_var_dict)
-            print("Thread \n", t_id, "...", fV, "  -----  ", len(thread_var_dict))
     csv_file.close()
-    # print("thread_var_op =>>  ", thread_var_op)
     ld_l2_group = {}
-    group_members = []
-    group_name = "Input_"
-    for ldK, ldvV in thread_var_op.items():
+    a = []
+
+    for lc, ld_vars in thread_var_op.items():
+        lc_list = []
+        lc_members = {k for k in ld_vars}
+        print("================================")
+        del a[:]
         if not ld_l2_group:
-            group_name += ldK
-            group_members.append({k for k, v in ldvV.items()})
-            # print("group_members---  ", group_members)
-            ld_l2_group.update({group_name: group_members})
+            group_name = "Input_" + lc
+            lc_list.append(lc)
+            ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+
         else:
-            group_name += "-" + ldK
-            print("\n ---------------group_name-----------------", group_name)
-            print("group_members---  ", group_members)
-            print("\n ld_l2_group---  ", ld_l2_group)
-            a = {k if str(group_members) == str(v) else None for k, v in ld_l2_group.items()}
-            print("---------------a-----------------", a)
-            # b = ld_l2_group.pop({k: if group_members == ld_l2_group[k] else None for k in ld_l2_group})
-            b = {k if group_members == ld_l2_group[k] else None for k in ld_l2_group}
-            print("-----------------b---------------", b)
-            # ld_l2_group[group_name]
+            a = list({k if lc_members == v['group_members'] else None for k, v in ld_l2_group.items()})
+            a_avoid_none = list(filter(partial(is_not, None), a))
+            if len(a_avoid_none) != 0:
+                group_name = str(a_avoid_none[0]) + "-" + lc
+                ld_l2_group[group_name] = ld_l2_group.pop(a_avoid_none[0])
+                ld_l2_group[group_name]['logical_components'].append(lc)
+            else:
+                group_name = "Input_" + lc
+                lc_list.append(lc)
+                ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+
+    print("ld_l2_group----->   \n", ld_l2_group)
+
     return render(request, 'logical_data_L2.html', {'thread_var_op': thread_var_op,
-                                                    'benchmark_name': benchmark_name})
+                                                    'benchmark_name': benchmark_name,
+                                                    'ld_input_lc': ld_l2_group})

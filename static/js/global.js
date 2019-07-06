@@ -48,9 +48,14 @@ function setNodeSize(nodeText, nodeIdStyle){
     let Height = null;
     if (nodeText.length > 20){
         nodeIdText = nodeIdStyle + '_big';
-        Width = 235 ;
-        Height = 125;
-    }else if (nodeIdStyle === 'LogicalComp'){
+        if(nodeIdStyle.search(/_R/)){
+            Width = 300 ;
+            Height = 150;
+        }else{
+            Width = 235 ;
+            Height = 125;
+        }
+    }else if (nodeIdStyle === 'LogicalComp' || nodeIdStyle.search(/_R/)){
         nodeIdText = nodeIdStyle;
         Width = 150 ;
         Height = 100;
@@ -80,7 +85,7 @@ function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill,
     // console.log("count " + count);
     let values = [];
     if (Text.length > 20){
-        console.log("----BigBox-----");
+
         values = setLDPositionBig(pX, pY, nthChild);
     }else{
         values = setLDPosition(pX, pY, nthChild);
@@ -88,7 +93,6 @@ function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill,
     let chX = values[0];
     let chY = values[1];
 
-    console.log(pNode['value'] + ": " + Text + ":  " + chX +" , "+ chY);
     let nodeSize = setNodeSize(Text, 'logicalData');
     nodeStyle(graph, nodeSize['nodeIdText']);
     let chNode = graph.insertVertex(parent, Text, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
@@ -96,6 +100,22 @@ function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill,
     graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=' + endArrowShape + ';sourcePerimeterSpacing=0;startFill=0;endFill=' + endArrowFill + ';');
 
 
+}
+
+function drawLcForLd(graph, parent, ldNode, childList) {
+    let nodeSize = {};
+    let chX = 600;
+    let chY = 50;
+    for (let j=0; j< childList.length; j++){
+        let nodeId = 'LD_L2' + j;
+        let Text = childList[j].innerHTML;
+        nodeSize = setNodeSize(Text, 'LogicalComp');
+        nodeStyle(graph, 'LogicalComp');
+        let lcNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        lcNode.source = ldNode;
+        graph.insertEdge(parent, null, null, ldNode, lcNode , 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+        chY += 200;
+    }
 }
 
 function drawChildThrOP(graph, parent, pNode, childList){
@@ -133,21 +153,11 @@ function drawChildThrOP(graph, parent, pNode, childList){
         let Text = childList[j].firstElementChild.innerHTML;
 
         let elementType = childList[j].getElementsByClassName('list_level2')[0].getElementsByTagName('li')[3].innerHTML;
-        // let CurrentNodeStyle = elementType;
 
         elementType = elementType.replace(/ /g,'') + "_R";
-        // let values = [];
-        // if (Text.length > 20){
-        //
-        //     values = setPositionBig(pX, pY, j);
-        // }else{
-        //     values = setPosition(pX, pY, j);
-        // }
-        // chX = values[0];
-        // chY = values[1];
+
         nodeSize = setNodeSize(Text, elementType );
         let nodValues = Object.keys(nodes);
-        console.log(nodValues);
         nodeStyle(graph, nodeSize['nodeIdText']);
         let chNode = null;
 
@@ -164,7 +174,6 @@ function drawChildThrOP(graph, parent, pNode, childList){
             chX += 200;
         }
 
-        console.log("Text: "+ Text +"   chX--- " + chX + "  chY---  " + chY);
         if ( !nodValues.includes(Text)){
             chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
             chNode.target = pNode;
@@ -177,7 +186,6 @@ function drawChildThrOP(graph, parent, pNode, childList){
     }
 
 }
-
 
 function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill, nodeIdStyle ){
     let nodeSize = {};
@@ -205,7 +213,6 @@ function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill,
         let values = [];
         if (pNode !== null){
             if (Text.length > 20){
-                console.log("----BigBox-----");
                 values = setPositionBig(pX, pY, j);
             }else{
                 values = setPosition(pX, pY, j);
@@ -216,8 +223,6 @@ function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill,
             values = setPositionVars(chX, chY, j);
             chX = values[0];
             chY = values[1];
-            console.log(Text);
-            console.log("j:" + j + "    X:" + chX + "   Y:" + chY);
         }
         let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         chNode.target = pNode;
