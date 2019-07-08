@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let graphGroupContainer = document.getElementById('logical_data_l2_Grouped');
-    mainGrouped(graphGroupContainer);
+    let graphContainer = document.getElementById('logical_data_l2_diagram');
+    main(graphContainer);
 });
 
 
-function mainGrouped(container) {
+function main(container){
     // Checks if the browser is supported
     if (!mxClient.isBrowserSupported())
     {
@@ -35,42 +35,41 @@ function mainGrouped(container) {
 
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
-        try {
-            console.log("---mainGrouped-----");
-            let lcX = 50;
+
+        try
+        {
+
+            let lcX = 600;
             let lcY = 50;
 
             configEdgeStyle(graph, "#000000");
             let eStyle = graph.getStylesheet().getDefaultEdgeStyle();
             eStyle['endSize'] = '5';
-            let lcs = document.getElementById("logical_data_l2_txt_Grouped").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
-
-            console.log(lcs);
+            let lcs = document.getElementById("logical_data_l2_textual").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
             let nodeSize = {};
             for (let i = 0; i < lcs.length; i++) {
                 let lcId = 'LC' + i;
                 let lcFirstElement = lcs[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
-                console.log(lcText);
-                nodeSize = setNodeSize(lcText, 'logicalData_R');
 
                 let lcAccessList = lcs[i].getElementsByClassName("list_level1")[0].getElementsByClassName('li-list_level1');
-                let lcList = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
-                nodeStyle(graph,  nodeSize['nodeIdText']);
+
+                nodeSize = setNodeSize(lcText, 'LogicalComp');
+                nodeStyle(graph, 'LogicalComp');
                 lcY += 300;
 
-                let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                drawLcForLd(graph, parent, ldNode, lcList)
+                let lcNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                // let stText = varList;
+                drawChildThrOP(graph, parent, lcNode, lcAccessList);
 
             }
 
-
-        }finally{
+        }
+        finally
+        {
             // Updates the display
             graph.getModel().endUpdate();
         }
 
     }
 }
-
-

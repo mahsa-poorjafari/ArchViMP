@@ -33,4 +33,5 @@ urlpatterns = [
     url(r'catastrophe', views.catastrophe, name='catastrophe'),
     url(r'Logical_Data_L1', views.logical_data_l1, name='Logical_Data_L1'),
     url(r'Logical_Data_L2', views.logical_data_l2, name='Logical_Data_L2'),
+    url(r'LD_L2_unG', views.logical_data_l2_ungrouped, name='logical_data_l2_ungrouped'),
 ]

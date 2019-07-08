@@ -4,24 +4,23 @@
      <nav class="navbar navbar-default">
         <div class="container-fluid">
             <h2>{{ benchmark_name }} Benchmark</h2>
-            <h4>Logical Data Level 2 - Inputs for threads</h4>
+            <h4>Logical Data Level 2</h4>
         </div>
     </nav>
-    <div class="tabs four-tabs">
+    <div class="tabs">
       <div class="tab-button-outer">
         <ul id="tab-button">
-          <li><a href="#tab01" class="btn-info">Diagram - Grouped </a></li>
-          <li><a href="#tab02" class="btn-warning">Textual - Grouped</a></li>
-          <li><a href="#tab03" class="btn-info">Diagram - Ungrouped</a></li>
-          <li><a href="#tab04" class="btn-warning">Textual - Ungrouped</a></li>
+          <li><a href="#tab01" class="btn-info">Input for Threads </a></li>
+          <li><a href="#tab02" class="btn-warning">Output of Threads</a></li>
+          <li><a href="#tab03" class="btn-warning">Processed by Threads</a></li>
+
         </ul>
       </div>
         <div class="tab-select-outer">
             <select id="tab-select">
-                <option value="#tab01">Diagram - Grouped </option>
-                <option value="#tab02">Textual - Grouped</option>
-                <option value="#tab03">Diagram - Ungrouped</option>
-                <option value="#tab04">Textual - Ungrouped</option>
+                <option value="#tab01">Input for Threads </option>
+                <option value="#tab02">Output of Threads</option>
+
 
             </select>
         </div>
@@ -32,60 +31,31 @@
         <div class="col-md-12 well diagram_container" id="logical_data_l2_Grouped"></div>
     </div>
     <div id="tab02" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l2_txt_Grouped">
-            <ul class="list_level0">
-                {% for ldK, ldV in ld_input_lc.items %}
-                    <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
-                        <span>{{ ldK }}</span>
-                        <ul class="list_level1">
-                            {% for vK, vV in ldV.items %}
-                                <li class="li-list_level1">
-                                    <span>{{ vK }} </span>
-
-                                    <ul class="list_level2">
-                                        {% for v in vV %}
-                                            <li class="li-list_level2">{{ v }} </li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+        <p>Output of Threads</p>
     </div>
-    <div id="tab03" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l2_diagram"></div>
+    <div class="col-md-12 well diagram_container"  style="display: none" id="logical_data_l2_txt_Grouped">
+        <ul class="list_level0">
+            {% for ldK, ldV in ld_input_lc.items %}
+                <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
+                    <span>{{ ldK }}</span>
+                    <ul class="list_level1">
+                        {% for vK, vV in ldV.items %}
+                            <li class="li-list_level1">
+                                <span>{{ vK }} </span>
+
+                                <ul class="list_level2">
+                                    {% for v in vV %}
+                                        <li class="li-list_level2">{{ v }} </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
     </div>
-    <div id="tab04" class="tab-contents">
-        <div class="col-md-12 well textual_container" id="logical_data_l2_textual">
-            <ul class="list_level0">
-                {% for tK, tV in thread_var_op.items %}
-                    <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
-                        <span>{{ tK }}</span>
 
-                        <ul class="list_level1">
-                            {% for vK, vV in tV.items %}
-                                <li class="li-list_level1">
-                                    <span>{{ vK }} </span>
-
-                                    <ul class="list_level2">
-                                        {% for v in vV %}
-                                            <li class="li-list_level2">{{ v }} </li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-
-                {% endfor %}
-
-
-            </ul>
-        </div>
-    </div>
 
     <script src="{% static 'js/LD_L2.js' %}" type="text/javascript"></script>
 {% endblock %}

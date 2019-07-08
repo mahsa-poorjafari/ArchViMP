@@ -23,8 +23,12 @@ function nodeStyle(graph, nodeId) {
     style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
     style[mxConstants.STYLE_WHITE_SPACE] = 'wrap';
     style[mxConstants.STYLE_FONTCOLOR] = '#000000';
+    style[mxConstants.FONT_BOLD] = 1;
+    style[mxConstants.STYLE_FONTSTYLE] = mxConstants.FONT_BOLD;
+    style[mxConstants.STYLE_FONTSIZE] = 12;
     style[mxConstants.STYLE_STROKECOLOR] = '#000000';
     style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+    console.table(style);
     graph.getStylesheet().putCellStyle(nodeId, style);
 }
 
