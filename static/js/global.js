@@ -18,17 +18,20 @@ function createLine(x1,y1,x2,y2,lineId) {
 
 function nodeStyle(graph, nodeId) {
     let style = new Object();
+    mxGraph.prototype.cellsEditable = false;
+
     style[mxConstants.STYLE_IMAGE] = '/static/media/Notations/'+ nodeId + '.png';
     style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
     style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
     style[mxConstants.STYLE_WHITE_SPACE] = 'wrap';
     style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-    style[mxConstants.FONT_BOLD] = 1;
-    style[mxConstants.STYLE_FONTSTYLE] = mxConstants.FONT_BOLD;
-    style[mxConstants.STYLE_FONTSIZE] = 12;
+
+    // style[mxConstants.FONT_BOLD] = 1;
+    // style[mxConstants.STYLE_FONTSTYLE] = mxConstants.FONT_BOLD;
+    // style[mxConstants.STYLE_FONTSIZE] = 12;
     style[mxConstants.STYLE_STROKECOLOR] = '#000000';
     style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-    console.table(style);
+
     graph.getStylesheet().putCellStyle(nodeId, style);
 }
 
@@ -106,17 +109,22 @@ function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill,
 
 }
 
-function drawLcForLd(graph, parent, ldNode, childList) {
+function drawLcForLd(graph, parent, ldNode, childList, op) {
     let nodeSize = {};
     let chX = 600;
     let chY = 50;
     for (let j=0; j< childList.length; j++){
-        let nodeId = 'LD_L2' + j;
+        let nodeId = 'LD_L2' + op + '_' + j;
         let Text = childList[j].innerHTML;
         nodeSize = setNodeSize(Text, 'LogicalComp');
         nodeStyle(graph, 'LogicalComp');
         let lcNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         lcNode.source = ldNode;
+        graph.dblClick = function(evt, lcNode){
+            document.getElementById('lc_l1_dig').style.display = "block";
+        };
+
+
         graph.insertEdge(parent, null, null, ldNode, lcNode , 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
         chY += 200;
     }
@@ -131,9 +139,6 @@ function drawChildThrOP(graph, parent, pNode, childList){
     if (pNode !== null){
         pX = pNode['geometry']['x'];
         pY = pNode['geometry']['y'];
-    }else{
-        chX = pX;
-        chY = pY;
     }
     chX = pX - 500;
     chY = pY;

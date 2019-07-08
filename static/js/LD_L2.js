@@ -1,10 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let graphGroupContainer = document.getElementById('logical_data_l2_Grouped');
-    mainGrouped(graphGroupContainer);
+    let graphInGroupContainer = document.getElementById('logical_data_l2_dig_input');
+    let txtInContainer = document.getElementById("logical_data_l2_txt_input");
+    mainGrouped(graphInGroupContainer, txtInContainer, "R");
+
+    let txtOutContainer = document.getElementById("logical_data_l2_txt_output");
+    let graphOutGroupContainer = document.getElementById('logical_data_l2_dig_output');
+    mainGrouped(graphOutGroupContainer, txtOutContainer, "W");
+
+    let txtPContainer = document.getElementById("logical_data_l2_txt_process");
+    let graphPGroupContainer = document.getElementById('logical_data_l2_dig_process');
+    mainGrouped(graphPGroupContainer, txtPContainer, "P");
+
 });
 
 
-function mainGrouped(container) {
+function mainGrouped(container, txt, op) {
     // Checks if the browser is supported
     if (!mxClient.isBrowserSupported())
     {
@@ -43,24 +53,25 @@ function mainGrouped(container) {
             configEdgeStyle(graph, "#000000");
             let eStyle = graph.getStylesheet().getDefaultEdgeStyle();
             eStyle['endSize'] = '5';
-            let lcs = document.getElementById("logical_data_l2_txt_Grouped").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+            let lcs = txt.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
 
-            console.log(lcs);
+
             let nodeSize = {};
             for (let i = 0; i < lcs.length; i++) {
-                let lcId = 'LC' + i;
+                let lcId = 'LC_' + op + '_' + i;
                 let lcFirstElement = lcs[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
                 console.log(lcText);
-                nodeSize = setNodeSize(lcText, 'logicalData_R');
+                nodeSize = setNodeSize(lcText, 'logicalData_' + op);
 
-                let lcAccessList = lcs[i].getElementsByClassName("list_level1")[0].getElementsByClassName('li-list_level1');
+                let lcAccessList = lcs[i].getElementsByClassName("list_level1")[0].getElementsByClassName('logical_components');
                 let lcList = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
                 lcY += 300;
 
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                drawLcForLd(graph, parent, ldNode, lcList)
+
+                drawLcForLd(graph, parent, ldNode, lcList, op)
 
             }
 

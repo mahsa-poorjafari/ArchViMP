@@ -196,7 +196,8 @@ def tech_comp():
     return thread_infos
 
 
-def get_thread_var_op(threads):
+def get_thread_var_op(threads, op):
+    print("get_thread_var_op   =>", op)
     thread_var_op = {}
     thr_func_dict = {}
     for indx, t in enumerate(threads):
@@ -214,9 +215,9 @@ def get_thread_var_op(threads):
                 t_id = tK
 
             # Filter the records onlx for LOAD- inputs
-            thread_vars_filter = filter(lambda row: row[1] == t_id and row[2] in ["LOAD"] and row[3] != '', csv_reader)
+            thread_vars_filter = filter(lambda row: row[1] == t_id and row[2] in op and row[3] != '', csv_reader)
             csv_file.seek(0, 0)
-            thread_vars_filter = map(lambda row: [row[3], row[0], row[1], row[2], row[4]], thread_vars_filter)
+            thread_vars_filter = map(lambda row: [row[3], row[0], row[1], row[2], row[4]], list(thread_vars_filter))
             thread_vars_list = list(thread_vars_filter)
 
             # if it is struct, only show it as logicalData
@@ -229,3 +230,31 @@ def get_thread_var_op(threads):
             thread_var_op.update({fV: thread_var_dict})
     csv_file.close()
     return thread_var_op
+
+
+def create_ld_thread_op(thread_var_op, op):
+    ld_l2_group = {}
+    a = []
+    for lc, ld_vars in thread_var_op.items():
+        lc_list = []
+        lc_members = {k for k in ld_vars}
+        del a[:]
+        if not ld_l2_group:
+            group_name = op + lc
+            lc_list.append(lc)
+            ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+
+        else:
+            a = list({k if lc_members == v['group_members'] else None for k, v in ld_l2_group.items()})
+            a_avoid_none = list(filter(partial(is_not, None), a))
+            if len(a_avoid_none) != 0:
+                group_name = str(a_avoid_none[0]) + "-" + lc
+                ld_l2_group[group_name] = ld_l2_group.pop(a_avoid_none[0])
+                ld_l2_group[group_name]['logical_components'].append(lc)
+            else:
+                group_name = op + lc
+                lc_list.append(lc)
+                ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+
+    return ld_l2_group
+

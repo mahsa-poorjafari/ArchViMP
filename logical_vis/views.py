@@ -78,8 +78,6 @@ def get_var_struct(shared_vars):
     return struct_vars_groups
 
 
-
-
 def get_records():
     with open('logical_vis/PowerWindowRosace.txt') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -197,7 +195,7 @@ def logical_data_l2_ungrouped(request):
     print("\n --------------logical_data_l2_ungrouped--------------- \n")
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
     threads = get_threads()
-    thread_var_op = get_thread_var_op(threads)
+    thread_var_op = get_thread_var_op(threads, ["LOAD"])
     return render(request, 'logical_data_L2_Ungrouped.html', {'thread_var_op': thread_var_op,
                                                               'benchmark_name': benchmark_name})
 
@@ -205,32 +203,22 @@ def logical_data_l2_ungrouped(request):
 def logical_data_l2(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
     threads = get_threads()
-    thread_var_op = get_thread_var_op(threads)
-    ld_l2_group = {}
-    a = []
 
-    for lc, ld_vars in thread_var_op.items():
-        lc_list = []
-        lc_members = {k for k in ld_vars}
-        del a[:]
-        if not ld_l2_group:
-            group_name = "Input_" + lc
-            lc_list.append(lc)
-            ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+    # Get the variables that are threads Input
+    thread_var_input = get_thread_var_op(threads, ["LOAD"])
+    ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
 
-        else:
-            a = list({k if lc_members == v['group_members'] else None for k, v in ld_l2_group.items()})
-            a_avoid_none = list(filter(partial(is_not, None), a))
-            if len(a_avoid_none) != 0:
-                group_name = str(a_avoid_none[0]) + "-" + lc
-                ld_l2_group[group_name] = ld_l2_group.pop(a_avoid_none[0])
-                ld_l2_group[group_name]['logical_components'].append(lc)
-            else:
-                group_name = "Input_" + lc
-                lc_list.append(lc)
-                ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+    # Get the variables that are threads Output
+    thread_var_output = get_thread_var_op(threads, ["STORE"])
+    ld_output_lc = create_ld_thread_op(thread_var_output, "Output_")
 
-    # print("ld_l2_group----->   \n", ld_l2_group)
+    # Get the variables that are threads Processed
+    thread_var_process = get_thread_var_op(threads, ["LOAD", "STORE"])
+    ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
+
+    # print("ld_l2_group----->   \n", ld_process_lc)
 
     return render(request, 'logical_data_L2.html', {'benchmark_name': benchmark_name,
-                                                    'ld_input_lc': ld_l2_group})
+                                                    'ld_input_lc': ld_input_lc,
+                                                    'ld_output_lc': ld_output_lc,
+                                                    'ld_process_lc': ld_process_lc})

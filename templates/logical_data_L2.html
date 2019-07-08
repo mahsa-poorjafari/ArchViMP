@@ -1,25 +1,36 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
-     <nav class="navbar navbar-default">
+     <nav class="navbar navbar-default col-md-12">
         <div class="container-fluid">
             <h2>{{ benchmark_name }} Benchmark</h2>
             <h4>Logical Data Level 2</h4>
         </div>
     </nav>
-    <div class="tabs">
+    <div class="tabs col-md-12">
       <div class="tab-button-outer">
         <ul id="tab-button">
-          <li><a href="#tab01" class="btn-info">Input for Threads </a></li>
-          <li><a href="#tab02" class="btn-warning">Output of Threads</a></li>
-          <li><a href="#tab03" class="btn-warning">Processed by Threads</a></li>
-
+            <div class="tabs col-md-12">
+                <div class="col-md-12 level2">
+                  <li><a href="#tab01" class="btn-info">Input for Threads </a></li>
+                  <li><a href="#tab02" class="btn-info">Output of Threads</a></li>
+                  <li><a href="#tab03" class="btn-info">Processed by Threads</a></li>
+                </div>
+                <div class="col-md-12 level1">
+                  <li id="lc_l1_dig">
+                      <a href="#tab04" class="btn-secondary lc_l1"> Logical Component Level 1 </a>
+                      <i class="far fa-window-close close"></i>
+                  </li>
+                </div>
+            </div>
         </ul>
       </div>
         <div class="tab-select-outer">
             <select id="tab-select">
                 <option value="#tab01">Input for Threads </option>
                 <option value="#tab02">Output of Threads</option>
+                <option value="#tab03">Processed by Threads</option>
+                <option value="#tab04" class="lc_l1">Logical Component Level 1</option>
 
 
             </select>
@@ -28,21 +39,73 @@
 
 
     <div id="tab01" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l2_Grouped"></div>
+        <div class="col-md-12 well diagram_container" id="logical_data_l2_dig_input"></div>
     </div>
     <div id="tab02" class="tab-contents">
-        <p>Output of Threads</p>
+        <div class="col-md-12 well diagram_container" id="logical_data_l2_dig_output"></div>
     </div>
-    <div class="col-md-12 well diagram_container"  style="display: none" id="logical_data_l2_txt_Grouped">
+    <div id="tab03" class="tab-contents">
+        <div class="col-md-12 well diagram_container" id="logical_data_l2_dig_process"></div>
+    </div>
+    <div id="tab04" class="tab-contents">
+        <div class="col-md-12 well diagram_container" id="logical_comp_l1_dig">
+            
+        </div>
+    </div>
+
+
+    <div class="col-md-12 well text_container" style="display: none" id=""></div>
+    <div class="col-md-12 well text_container" style="display: none" id="logical_data_l2_txt_input">
         <ul class="list_level0">
             {% for ldK, ldV in ld_input_lc.items %}
                 <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
                     <span>{{ ldK }}</span>
                     <ul class="list_level1">
                         {% for vK, vV in ldV.items %}
-                            <li class="li-list_level1">
+                            <li class="li-list_level1 {{ vK }}">
                                 <span>{{ vK }} </span>
-
+                                <ul class="list_level2">
+                                    {% for v in vV %}
+                                        <li class="li-list_level2">{{ v }} </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-12 well diagram_container" style="display: none" id="logical_data_l2_txt_output">
+        <ul class="list_level0">
+            {% for ldK, ldV in ld_output_lc.items %}
+                <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
+                    <span>{{ ldK }}</span>
+                    <ul class="list_level1">
+                        {% for vK, vV in ldV.items %}
+                            <li class="li-list_level1 {{ vK }}">
+                                <span>{{ vK }} </span>
+                                <ul class="list_level2">
+                                    {% for v in vV %}
+                                        <li class="li-list_level2">{{ v }} </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-12 well diagram_container" style="display: none" id="logical_data_l2_txt_process">
+        <ul class="list_level0">
+            {% for ldK, ldV in ld_process_lc.items %}
+                <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
+                    <span>{{ ldK }}</span>
+                    <ul class="list_level1">
+                        {% for vK, vV in ldV.items %}
+                            <li class="li-list_level1 {{ vK }}">
+                                <span>{{ vK }} </span>
                                 <ul class="list_level2">
                                     {% for v in vV %}
                                         <li class="li-list_level2">{{ v }} </li>

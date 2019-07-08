@@ -14,6 +14,11 @@ $(document).ready(function(){
         $('#pageSubmenu li').removeClass("hovered");
         $(this).addClass("hovered");
     });
+    $('#tab-button li#lc_l1_dig i.close').click(function () {
+        $('#lc_l1_dig').fadeOut('fast');
+        $('#logical_comp_l1_dig').fadeOut('fast');
+
+    })
 
 });
 
