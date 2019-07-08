@@ -1,8 +1,0 @@
-DOUBLE;CONSTANT;,"['Vz_filter_100', 'variables', 'Va_control_50', 'engine']"
-POINTER;LOCAL;,"['wp', 'struct', 'variables']"
-DOUBLE;LOCAL;,['variables']
-POINTER;,['variables']
-POINTER;POINTER;,"['run_rosace', 'variables']"
-POINTER;CONSTANT;,['variables']
-INT;LOCAL;,"['wp', 'variables']"
-INT;CONSTANT;,"['engine486_fun', 'variables', 'ROSACE_write_outputs', 'Va_c0_fun', 'Vz_filter_100', 'Vz_filter_100452_fun', 'delta_th_c0_fun', 'Va_control_50474_fun']"

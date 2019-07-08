@@ -183,7 +183,7 @@ def logical_data_l0(request):
     # struct_vars_groups = get_var_struct(shared_variables)
     # data_types_vars = list(filter(None, data_types_vars))
     # print("data_types_vars=>  ", data_types_vars)
-    write_to_csv_file(data_types_vars, "data_types_vars")
+    # write_to_csv_file(data_types_vars, "data_types_vars")
     # threads = get_threads()
 
     return render(request, 'logical_data_L0.html', {'data_types': data_types_vars,
@@ -212,7 +212,7 @@ def logical_data_l1(request):
     threads = get_threads()
     struct_vars_groups = get_var_struct(shared_variables_names)
     # print("struct_vars_groups   =>  ", struct_vars_groups)
-    write_to_csv_file(struct_vars_groups, "struct_vars")
+    # write_to_csv_file(struct_vars_groups, "struct_vars")
     return render(request, 'logical_data_L1.html', {'struct_vars': struct_vars_groups,
                                                     'benchmark_name': benchmark_name})
 
