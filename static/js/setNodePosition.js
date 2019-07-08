@@ -231,7 +231,7 @@ function setPositionVars(pX, pY, j) {
     }
     else if (j%6 === 0){
         chX = 0;
-        chY = chY + 250;
+        chY = chY + 100;
     }else {
         chX = chX + 250;
         chY = pY;

@@ -78,30 +78,6 @@ def get_var_struct(shared_vars):
     return struct_vars_groups
 
 
-def get_first_function(t, indx):
-
-    # print("=========>", t, " - ", indx)
-    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
-        csv_file.seek(0, 0)
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        if "Main_" in t:
-            b = t.split('_')
-            thread_functioncall_filter = filter(lambda row: row[2] == "FUNCTIONCALL" and row[1] == b[1]
-                                                , csv_reader)
-            thread_functioncall_list = list(thread_functioncall_filter)[1]
-            thread_function = {t: thread_functioncall_list[3]}
-
-        else:
-            thread_functioncall_filter = filter(lambda row: row[2] == "FUNCTIONCALL" and row[1] == t
-                                                            and (row[5] == "CONSTANT;LOCAL;" or row[5] == "LOCAL;CONSTANT;"),
-                                                csv_reader)
-            thread_functioncall_list = list(thread_functioncall_filter)[-1]
-            # print("list(thread_functioncall_filter)=  ", thread_functioncall_list)
-
-            thread_function = {t: thread_functioncall_list[3]}
-    csv_file.close()
-    print(t, "=>  ", thread_function)
-    return thread_function
 
 
 def get_records():
@@ -217,63 +193,44 @@ def logical_data_l1(request):
                                                     'benchmark_name': benchmark_name})
 
 
+def logical_data_l2_ungrouped(request):
+    print("\n --------------logical_data_l2_ungrouped--------------- \n")
+    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
+    threads = get_threads()
+    thread_var_op = get_thread_var_op(threads)
+    return render(request, 'logical_data_L2_Ungrouped.html', {'thread_var_op': thread_var_op,
+                                                              'benchmark_name': benchmark_name})
+
+
 def logical_data_l2(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
     threads = get_threads()
-    thread_var_op = {}
-    thr_func_dict = {}
-    for indx, t in enumerate(threads):
-        thr_func = get_first_function(t, indx)
-        thr_func_dict.update(thr_func)
-
-    # What I need is: To show the inputs-LD of each threads
-    # For that, I built an dict: {'main function of each thread as the key': [list of variables or structs]}
-    with open('logical_vis/PowerWindowRosace.txt') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for tK, fV in thr_func_dict.items():
-            if "Main_" in tK:
-                t_id = tK.strip("Main_")
-            else:
-                t_id = tK
-
-            # Filter the records onlx for LOAD- inputs
-            thread_vars_filter = filter(lambda row: row[1] == t_id and row[2] in ["LOAD"] and row[3] != '', csv_reader)
-            csv_file.seek(0, 0)
-            thread_vars_filter = map(lambda row: [row[3], row[0], row[1], row[2], row[4]], thread_vars_filter)
-            thread_vars_list = list(thread_vars_filter)
-
-            # if it is struct, only show it as logicalData
-            # need to specify the type of elements
-            thread_vars_list = [[v[0].split(".")[0], v[1], v[2], v[3], "logicalData"] if "." in v[0]
-                                else [v[0], v[1], v[2], v[3], "variable"] for v in thread_vars_list]
-
-            # remove duplicate rows
-            thread_var_dict = {i[0]: [i[1], i[2], i[3], i[4]] for i in thread_vars_list}
-            thread_var_op.update({fV: thread_var_dict})
-
-            # print("\n thread_vars_list =>  ", thread_var_dict)
-            print("Thread \n", t_id, "...", fV, "  -----  ", len(thread_var_dict))
-    csv_file.close()
-    # print("thread_var_op =>>  ", thread_var_op)
+    thread_var_op = get_thread_var_op(threads)
     ld_l2_group = {}
-    group_members = []
-    group_name = "Input_"
-    for ldK, ldvV in thread_var_op.items():
+    a = []
+
+    for lc, ld_vars in thread_var_op.items():
+        lc_list = []
+        lc_members = {k for k in ld_vars}
+        del a[:]
         if not ld_l2_group:
-            group_name += ldK
-            group_members.append({k for k, v in ldvV.items()})
-            # print("group_members---  ", group_members)
-            ld_l2_group.update({group_name: group_members})
+            group_name = "Input_" + lc
+            lc_list.append(lc)
+            ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+
         else:
-            group_name += "-" + ldK
-            print("\n ---------------group_name-----------------", group_name)
-            print("group_members---  ", group_members)
-            print("\n ld_l2_group---  ", ld_l2_group)
-            a = {k if str(group_members) == str(v) else None for k, v in ld_l2_group.items()}
-            print("---------------a-----------------", a)
-            # b = ld_l2_group.pop({k: if group_members == ld_l2_group[k] else None for k in ld_l2_group})
-            b = {k if group_members == ld_l2_group[k] else None for k in ld_l2_group}
-            print("-----------------b---------------", b)
-            # ld_l2_group[group_name]
-    return render(request, 'logical_data_L2.html', {'thread_var_op': thread_var_op,
-                                                    'benchmark_name': benchmark_name})
+            a = list({k if lc_members == v['group_members'] else None for k, v in ld_l2_group.items()})
+            a_avoid_none = list(filter(partial(is_not, None), a))
+            if len(a_avoid_none) != 0:
+                group_name = str(a_avoid_none[0]) + "-" + lc
+                ld_l2_group[group_name] = ld_l2_group.pop(a_avoid_none[0])
+                ld_l2_group[group_name]['logical_components'].append(lc)
+            else:
+                group_name = "Input_" + lc
+                lc_list.append(lc)
+                ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+
+    # print("ld_l2_group----->   \n", ld_l2_group)
+
+    return render(request, 'logical_data_L2.html', {'benchmark_name': benchmark_name,
+                                                    'ld_input_lc': ld_l2_group})

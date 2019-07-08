@@ -18,19 +18,23 @@
             </a>
         </li>
         <li class="row">
-            <a  href="Logical_Data_L2?b={{ href_id }}">
-                <span class="col-12"> Logical Data (Level 2) - I</span>
+            <a  href="#ld_l2_Submenu" data-toggle="collapse" aria-expanded="false">
+                <span class="col-9 mv-title"> Logical Data (Level 2)</span>
+                <i class="fa fa-chevron-down col-1 submenu-l2-arrow benchmark-icon" aria-hidden="true"></i>
             </a>
-        </li>
-        <li class="row">
-            <a  href="Logical_Data_L2?b={{ href_id }}">
-                <span class="col-12"> Logical Data (Level 2) - O</span>
-            </a>
-        </li>
-        <li class="row">
-            <a  href="Logical_Data_L2?b={{ href_id }}">
-                <span class="col-12"> Logical Data (Level 2) - P</span>
-            </a>
+            <ul class="collapse list-unstyled components dynamic-size" id="ld_l2_Submenu">
+                <li class="row">
+                    <a  href="Logical_Data_L2?b={{ href_id }}">
+                        <i class="fas fa-long-arrow-alt-right col-2"></i>
+                        <span class="col-10"> Operation of Threads</span>
+                    </a>
+                    <a  href="LD_L2_unG?b={{ href_id }}">
+                        <i class="fas fa-long-arrow-alt-right col-2"></i>
+                        <span class="col-8"> Ungrouped</span>
+                        <i class="far fa-object-ungroup col-1"></i>
+                    </a>
+                </li>
+            </ul>
         </li>
         <li class="row">
             <a  href="logical_comp?b={{ href_id }}">
