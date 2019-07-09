@@ -129,14 +129,13 @@
 #tab-button li#lc_l1_dig a.lc_l1 {
     background-color: #cccccc;
     color: #1b1b1b;
-
-
 }
 #tab-button li#lc_l1_dig a.lc_l1:hover, #tab-button li#lc_l1_dig.is-active a.lc_l1{
     border-bottom-color: transparent;
     background-color: #5a6268;
     color: #ffffff;
 }
+#tab-button li#lc_l1_dig.is-active i.close{color: #5a6268;}
 
 #tab-button li a {
     display: block;
@@ -184,16 +183,17 @@
     margin-top: 0;
   }
 }
-.textual_container ul.list_level0{
+.text_container ul.list_level0{
     list-style-type: number;
     margin-left: 0; padding-left: 1em;
 }
-.textual_container ul.list_level1{
+
+.text_container ul.list_level1{
     list-style-type:circle ;
     margin-left: 0; padding-left: 1em;
 }
 
-.textual_container ul.list_level2{
+.text_container ul.list_level2{
     list-style-type: square;
     margin-left: 0; padding-left: 1em;
 }

@@ -18,7 +18,7 @@
                 </div>
                 <div class="col-md-12 level1">
                   <li id="lc_l1_dig">
-                      <a href="#tab04" class="btn-secondary lc_l1"> Logical Component Level 1 </a>
+                      <a href="#tab04" class="btn-secondary lc_l1"> Logical Data-Thread Input-Level 1 </a>
                       <i class="far fa-window-close close"></i>
                   </li>
                 </div>
@@ -48,14 +48,10 @@
         <div class="col-md-12 well diagram_container" id="logical_data_l2_dig_process"></div>
     </div>
     <div id="tab04" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_comp_l1_dig">
-            
-        </div>
+        <div class="col-md-12 well diagram_container" id="logical_data_l1_dig"></div>
     </div>
 
-
-    <div class="col-md-12 well text_container" style="display: none" id=""></div>
-    <div class="col-md-12 well text_container" style="display: none" id="logical_data_l2_txt_input">
+    <div class="col-md-12 well text_container" style="display:  none" id="logical_data_l2_txt_input">
         <ul class="list_level0">
             {% for ldK, ldV in ld_input_lc.items %}
                 <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
@@ -64,11 +60,23 @@
                         {% for vK, vV in ldV.items %}
                             <li class="li-list_level1 {{ vK }}">
                                 <span>{{ vK }} </span>
-                                <ul class="list_level2">
-                                    {% for v in vV %}
-                                        <li class="li-list_level2">{{ v }} </li>
-                                    {% endfor %}
-                                </ul>
+
+                                {% if vK == "group_members" %}
+                                    <ul class="list_level2">
+                                        {% for k, v in vV.items %}
+                                            <li class="li-list_level2 test">
+                                                <span class="key">{{ k }}</span>
+                                                <span class="value">{{ v }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <ul class="list_level2">
+                                        {% for v in vV %}
+                                            <li class="li-list_level2">{{ v }} </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>
@@ -85,11 +93,23 @@
                         {% for vK, vV in ldV.items %}
                             <li class="li-list_level1 {{ vK }}">
                                 <span>{{ vK }} </span>
-                                <ul class="list_level2">
-                                    {% for v in vV %}
-                                        <li class="li-list_level2">{{ v }} </li>
-                                    {% endfor %}
-                                </ul>
+
+                                {% if vK == "group_members" %}
+                                    <ul class="list_level2">
+                                        {% for k, v in vV.items %}
+                                            <li class="li-list_level2 test">
+                                                <span class="key">{{ k }} </span>
+                                                <span class="value">{{ v }} </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <ul class="list_level2">
+                                        {% for v in vV %}
+                                            <li class="li-list_level2">{{ v }} </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>
@@ -106,14 +126,27 @@
                         {% for vK, vV in ldV.items %}
                             <li class="li-list_level1 {{ vK }}">
                                 <span>{{ vK }} </span>
-                                <ul class="list_level2">
-                                    {% for v in vV %}
-                                        <li class="li-list_level2">{{ v }} </li>
-                                    {% endfor %}
-                                </ul>
+
+                                {% if vK == "group_members" %}
+                                    <ul class="list_level2">
+                                        {% for k, v in vV.items %}
+                                            <li class="li-list_level2 test">
+                                                <span class="key">{{ k }} </span>
+                                                <span class="value">{{ v }} </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <ul class="list_level2">
+                                        {% for v in vV %}
+                                            <li class="li-list_level2">{{ v }} </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
                             </li>
                         {% endfor %}
-                    </ul>
+                    </ul><
                 </li>
             {% endfor %}
         </ul>

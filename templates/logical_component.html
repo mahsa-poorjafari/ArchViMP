@@ -12,8 +12,8 @@
     <div class="tabs">
       <div class="tab-button-outer">
         <ul id="tab-button">
-          <li><a href="#tab01">Diagram</a></li>
-          <li><a href="#tab02">Textual</a></li>
+          <li><a href="#tab01" class="btn-info">Diagram</a></li>
+          <li><a href="#tab02" class="btn-info">Textual</a></li>
         </ul>
       </div>
         <div class="tab-select-outer">
@@ -29,13 +29,16 @@
         <div class="col-md-12 well diagram_container" id="logical_comp_diagram"></div>
     </div>
     <div id="tab02" class="tab-contents">
-        <div class="col-md-12 well textual_container" id="logical_comp_textual">
-            <ul class="threads">
+        <div class="col-md-12 well text_container" id="logical_comp_textual">
+            <ul class="list_level0">
                 {% for t, f in thread_function.items %}
-                    <li>
+                    <li class="li-list_level0">
                         <span>{{ t }}</span>
-                        <ul class="thr_op">
-                            <lo>{{ f }} </lo>
+                        <ul class="list_level1">
+                            <li class="li-list_level1" >
+                                {{ f }}
+                            </li>
+
                         </ul>
                     </li>
 

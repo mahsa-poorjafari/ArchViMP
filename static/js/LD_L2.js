@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let graphPGroupContainer = document.getElementById('logical_data_l2_dig_process');
     mainGrouped(graphPGroupContainer, txtPContainer, "P");
 
+    let ldL1Container = document.getElementById("logical_data_l1_dig");
+
+    logicalDataLevel1(ldL1Container, txtInContainer, "R");
+
 });
 
 
@@ -41,12 +45,16 @@ function mainGrouped(container, txt, op) {
 
         // Gets the default parent for inserting new cells. This
         // is normally the first child of the root (ie. layer 0).
-        var parent = graph.getDefaultParent();
+        let parent = graph.getDefaultParent();
+
+
+
+        // Highlights the vertices when the mouse enters
+        let highlight = new mxCellTracker(graph, '#337ab7');
 
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
         try {
-            console.log("---mainGrouped-----");
             let lcX = 50;
             let lcY = 50;
 
@@ -61,7 +69,7 @@ function mainGrouped(container, txt, op) {
                 let lcId = 'LC_' + op + '_' + i;
                 let lcFirstElement = lcs[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
-                console.log(lcText);
+                // console.log(lcText);
                 nodeSize = setNodeSize(lcText, 'logicalData_' + op);
 
                 let lcAccessList = lcs[i].getElementsByClassName("list_level1")[0].getElementsByClassName('logical_components');
@@ -70,8 +78,17 @@ function mainGrouped(container, txt, op) {
                 lcY += 300;
 
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                let benchmarkName = get_url_benchmark();
 
-                drawLcForLd(graph, parent, ldNode, lcList, op)
+                graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+				    let cell = evt.getProperty('cell');
+				    if (cell['style'] === "logicalData_R_big" || cell['style'] === "logicalData_R"){
+                        document.getElementById('lc_l1_dig').style.display = "block";
+                    }
+				    evt.consume();
+                });
+
+                drawLcForLd(graph, parent, ldNode, lcList, op, benchmarkName)
 
             }
 
@@ -85,3 +102,66 @@ function mainGrouped(container, txt, op) {
 }
 
 
+function logicalDataLevel1(container, txt, op) {
+    // Checks if the browser is supported
+    if (!mxClient.isBrowserSupported())
+    {
+        // Displays an error message if the browser is not supported.
+        mxUtils.error('Browser is not supported!', 200, false);
+    }
+    else
+    {
+        // Disables the built-in context menu
+        mxEvent.disableContextMenu(container);
+
+        // Creates the graph inside the given container
+        var graph = new mxGraph(container);
+        //graph.setEnabled(false);
+
+
+        // graph.getStylesheet().getDefaultEdgeStyle();
+
+        // Enables rubberband selection
+        new mxRubberband(graph);
+
+        // Disables basic selection and cell handling
+        // configureStylesheet(graph);
+
+        // Gets the default parent for inserting new cells. This
+        // is normally the first child of the root (ie. layer 0).
+        let parent = graph.getDefaultParent();
+
+
+
+        // Highlights the vertices when the mouse enters
+        let highlight = new mxCellTracker(graph, '#337ab7');
+
+        // Adds cells to the model in a single step
+        graph.getModel().beginUpdate();
+        try {
+            let lcX = 500;
+            let lcY = 200;
+
+            configEdgeStyle(graph, "#000000");
+
+            let ldL2 = txt.getElementsByClassName('list_level0')[0].getElementsByClassName('li-list_level0');
+            let nodeSize = {};
+            for (let i = 0; i < ldL2.length; i++) {
+                let lcId = 'LDL2_' + op + '_' + i;
+                let lcFirstElement = ldL2[i].firstElementChild;
+                let lcText = lcFirstElement.innerHTML;
+                nodeSize = setNodeSize(lcText, 'logicalData_' + op);
+                let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
+                let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
+                nodeStyle(graph,  nodeSize['nodeIdText']);
+                let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                lcY += 700;
+                drawTdForLd(graph, parent, ldNode, ldL2List, op)
+            }
+        }finally {
+            graph.getModel().endUpdate();
+
+        }
+    }
+
+}

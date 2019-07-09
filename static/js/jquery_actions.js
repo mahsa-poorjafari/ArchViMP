@@ -16,7 +16,7 @@ $(document).ready(function(){
     });
     $('#tab-button li#lc_l1_dig i.close').click(function () {
         $('#lc_l1_dig').fadeOut('fast');
-        $('#logical_comp_l1_dig').fadeOut('fast');
+        $('#logical_data_l1_dig').fadeOut('fast');
 
     })
 

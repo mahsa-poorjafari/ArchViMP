@@ -238,3 +238,49 @@ function setPositionVars(pX, pY, j) {
     }
     return [chX, chY];
 }
+
+function setPositionPBig(pX, pY, j) {
+    let chX = pX;
+    let chY = pY;
+    switch (j) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            chX = pX - 250;
+            chY = pY + (j * 100);
+            break;
+        case 4:
+            chX = pX - 250;
+            chY = pY - (j * 50);
+            break;
+        case 5:
+            chX = pX;
+            chY = pY - (j * 50);
+            break;
+        case 6:
+            chX = pX + 200;
+            chY = pY - 200;
+            break;
+        case 7:
+            chX = pX + 400;
+            chY = pY;
+            break;
+        case 8:
+            chX = pX + 400;
+            chY = pY + 200;
+            break;
+        case 9:
+            chX = pX + 300;
+            chY = pY + 300;
+            break;
+        case 10:
+            chX = pX + 400;
+            chY = pY + 400;
+            break;
+
+    }
+
+    return [chX, chY];
+}
+

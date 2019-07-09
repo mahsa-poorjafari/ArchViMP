@@ -6,8 +6,10 @@ from functools import partial
 import csv
 from django.conf import settings
 from django.utils import timezone
+import collections
+
 # Create your views here.
-import itertools
+
 
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "")
 print("CURRENT_TIME: ", settings.CURRENT_TIME)
@@ -45,7 +47,7 @@ def get_shared_var_names():
 
 
 def get_all_shared_var_names():
-    with open('benchmark_traces/ROSACE/PowerWindowRosace.txt', 'r') as csv_file:
+    with open('benchmark_traces/ROSACE/TraceDataRosace.txt', 'r') as csv_file:
         csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         var_records = filter(lambda var: var[2] in ["LOAD", "STORE", "GETELEMENTPTR"] and var[3] != '', csv_reader)
@@ -109,8 +111,7 @@ def get_threads():
 def thread_per_vars(shared_variables, thread_ids):
     thread_vars_op = {}
     thread_op = dict()
-    # print("\n shared_variables=> ", shared_variables)
-    # print("\n thread_ids=> ", thread_ids)
+
     with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
         # csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -182,12 +183,14 @@ def logical_comp(request):
 
 def logical_data_l1(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
+    struct_vars_groups_list = []
     shared_variables_names = get_all_shared_var_names()
-    threads = get_threads()
     struct_vars_groups = get_var_struct(shared_variables_names)
-    # print("struct_vars_groups   =>  ", struct_vars_groups)
-    # write_to_csv_file(struct_vars_groups, "struct_vars")
+    variables = {"variables": struct_vars_groups.pop("variables")}
+    print(struct_vars_groups)
+    print("\n", variables)
     return render(request, 'logical_data_L1.html', {'struct_vars': struct_vars_groups,
+                                                    'variable_list': variables,
                                                     'benchmark_name': benchmark_name})
 
 
@@ -203,10 +206,35 @@ def logical_data_l2_ungrouped(request):
 def logical_data_l2(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
     threads = get_threads()
-
+    ld_input_g = {}
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(threads, ["LOAD"])
     ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
+    for k, v in ld_input_lc.items():
+        ld_input_lc_g = {}
+        print(len(v['group_members']))
+        if len(v['group_members']) > 11:
+            child_list_var = [k if a == "variable" else None for k, a in v['group_members'].items()]
+            child_list_var = list(filter(partial(is_not, None), child_list_var))
+            if len(child_list_var) > 10:
+                ld_input_lc_g.update({"group_over10_var": {"LogicalData_group_over10_variable": "logicalData_var",
+                                                                        "child_list": child_list_var}})
+            else:
+                ld_input_lc_g.update({k: "variable" for k in child_list_var})
+
+            child_list_ld = [k if a == "logicalData" else None for k, a in v['group_members'].items()]
+            child_list_ld = list(filter(partial(is_not, None), child_list_ld))
+            if len(child_list_ld) > 10:
+                ld_input_lc_g.update({"group_over10_ld": {"LogicalData_group_over10_LogicalData": "logicalData",
+                                                                       "child_list": child_list_ld}})
+            else:
+                ld_input_lc_g.update({k: "logicalData" for k in child_list_ld})
+            # print("ld_input_lc_g=>  ", ld_input_lc_g)
+        else:
+            ld_input_lc_g.update(v['group_members'])
+        # {group_name: {"logical_components": lc_list, "group_members": ld_vars}
+        ld_input_g.update({k: {"logical_components": v['logical_components'], "group_members": ld_input_lc_g}})
+    print("ld_input_v1=>  ", ld_input_g)
 
     # Get the variables that are threads Output
     thread_var_output = get_thread_var_op(threads, ["STORE"])
@@ -216,9 +244,9 @@ def logical_data_l2(request):
     thread_var_process = get_thread_var_op(threads, ["LOAD", "STORE"])
     ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
 
-    # print("ld_l2_group----->   \n", ld_process_lc)
+    # print("\n ld_input_lc=>  ", ld_input_lc)
 
     return render(request, 'logical_data_L2.html', {'benchmark_name': benchmark_name,
-                                                    'ld_input_lc': ld_input_lc,
+                                                    'ld_input_lc': ld_input_g,
                                                     'ld_output_lc': ld_output_lc,
                                                     'ld_process_lc': ld_process_lc})

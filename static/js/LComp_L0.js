@@ -28,7 +28,7 @@ function main(container) {
 
         try {
 
-            let threadList = document.getElementById("logical_comp_textual").getElementsByClassName("threads")[0].getElementsByTagName("li");
+            let threadList = document.getElementById("logical_comp_textual").getElementsByClassName("list_level0")[0].getElementsByClassName('li-list_level0');
             nodeStyle(graph, 'LogicalComp');
             configEdgeStyle(graph, "#000000");
             let fW = 50;
@@ -36,9 +36,7 @@ function main(container) {
             let tW = 20;
             let tH = 300;
             let thrNode = null;
-            // addThreadNodes(graph, parent, threadList, 20, 300);
-            // var thrCells = graph.getChildVertices(graph.getDefaultParent());
-            // console.table( graph.getChildVertices(graph.getDefaultParent()));
+
             for (let i=0; i<threadList.length; i++){
                 let thrId = 'thr' + i;
                 let thrText = threadList[i].getElementsByTagName("span")[0].innerHTML;
@@ -53,7 +51,7 @@ function main(container) {
                     tW += 150;
                 }
                 let funcId = "func_" + i;
-                let thrFunc = threadList[i].getElementsByTagName('lo')[0].innerHTML;
+                let thrFunc = threadList[i].getElementsByClassName('li-list_level1')[0].innerHTML;
                 let funcNode = graph.insertVertex(parent, funcId, thrFunc, fW, fH, 120, 80, 'LogicalComp');
                 fW += 150;
                 graph.insertEdge(parent, null, null, thrNode, funcNode, 'dashed=0;' +

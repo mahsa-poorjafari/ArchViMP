@@ -206,7 +206,7 @@ def get_thread_var_op(threads, op):
 
     # What I need is: To show the inputs-LD of each threads
     # For that, I built an dict: {'main function of each thread as the key': [list of variables or structs]}
-    with open('logical_vis/PowerWindowRosace.txt') as csv_file:
+    with open('benchmark_traces/ROSACE/TraceDataRosace.txt') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for tK, fV in thr_func_dict.items():
             if "Main_" in tK:
@@ -226,26 +226,39 @@ def get_thread_var_op(threads, op):
                                 else [v[0], v[1], v[2], v[3], "variable"] for v in thread_vars_list]
 
             # remove duplicate rows
-            thread_var_dict = {i[0]: [i[1], i[2], i[3], i[4]] for i in thread_vars_list}
+            # thread_var_dict = {i[0]: [i[1], i[2], i[3], i[4]] for i in thread_vars_list}
+            thread_var_dict = {i[0]: i[4] for i in thread_vars_list}
+            # for i in thread_vars_list:
+            #     if i[0] not in [k['item_name'] for k in thread_var]:
+            #         thread_var.append({"item_name": i[0], "group_type": i[4]})
+            #     # print("thread_var_dict=>  ", thread_var_dict)
+            # thread_var_dict.update({{"item_name": i[0], "group_type": i[4]} for i in thread_vars_list})
+
             thread_var_op.update({fV: thread_var_dict})
     csv_file.close()
     return thread_var_op
 
 
 def create_ld_thread_op(thread_var_op, op):
+    # print("\n thread_var_op==>>", thread_var_op)
     ld_l2_group = {}
     a = []
+    group_members = []
     for lc, ld_vars in thread_var_op.items():
+        # print("\n lc=>  ", lc)
+        # print("\n ld_vars=>  ", ld_vars)
         lc_list = []
         lc_members = {k for k in ld_vars}
+        # print("\n lc_members=>  ", lc_members)
         del a[:]
         if not ld_l2_group:
             group_name = op + lc
             lc_list.append(lc)
-            ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+            ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": ld_vars}})
 
         else:
-            a = list({k if lc_members == v['group_members'] else None for k, v in ld_l2_group.items()})
+
+            a = list({k if lc_members == {k for k in v['group_members']} else None for k, v in ld_l2_group.items()})
             a_avoid_none = list(filter(partial(is_not, None), a))
             if len(a_avoid_none) != 0:
                 group_name = str(a_avoid_none[0]) + "-" + lc
@@ -254,7 +267,7 @@ def create_ld_thread_op(thread_var_op, op):
             else:
                 group_name = op + lc
                 lc_list.append(lc)
-                ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": lc_members}})
+                ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": ld_vars}})
 
     return ld_l2_group
 
