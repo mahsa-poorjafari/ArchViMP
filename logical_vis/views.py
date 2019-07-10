@@ -6,7 +6,6 @@ from functools import partial
 import csv
 from django.conf import settings
 from django.utils import timezone
-import collections
 
 
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "")
@@ -15,7 +14,7 @@ print("CURRENT_TIME: ", settings.CURRENT_TIME)
 
 def index(request):
 
-    return render(request, 'Home.html')
+    return render(request, 'trace_vis.html')
 
 
 def home(request):

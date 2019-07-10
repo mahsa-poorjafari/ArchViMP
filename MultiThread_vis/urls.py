@@ -15,12 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from logical_vis import views, test_diagrams
+from logical_vis import views, test_diagrams, error_handling
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
+    url(r'^trace_vis', views.index, name='index'),
     url(r'^home', views.home, name='home'),
     url(r'logical_comp', views.logical_comp, name='logical_comp'),
     url(r'cy', test_diagrams.cy, name='cy'),
@@ -35,3 +36,4 @@ urlpatterns = [
     url(r'LD_L2_unG', views.logical_data_l2_ungrouped, name='logical_data_l2_ungrouped'),
     url(r'exe_path_L2', views.ld_exe_path_l2, name='logical_data_l2_exe_path'),
 ]
+# handler404 = error_handling.error_404_view
