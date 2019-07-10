@@ -8,8 +8,6 @@ from django.conf import settings
 from django.utils import timezone
 import collections
 
-# Create your views here.
-
 
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "")
 print("CURRENT_TIME: ", settings.CURRENT_TIME)
@@ -46,66 +44,12 @@ def get_shared_var_names():
     return shared_variables_names
 
 
-def get_all_shared_var_names():
-    with open('benchmark_traces/ROSACE/TraceDataRosace.txt', 'r') as csv_file:
-        csv_file.seek(0, 0)
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        var_records = filter(lambda var: var[2] in ["LOAD", "STORE", "GETELEMENTPTR"] and var[3] != '', csv_reader)
-        var_names = map(lambda var: var[3], var_records)
-        shared_variables_names = remove_dups(list(var_names))
-        # print("Shared Variables: \n", shared_variables_names)
-    csv_file.close()
-    return shared_variables_names
-
-
-def get_var_struct(shared_vars):
-    struct_vars_groups = {}
-    struct_group = []
-    shared_group = []
-    for v in shared_vars:
-        if v.find(".") > 0:
-            struct_var = v.split(".")
-            struct_group.append(struct_var)
-        else:
-            shared_group.append(v)
-
-    struct_names = map(lambda a: a[0], struct_group)
-    struct_names_keys = remove_dups(list(struct_names))
-    for s in struct_names_keys:
-        find_struct_vars = map(lambda i: i[1] if i[0] == s else None, struct_group)
-        struct_vars_not_none = filter(partial(is_not, None), find_struct_vars)
-        struct_vars_groups.update({s: list(struct_vars_not_none)})
-    struct_vars_groups.update({"variables": shared_group})
-    # print(struct_vars_groups)
-    return struct_vars_groups
-
-
 def get_records():
     with open('logical_vis/PowerWindowRosace.txt') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
     csv_file.close()
     print("csv_reader=>  ", type(csv_reader))
     return csv_reader
-
-
-def get_threads():
-    # get_records()
-    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        main_thread_filter = filter(lambda row: row[2] == "FUNCTIONCALL" and row[3] == "main", csv_reader)
-        main_thread_list = list(main_thread_filter)
-        main_thread_id = main_thread_list[0][1]
-        # print("main_thread_id =>  ", main_thread_id)
-
-        csv_file.seek(0, 0)
-        thread_ids = map(lambda var: var[1], csv_reader)
-        thr_dict = dict.fromkeys(list(thread_ids))
-        thread_list = list(thr_dict)
-        threads = ['Main_' + item if item == main_thread_id else item for item in thread_list]
-        # threads = {"threads": thread_list, "Main": main_thread_id}
-        # print(threads)
-    csv_file.close()
-    return threads
 
 
 def thread_per_vars(shared_variables, thread_ids):
@@ -140,39 +84,26 @@ def catastrophe(request):
                                                 "thread_ids": thread_ids})
 
 
-def logical_data(request):
-    shared_variables = logical_data_input_function()
-    struct_vars_groups = get_var_struct(shared_variables)
-    fun_names = get_function_names()
-    # print(fun_names)
-
-    return render(request, 'Logical_data.html', {'shared_variables': shared_variables,
-                                                 'shared_struct': struct_vars_groups,
-                                                 'function_names': fun_names})
-
-
 def logical_data_l0(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    shared_variables = get_shared_var_names()
-    data_types_vars = get_data_types()
-    # struct_vars_groups = get_var_struct(shared_variables)
-    # data_types_vars = list(filter(None, data_types_vars))
-    # print("data_types_vars=>  ", data_types_vars)
-    # write_to_csv_file(data_types_vars, "data_types_vars")
-    # threads = get_threads()
+    trace_file = get_file_path(benchmark_name)
+    # shared_variables = get_shared_var_names()
+    shared_variables_names = get_all_shared_var_names(trace_file)
+    data_types_vars = get_data_types(trace_file)
+    # print("\n data_types_vars=>  ", data_types_vars)
 
     return render(request, 'logical_data_L0.html', {'data_types': data_types_vars,
-                                                    'shared_variables': shared_variables,
+                                                    'shared_variables': shared_variables_names,
                                                     'benchmark_name': benchmark_name})
 
 
 def logical_comp(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    thread_list = get_threads()
-    # print("thread_list=  ", thread_list)
+    trace_file = get_file_path(benchmark_name)
+    thread_list = get_threads(trace_file)
     thr_func_dict = {}
     for indx, t in enumerate(thread_list):
-        thr_func = get_first_function(t, indx)
+        thr_func = get_first_function(t, indx, trace_file)
         thr_func_dict.update(thr_func)
     # print("thr_func_list => ", thr_func_dict)
 
@@ -183,70 +114,70 @@ def logical_comp(request):
 
 def logical_data_l1(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    struct_vars_groups_list = []
-    shared_variables_names = get_all_shared_var_names()
+    trace_file = get_file_path(benchmark_name)
+    # print("trace_file=>  ", trace_file)
+    shared_variables_names = get_all_shared_var_names(trace_file)
     struct_vars_groups = get_var_struct(shared_variables_names)
     variables = {"variables": struct_vars_groups.pop("variables")}
-    print(struct_vars_groups)
-    print("\n", variables)
     return render(request, 'logical_data_L1.html', {'struct_vars': struct_vars_groups,
                                                     'variable_list': variables,
                                                     'benchmark_name': benchmark_name})
 
 
 def logical_data_l2_ungrouped(request):
-    print("\n --------------logical_data_l2_ungrouped--------------- \n")
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    threads = get_threads()
-    thread_var_op = get_thread_var_op(threads, ["LOAD"])
+    trace_file = get_file_path(benchmark_name)
+    threads = get_threads(trace_file)
+    thread_var_op = get_thread_var_op(threads, ["LOAD"], trace_file)
     return render(request, 'logical_data_L2_Ungrouped.html', {'thread_var_op': thread_var_op,
                                                               'benchmark_name': benchmark_name})
 
 
 def logical_data_l2(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    threads = get_threads()
-    ld_input_g = {}
-    # Get the variables that are threads Input
-    thread_var_input = get_thread_var_op(threads, ["LOAD"])
-    ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
-    for k, v in ld_input_lc.items():
-        ld_input_lc_g = {}
-        print(len(v['group_members']))
-        if len(v['group_members']) > 11:
-            child_list_var = [k if a == "variable" else None for k, a in v['group_members'].items()]
-            child_list_var = list(filter(partial(is_not, None), child_list_var))
-            if len(child_list_var) > 10:
-                ld_input_lc_g.update({"group_over10_var": {"LogicalData_group_over10_variable": "logicalData_var",
-                                                                        "child_list": child_list_var}})
-            else:
-                ld_input_lc_g.update({k: "variable" for k in child_list_var})
+    trace_file = get_file_path(benchmark_name)
+    threads = get_threads(trace_file)
 
-            child_list_ld = [k if a == "logicalData" else None for k, a in v['group_members'].items()]
-            child_list_ld = list(filter(partial(is_not, None), child_list_ld))
-            if len(child_list_ld) > 10:
-                ld_input_lc_g.update({"group_over10_ld": {"LogicalData_group_over10_LogicalData": "logicalData",
-                                                                       "child_list": child_list_ld}})
-            else:
-                ld_input_lc_g.update({k: "logicalData" for k in child_list_ld})
-            # print("ld_input_lc_g=>  ", ld_input_lc_g)
-        else:
-            ld_input_lc_g.update(v['group_members'])
-        # {group_name: {"logical_components": lc_list, "group_members": ld_vars}
-        ld_input_g.update({k: {"logical_components": v['logical_components'], "group_members": ld_input_lc_g}})
-    print("ld_input_v1=>  ", ld_input_g)
+    # Get the variables that are threads Input
+    thread_var_input = get_thread_var_op(threads, ["LOAD"], trace_file)
+    ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
+    ld_input_g = group_over10_child(ld_input_lc)
 
     # Get the variables that are threads Output
-    thread_var_output = get_thread_var_op(threads, ["STORE"])
+    thread_var_output = get_thread_var_op(threads, ["STORE"], trace_file)
     ld_output_lc = create_ld_thread_op(thread_var_output, "Output_")
+    ld_output_g = group_over10_child(ld_output_lc)
 
     # Get the variables that are threads Processed
-    thread_var_process = get_thread_var_op(threads, ["LOAD", "STORE"])
+    thread_var_process = get_thread_var_op(threads, ["LOAD", "STORE"], trace_file)
     ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
-
-    # print("\n ld_input_lc=>  ", ld_input_lc)
+    ld_process_g = group_over10_child(ld_process_lc)
 
     return render(request, 'logical_data_L2.html', {'benchmark_name': benchmark_name,
                                                     'ld_input_lc': ld_input_g,
-                                                    'ld_output_lc': ld_output_lc,
-                                                    'ld_process_lc': ld_process_lc})
+                                                    'ld_output_lc': ld_output_g,
+                                                    'ld_process_lc': ld_process_g})
+
+
+def ld_exe_path_l2(request):
+    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
+    trace_file = get_file_path(benchmark_name)
+    threads = get_threads(trace_file)
+    thr_func_dict = {}
+    parent_function_list = []
+    for indx, t in enumerate(threads):
+        thr_func = get_first_function(t, indx, trace_file)
+        thr_func_dict.update(thr_func)
+
+    print("thr_func_dict=>  ", thr_func_dict)
+
+    # I start to catch the first ExePath from the Main thread
+    # For that purpose I have to get the function body of the first/parent function of the main thread
+    # get the first/parent function of the main thread
+    main_pfuntion_name = [v if "Main_" in k else parent_function_list.append(v) for k, v in thr_func_dict.items()]
+    # main_pfuntion_name = list(filter(partial(is_not, None), main_pfuntion_name_with_none))
+    main_pfuntion_name = main_pfuntion_name[0] if len(main_pfuntion_name) is 1 else None
+    print("parent_function_list=>  ", parent_function_list)
+
+    return render(request, 'exe_path_L2.html', {'benchmark_name': benchmark_name})
+

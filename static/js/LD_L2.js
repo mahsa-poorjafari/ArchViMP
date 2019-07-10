@@ -140,7 +140,7 @@ function logicalDataLevel1(container, txt, op) {
         graph.getModel().beginUpdate();
         try {
             let lcX = 500;
-            let lcY = 200;
+            let lcY = 0;
 
             configEdgeStyle(graph, "#000000");
 
@@ -154,8 +154,9 @@ function logicalDataLevel1(container, txt, op) {
                 let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
                 let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
+                lcY = (i === 0 && lcText.length > 20)? 400 : lcY + 700;
+                console.log(lcText + "-" + lcX +"--"+ lcY);
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                lcY += 700;
                 drawTdForLd(graph, parent, ldNode, ldL2List, op)
             }
         }finally {

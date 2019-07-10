@@ -24,18 +24,31 @@ def get_types(var_list):
     return type_names
 
 
-def logical_data_input_function():
-    with open('logical_vis/shared_variables.txt') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        shared_variables_names = get_var_names(csv_reader)
-        print("Number of Shared Variables: ", len(shared_variables_names))
-        # variables_names = {'names': list(shared_variables_names)}
-    return list(shared_variables_names)
+def get_var_struct(shared_vars):
+    struct_vars_groups = {}
+    struct_group = []
+    shared_group = []
+    for v in shared_vars:
+        if v.find(".") > 0:
+            struct_var = v.split(".")
+            struct_group.append(struct_var)
+        else:
+            shared_group.append(v)
+
+    struct_names = map(lambda a: a[0], struct_group)
+    struct_names_keys = remove_dups(list(struct_names))
+    for s in struct_names_keys:
+        find_struct_vars = map(lambda i: i[1] if i[0] == s else None, struct_group)
+        struct_vars_not_none = filter(partial(is_not, None), find_struct_vars)
+        struct_vars_groups.update({s: list(struct_vars_not_none)})
+    struct_vars_groups.update({"variables": shared_group})
+    # print(struct_vars_groups)
+    return struct_vars_groups
 
 
-def get_data_types():
+def get_data_types(trace_file):
     data_types_vars = {}
-    with open('logical_vis/PowerWindowRosace.txt') as csv_file:
+    with open(trace_file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         data_types = get_types(csv_reader)
         # print("data_types", data_types)
@@ -46,8 +59,7 @@ def get_data_types():
             var_names_not_none = filter(partial(is_not, ''), var_names_not_none)
             var_names = remove_dups(list(var_names_not_none))
             var_list = list(var_names)
-            var_struct_list = views.get_var_struct(var_list)
-            # print(t, "  var_names  ", var_struct_list)
+            var_struct_list = get_var_struct(var_list)
             data_types_vars.update({t: var_struct_list})
 
     return data_types_vars

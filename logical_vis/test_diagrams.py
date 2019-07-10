@@ -1,10 +1,18 @@
 from django.shortcuts import render
-from logical_vis.logical_data_inputs import *
 from logical_vis.dynamic_analysis import *
 from operator import is_not
 from functools import partial
 import csv
 # Create your views here.
+
+
+def logical_data_input_function():
+    with open('logical_vis/shared_variables.txt') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        shared_variables_names = get_var_names(csv_reader)
+        # print("Number of Shared Variables: ", len(shared_variables_names))
+        # variables_names = {'names': list(shared_variables_names)}
+    return list(shared_variables_names)
 
 
 def cy(request):

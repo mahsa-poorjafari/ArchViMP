@@ -25,10 +25,8 @@ function nodeStyle(graph, nodeId) {
     style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
     style[mxConstants.STYLE_WHITE_SPACE] = 'wrap';
     style[mxConstants.STYLE_FONTCOLOR] = '#000000';
-
-    // style[mxConstants.FONT_BOLD] = 1;
-    // style[mxConstants.STYLE_FONTSTYLE] = mxConstants.FONT_BOLD;
-    // style[mxConstants.STYLE_FONTSIZE] = 12;
+    style[mxConstants.VERTEX_SELECTION_COLOR] = '#337ab7';
+    style[mxConstants.VERTEX_SELECTION_DASHED] = false;
     style[mxConstants.STYLE_STROKECOLOR] = '#000000';
     style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
 
@@ -160,12 +158,11 @@ function drawChildThrOP(graph, parent, pNode, childList){
         }
     });
 
-
     for (let j=0; j< childList.length; j++){
         let nodeId = 'thr_in_' + j;
-        let Text = childList[j].firstElementChild.innerHTML;
+        let Text = childList[j].getElementsByClassName('key')[0].innerHTML;
 
-        let elementType = childList[j].getElementsByClassName('list_level2')[0].getElementsByTagName('li')[3].innerHTML;
+        let elementType = childList[j].getElementsByClassName('value')[0].innerHTML;
 
         elementType = elementType.replace(/ /g,'') + "_R";
 
@@ -355,9 +352,16 @@ function drawTdForLd(graph, parent, pNode, childList, op) {
         }
         chX = values[0];
         chY = values[1];
-        console.table([Text, chX, chY, j]);
         let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
         chNode.target = pNode;
+        let benchmarkName= get_url_benchmark();
+        graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+                let cell = evt.getProperty('cell');
+                if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
+                    window.location = "http://127.0.0.1:8000/Logical_Data_L1?b=" + benchmarkName;
+                }
+                evt.consume();
+            });
         graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
 
     }

@@ -22,7 +22,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
     url(r'^home', views.home, name='home'),
-    url(r'logical_data', views.logical_data, name='logical_data'),
     url(r'logical_comp', views.logical_comp, name='logical_comp'),
     url(r'cy', test_diagrams.cy, name='cy'),
     url(r'draw2d', test_diagrams.draw2d, name='draw2d'),
@@ -34,4 +33,5 @@ urlpatterns = [
     url(r'Logical_Data_L1', views.logical_data_l1, name='Logical_Data_L1'),
     url(r'Logical_Data_L2', views.logical_data_l2, name='Logical_Data_L2'),
     url(r'LD_L2_unG', views.logical_data_l2_ungrouped, name='logical_data_l2_ungrouped'),
+    url(r'exe_path_L2', views.ld_exe_path_l2, name='logical_data_l2_exe_path'),
 ]

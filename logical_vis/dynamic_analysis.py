@@ -1,6 +1,7 @@
 import csv
 from operator import is_not
 from functools import partial
+from logical_vis.logical_data_inputs import *
 
 
 def remove_dups(a_list):
@@ -10,37 +11,39 @@ def remove_dups(a_list):
     return the_list
 
 
-def get_threads(a_list):
-    threads_map = map(lambda r: r[1], a_list)
-    threads_list = list(threads_map)
-    return threads_list
-
-
-def get_first_function(t, indx):
-
-    # print("=========>", t, " - ", indx)
-    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
+def get_first_function(t, indx, trace_file):
+    with open(trace_file, 'r') as csv_file:
         csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         if "Main_" in t:
+            # print("t=>  ", t)
             b = t.split('_')
-            thread_functioncall_filter = filter(lambda row: row[2] == "FUNCTIONCALL" and row[1] == b[1]
-                                                , csv_reader)
-            thread_functioncall_list = list(thread_functioncall_filter)[1]
-            thread_function = {t: thread_functioncall_list[3]}
+            csv_file.seek(0, 0)
+            thread_functioncall_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and
+                                        row[1].lstrip() == b[1]
+                                        and "CONSTANT;" in row[5].lstrip(), csv_reader)
 
+            thread_functioncall_flist = list(thread_functioncall_filter)
+
+            thread_functioncall_list = thread_functioncall_flist[0] \
+                if len(thread_functioncall_flist) > 0 else None
+
+            thread_function = {t: thread_functioncall_list[3] if thread_functioncall_list is not None else None}
         else:
-            thread_functioncall_filter = filter(lambda row: row[2] == "FUNCTIONCALL" and row[1] == t
-                                                            and (row[5] == "CONSTANT;LOCAL;" or row[5] == "LOCAL;CONSTANT;"),
+            csv_file.seek(0, 0)
+            thread_functioncall_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and
+                                                            row[1].lstrip() == str(t)
+                                                            and row[5].lstrip() in ["LOCAL;CONSTANT;", "CONSTANT;LOCAL;"],
                                                 csv_reader)
-            thread_functioncall_list = list(thread_functioncall_filter)[-1]
-            # print("list(thread_functioncall_filter)=  ", thread_functioncall_list)
 
-            thread_function = {t: thread_functioncall_list[3]}
+            thread_functioncall_flist = list(thread_functioncall_filter)
+            # print("thread_functioncall_flist => \n", thread_functioncall_flist)
+            thread_functioncall_list = thread_functioncall_flist[-1] \
+                if len(thread_functioncall_flist) > 0 else None
+            thread_function = {t: thread_functioncall_list[3] if thread_functioncall_list is not None else None}
     csv_file.close()
-    print(t, "=>  ", thread_function)
+    # print(t, "=>  ", thread_function)
     return thread_function
-
 
 
 def create_groups(thr_l, loaded_var_list, access_op):
@@ -48,9 +51,9 @@ def create_groups(thr_l, loaded_var_list, access_op):
     var_thrids_filter = filter(lambda t: t[1] == thr_l, loaded_var_list.items())
     var_thrids_list = list(var_thrids_filter)
     num_thr = len(thr_l)
-    print("\n" + str(len(var_thrids_list)) + " variables " + str(access_op) + " by " + str(
-        num_thr) + " threads. List in below:")
-    print(thr_l)
+    # print("\n" + str(len(var_thrids_list)) + " variables " + str(access_op) + " by " + str(
+      #   num_thr) + " threads. List in below:")
+    # print(thr_l)
     if str(access_op) == "MAIN":
         group_name = "Only" + str(access_op) + "Thread"
     else:
@@ -68,14 +71,14 @@ def get_var_names(var_list, op):
     var_names = map(lambda var: var[3], var_list)
     # Remover Duplicates
     var_name_list = remove_dups(list(var_names))
-    print("Number of ACTUAL variables of " + op + "= ", len(var_name_list))
+    # print("Number of ACTUAL variables of " + op + "= ", len(var_name_list))
     return var_name_list
 
 
 def get_variables(a_list, op_list):
     filter_vars = filter(lambda row: row[2] in op_list and not row[3] == "", a_list)
     vars_list = list(filter_vars)
-    print("TOTAL Lengh of variable list", len(vars_list))
+    # print("TOTAL Lengh of variable list", len(vars_list))
     return vars_list
 
 
@@ -196,17 +199,17 @@ def tech_comp():
     return thread_infos
 
 
-def get_thread_var_op(threads, op):
-    print("get_thread_var_op   =>", op)
+def get_thread_var_op(threads, op, trace_file):
+    # print("get_thread_var_op   =>", op)
     thread_var_op = {}
     thr_func_dict = {}
     for indx, t in enumerate(threads):
-        thr_func = get_first_function(t, indx)
+        thr_func = get_first_function(t, indx, trace_file)
         thr_func_dict.update(thr_func)
 
     # What I need is: To show the inputs-LD of each threads
     # For that, I built an dict: {'main function of each thread as the key': [list of variables or structs]}
-    with open('benchmark_traces/ROSACE/TraceDataRosace.txt') as csv_file:
+    with open(trace_file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for tK, fV in thr_func_dict.items():
             if "Main_" in tK:
@@ -271,3 +274,77 @@ def create_ld_thread_op(thread_var_op, op):
 
     return ld_l2_group
 
+
+def get_file_path(benchmark_name):
+
+    switcher = {
+        "ROSACE": "benchmark_traces/ROSACE/TraceDataRosace.txt",
+        "OCEAN": "benchmark_traces/OCEAN/Splash2ocean_contiguous_partitions.txt",
+    }
+    return switcher.get(benchmark_name, "Invalid Value")
+
+
+def get_all_shared_var_names(file_path):
+    trace_file_path = str(file_path)
+    with open(trace_file_path, 'r') as csv_file:
+        csv_file.seek(0, 0)
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        var_records = filter(lambda var: var[2].lstrip() in ["LOAD", "STORE", "GETELEMENTPTR"] and var[3] != '' and
+                                         var[5].lstrip() in ["DOUBLE;CONSTANT;", "INT;CONSTANT;"], csv_reader)
+        var_names = map(lambda var: var[3], var_records)
+        shared_variables_names = remove_dups(list(var_names))
+        # print("Shared Variables: \n", shared_variables_names)
+    csv_file.close()
+    return shared_variables_names
+
+
+def get_threads(file_path):
+    trace_file_path = str(file_path)
+    # print("trace_file_path", trace_file_path)
+    # get_records()
+    with open(trace_file_path, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        main_thread_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and row[3].lstrip() == "main", csv_reader)
+        main_thread_list = list(main_thread_filter)
+        # print("\n main_thread_list", main_thread_list)
+        main_thread_id = main_thread_list[0][1]
+        # print("main_thread_id =>  ", main_thread_id)
+
+        csv_file.seek(0, 0)
+        thread_ids = map(lambda var: var[1], csv_reader)
+        thr_dict = dict.fromkeys(list(thread_ids))
+        thread_list = list(thr_dict)
+        threads = ['Main_' + item if item == main_thread_id else item for item in thread_list]
+        # threads = {"threads": thread_list, "Main": main_thread_id}
+        # print(threads)
+    csv_file.close()
+    return threads
+
+
+def group_over10_child(ld_lc):
+    ld_op_g = {}
+    for k, v in ld_lc.items():
+        ld_input_lc_g = {}
+        # print(len(v['group_members']))
+        if len(v['group_members']) > 11:
+            child_list_var = [k if a == "variable" else None for k, a in v['group_members'].items()]
+            child_list_var = list(filter(partial(is_not, None), child_list_var))
+            if len(child_list_var) > 10:
+                ld_input_lc_g.update({"group_over10_var": {"LogicalData_group_over10_variable": "logicalData_var",
+                                                                        "child_list": child_list_var}})
+            else:
+                ld_input_lc_g.update({k: "variable" for k in child_list_var})
+
+            child_list_ld = [k if a == "logicalData" else None for k, a in v['group_members'].items()]
+            child_list_ld = list(filter(partial(is_not, None), child_list_ld))
+            if len(child_list_ld) > 10:
+                ld_input_lc_g.update({"group_over10_ld": {"LogicalData_group_over10_LogicalData": "logicalData",
+                                                                       "child_list": child_list_ld}})
+            else:
+                ld_input_lc_g.update({k: "logicalData" for k in child_list_ld})
+            # print("ld_input_lc_g=>  ", ld_input_lc_g)
+        else:
+            ld_input_lc_g.update(v['group_members'])
+        # {group_name: {"logical_components": lc_list, "group_members": ld_vars}
+        ld_op_g.update({k: {"logical_components": v['logical_components'], "group_members": ld_input_lc_g}})
+    return ld_op_g

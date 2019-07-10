@@ -54,7 +54,7 @@ function main(container) {
                 if (stText !== "variables") {
                     let stId = 'st' + i;
                     nodeStyle(graph, nodeSize['nodeIdText']);
-                    if (i === 0 || i === 1){
+                    if (i === 0){
                         stX = 200;
                         stY = 300;
                     }
@@ -76,8 +76,8 @@ function main(container) {
                     mxCells.forEach(function (node) {
                         (node.target === null) ? parentList.push(node) : "";
                     });
-                    let lastNode = parentList[parentList.length-1];
-                    let lastNodePosition = lastNode['geometry']['y'] + 300;
+                    let lastNode = (parentList.length > 0) ? parentList[parentList.length - 1] : null;
+                    let lastNodePosition = (lastNode !== null)? lastNode['geometry']['y'] + 300 : 100;
 
                     let lastChild = structList.length;
                     let varList = structList[lastChild-1].getElementsByClassName('thr_op')[0].getElementsByTagName('lo');
