@@ -5,10 +5,17 @@ This is a web framework for vizualizing the Trace Files of multithreaded program
 
 ## Built With
 
-* [Python3.5] 
+* Python3.5
 * [Django](https://www.djangoproject.com/) - The python web framework - Django is a Model-View-Controller (MVC) framework
-* [Django Channel](https://channels.readthedocs.io/en/latest/introduction.html) - To provide connections too - WebSockets
 * [Bootstrap 4](https://getbootstrap.com/) - Open-source CSS framework to design front-end
+* [Django Channel](https://channels.readthedocs.io/en/latest/introduction.html) - To provide connections too - WebSockets
+Channels is comprised of several packages:
+	* Channels, the Django integration layer
+	* Daphne, the HTTP and Websocket termination server
+	* asgiref, the base ASGI library
+	* [channels_redis](https://redis.io/topics/introduction) The Redis channel layer backend (optional)
+
+You can read the Django Channel Documentation [here](https://buildmedia.readthedocs.org/media/pdf/channels/latest/channels.pdf)
 
 
 ## Install Packages

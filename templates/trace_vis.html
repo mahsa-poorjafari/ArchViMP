@@ -14,10 +14,10 @@
             <h2>You can upload your Trace file (txt) here:</h2>
         </div>
         <div class="col-md-12 trace_file_form">
-            <form action="#" method="post" enctype="multipart/form-data" class="form-inline needs-validation" id="trace_file_upload" novalidate>
+            <form action="#" method="post" enctype="multipart/form-data" class="form-inline needs-validation trace_file_upload" id="trace_file_upload" novalidate>
                 {% csrf_token %}
                 <div class="form-group col-md-3">
-                    <input type="text" class="form-control" placeholder="Enter Name of your Program" id="program_name" name="program_name">
+                    <input type="text" class="form-control program_name" placeholder="Enter Name of your Program" id="program_name" name="program_name">
                 </div>
                 <div class="input-group">
                     <div class="input-group-prepend">

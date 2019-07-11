@@ -7,7 +7,6 @@ import csv
 from django.conf import settings
 from django.utils import timezone
 
-
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "")
 print("CURRENT_TIME: ", settings.CURRENT_TIME)
 

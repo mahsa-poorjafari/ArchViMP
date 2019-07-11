@@ -30,8 +30,9 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
-
 INSTALLED_APPS = [
+    'channels',
+    'logical_vis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap4',
-    'channels',
 ]
 
 MIDDLEWARE = [
@@ -70,8 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'MultiThread_vis.wsgi.application'
-
+# WSGI_APPLICATION = 'MultiThread_vis.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -126,3 +125,17 @@ STATICFILES_DIRS = [
 ]
 
 CURRENT_TIME = None
+
+# Channels
+ASGI_APPLICATION = 'MultiThread_vis.routing.application'
+# ASGI_APPLICATION = 'MultiThread_vis.asgi:application'
+CHANNEL_LAYERS = {
+
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+        # 'ROUTING': 'MultiThread_vis.routing.channel_routing',
+    },
+}
