@@ -3,3 +3,8 @@
 .pydevproject
 .*.pyc
 .env/
+# exclude everything
+Uploaded_files/*
+
+# exception to the rule
+!Uploaded_files/.gitkeep 
