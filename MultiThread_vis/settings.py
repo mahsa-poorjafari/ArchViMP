@@ -140,7 +140,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "Uploaded_files")en 
+MEDIA_ROOT = os.path.join(BASE_DIR, "Uploaded_files")
 
 MEDIA_URL = "/Uploaded_files/"
 
