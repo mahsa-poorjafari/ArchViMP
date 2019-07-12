@@ -6,19 +6,49 @@ from functools import partial
 import csv
 from django.conf import settings
 from django.utils import timezone
-
-settings.CURRENT_TIME = str(timezone.now()).replace(" ", "")
-print("CURRENT_TIME: ", settings.CURRENT_TIME)
+from django.core.files.storage import FileSystemStorage
 
 
 def index(request):
+    context = {}
+    settings.CURRENT_TIME = str(timezone.now()).replace(" ", "-")
+    current_time = str(settings.CURRENT_TIME).replace("+00:00", "").replace(":", "-").replace(".", "-")
+    print("CURRENT_TIME: ", settings.CURRENT_TIME)
+    context['error'] = ""
+    # print(dict(request.FILES))
+    if request.method == 'POST':
+        if 'trace_file' in request.FILES:
+            uploaded_file = request.FILES['trace_file']
+            fname = uploaded_file.name
+            file_data = fname.split(".")
+            print(file_data[-1])
+            if file_data[-1] not in ["txt"]:
+                context['error'] = "Valid format of the file is txt."
+            else:
+                project_name = request.POST.get("program_name")
+                project_name = str(project_name).replace(" ", "_")
+                fs = FileSystemStorage()
+                raw_file_name = project_name + "_" + current_time
+                file_name = raw_file_name + "." + file_data[-1]
+                name = fs.save(file_name, uploaded_file)
+                context['url'] = fs.url(name)
+                context['program_name'] = project_name if project_name else "Unnamed Program"
+                context['href_id'] = "UPLOADED"
+                context['file_path'] = fs.url(name)
+                context['raw_file_name'] = raw_file_name
+        else:
+            context['error'] = "Please enter a trace file."
 
-    return render(request, 'trace_vis.html')
+    return render(request, 'trace_vis.html', context)
 
 
 def home(request):
 
     return render(request, 'home.html')
+
+
+def trace_file_upload(request):
+    return render(request, 'upload_file.html')
 
 
 def write_to_csv_file(data, data_name):
@@ -83,8 +113,16 @@ def catastrophe(request):
 
 
 def logical_data_l0(request):
-    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_file_path(benchmark_name)
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    file_name = None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
     # shared_variables = get_shared_var_names()
     shared_variables_names = get_all_shared_var_names(trace_file)
     data_types_vars = get_data_types(trace_file)
@@ -92,12 +130,23 @@ def logical_data_l0(request):
 
     return render(request, 'logical_data_L0.html', {'data_types': data_types_vars,
                                                     'shared_variables': shared_variables_names,
-                                                    'benchmark_name': benchmark_name})
+                                                    'title_name': which_way,
+                                                    'file_path': trace_file,
+                                                    'raw_file_name': file_name,
+                                                    'href_id': b_parameter})
 
 
 def logical_comp(request):
-    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_file_path(benchmark_name)
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    file_name = None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
     thread_list = get_threads(trace_file)
     thr_func_dict = {}
     for indx, t in enumerate(thread_list):
@@ -107,19 +156,33 @@ def logical_comp(request):
 
     return render(request, 'logical_component.html', {'threads': thread_list,
                                                       'thread_function': thr_func_dict,
-                                                      'benchmark_name': benchmark_name})
+                                                      'title_name': which_way,
+                                                      'file_path': trace_file,
+                                                      'raw_file_name': file_name,
+                                                      'href_id': b_parameter})
 
 
 def logical_data_l1(request):
-    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_file_path(benchmark_name)
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    file_name = None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
     # print("trace_file=>  ", trace_file)
     shared_variables_names = get_all_shared_var_names(trace_file)
     struct_vars_groups = get_var_struct(shared_variables_names)
     variables = {"variables": struct_vars_groups.pop("variables")}
     return render(request, 'logical_data_L1.html', {'struct_vars': struct_vars_groups,
                                                     'variable_list': variables,
-                                                    'benchmark_name': benchmark_name})
+                                                    'title_name': which_way,
+                                                    'file_path': trace_file,
+                                                    'raw_file_name': file_name,
+                                                    'href_id': b_parameter})
 
 
 def logical_data_l2_ungrouped(request):
@@ -178,4 +241,5 @@ def ld_exe_path_l2(request):
     print("parent_function_list=>  ", parent_function_list)
 
     return render(request, 'exe_path_L2.html', {'benchmark_name': benchmark_name})
+
 

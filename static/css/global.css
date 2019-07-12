@@ -200,3 +200,7 @@
 
 .invalid_field {box-shadow: 0 .125rem .25rem #dc3545 !important; }
 .invalid_field .empty-file, .invalid_field .wrong-format{margin-top: 5em;}
+.file_uploaded a {
+    color: #0c5460;
+}
+.file_uploaded p {color: #1b1b1b}

@@ -14,7 +14,12 @@
             <h2>You can upload your Trace file (txt) here:</h2>
         </div>
         <div class="col-md-12 trace_file_form">
-            <form action="#" method="post" enctype="multipart/form-data" class="form-inline needs-validation trace_file_upload" id="trace_file_upload" novalidate>
+            {% if error != "" %}
+                <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% endif %}
+
+
+            <form method="post" enctype="multipart/form-data" class="form-inline needs-validation trace_file_upload" id="trace_file_upload" novalidate>
                 {% csrf_token %}
                 <div class="form-group col-md-3">
                     <input type="text" class="form-control program_name" placeholder="Enter Name of your Program" id="program_name" name="program_name">
@@ -31,6 +36,7 @@
                         <label class="custom-file-label" for="inputGroupFile01">Choose File</label>
                         <div class="invalid-feedback empty-file">Please enter a trace file.</div>
                         <div class="invalid-feedback wrong-format">Valid format of the file is txt.</div>
+
                     </div>
 
                 </div>
@@ -41,5 +47,26 @@
 
         </div>
     </div>
+
+    {% if url %}
+        <div class="col-md-12 file_uploaded">
+            <div class="alert alert-success" role="alert">
+                <h3>
+                    <i class="far fa-check-circle" aria-hidden="true" style="color: #155724"></i>
+                    <span>Your file has been uploaded</span>
+                </h3>
+                <br/>
+                <p>Program Name: <strong> {{ program_name }} </strong></p>
+                <p>File Path:  <a href="{{ url }}" target="_blank"> {{ url }}</a> </p>
+                <p>
+                    <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
+                    <span>Please check the side bar to access the diagrams</span>
+
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+
 
 {% endblock %}

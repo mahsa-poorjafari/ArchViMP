@@ -1,0 +1,75 @@
+<!-- Sidebar subnav for Benchmarks Holder -->
+<li class="row traceVisCollapse l1">
+    <a href="#{{ href_id }}SubViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
+        <i class="fa fa-window-restore col-2 benchmark-icon" aria-hidden="true"></i>
+        <span class="col-6 mv-title"> Sub Views</span>
+        <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
+
+    </a>
+    <ul class="collapse list-unstyled components dynamic-size" id="{{ href_id }}SubViewsSubmenu">
+        <li class="row">
+            <a  href="#ld_l2_Submenu" data-toggle="collapse" aria-expanded="false">
+                <span class="col-9 mv-title"> Logical Data (Level 2)</span>
+                <i class="fa fa-chevron-down col-1 submenu-l2-arrow benchmark-icon" aria-hidden="true"></i>
+            </a>
+            <ul class="collapse list-unstyled components dynamic-size" id="ld_l2_Submenu">
+                <li class="row">
+                    <a  href="Logical_Data_L2?b={{ href_id }}&FileName={{ file_name }}">
+                        <i class="fa fa-cogs col-2" aria-hidden="true"></i>
+                        <span class="col-10"> Operation of Threads</span>
+                    </a>
+                </li>
+                <hr/>
+                <li class="row">
+                    <a  href="exe_path_L2?b={{ href_id }}&FileName={{ file_name }}">
+                        <i class="fas fa-align-left col-2" aria-hidden="true"></i>
+                        <span class="col-10"> Execution Path of Threads</span>
+                    </a>
+                </li>
+                <li class="row">
+                    <a  href="#">
+                        <i class="fas fa-map-signs col-2" aria-hidden="true"></i>
+                        <span class="col-10"> Logical Decision of Threads</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="row">
+            <a  href="Logical_Data_L1?b={{ href_id }}&FileName={{ file_name }}">
+                <span class="col-12"> Logical Data (Level 1)</span>
+            </a>
+        </li>
+        <li class="row">
+            <a  href="Logical_Data_L0?b={{ href_id }}&FileName={{ file_name }}">
+                <span class="col-12"> Logical Data (Level 0)</span>
+            </a>
+        </li>
+        <li class="row">
+            <a  href="logical_comp?b={{ href_id }}&FileName={{ file_name }}">
+                <span class="col-12"> Logical Component (Level 0)</span>
+            </a>
+        </li>
+    </ul>
+</li>
+<li class="row traceVisCollapse l1">
+    <a href="#MainViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
+        <i class="fa fa-window-maximize col-2 benchmark-icon" aria-hidden="true"></i>
+        <span class="col-6 mv-title"> Main Views</span>
+        <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
+
+    </a>
+    <ul class="collapse list-unstyled components dynamic-size" id="MainViewsSubmenu">
+          <li class="row">
+              <a href="#">
+                  <span class="col-12"> Time Line View</span>
+
+              </a>
+          </li>
+          <li class="row">
+              <a  href="#">
+                  <span class="col-12"> Structure View</span>
+
+              </a>
+          </li>
+      </ul>
+</li>

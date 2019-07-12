@@ -275,11 +275,13 @@ def create_ld_thread_op(thread_var_op, op):
     return ld_l2_group
 
 
-def get_file_path(benchmark_name):
-
+def get_file_path(benchmark_name, *args, **kwargs):
+    file_name = kwargs.get('file_name') if kwargs.get('file_name') is not None else ""
+    print("file_name--  ", file_name)
     switcher = {
         "ROSACE": "benchmark_traces/ROSACE/TraceDataRosace.txt",
         "OCEAN": "benchmark_traces/OCEAN/Splash2ocean_contiguous_partitions.txt",
+        "UPLOADED": "Uploaded_files/" + file_name + ".txt",
     }
     return switcher.get(benchmark_name, "Invalid Value")
 

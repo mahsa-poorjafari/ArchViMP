@@ -139,3 +139,8 @@ CHANNEL_LAYERS = {
         # 'ROUTING': 'MultiThread_vis.routing.channel_routing',
     },
 }
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "Uploaded_files")
+
+MEDIA_URL = "/Uploaded_files/"
+

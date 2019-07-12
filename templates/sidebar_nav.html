@@ -106,6 +106,29 @@
                 {% endwith %}
             </ul>
         </li>
-        <hr/>
+        {% if href_id == "UPLOADED" %}
+            <li class="row btn-info">
+                <a  href="#">
+                    <i class="fas fa-file-upload col-2" aria-hidden="true"></i>
+                    <span class="col-9"> Uploaded Trace File</span>
+                </a>
+            </li>
+            <li class="row traceVisCollapse l0">
+            <a  href="#UploadedSubmenu" data-toggle="collapse" aria-expanded="false">
+                <i class="fa fa-tachometer-alt col-2 benchmark-icon"  aria-hidden="true"></i>
+                <span class="col-6 mv-title">Your Diagrams</span>
+                <i class="fa fa-chevron-down col-1 submenu-arrow benchmark-icon" aria-hidden="true"></i>
+            </a>
+            <ul class="collapse list-unstyled components dynamic-size" id="UploadedSubmenu">
+                <!-- I want to send a string variable to the subnav.html file, then the id of the ul will be dynamic. -->
+                {% with  href_id="UPLOADED" %}
+                {% with  file_name=raw_file_name %}
+                    {% include 'sidebar_subnav_uploaded.html' %}
+                {% endwith %}
+                {% endwith %}
+            </ul>
+        </li>
+        {% endif %}
+
     </ul>
 </nav>

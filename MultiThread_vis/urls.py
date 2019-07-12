@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from logical_vis import views, test_diagrams, error_handling
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -35,5 +37,10 @@ urlpatterns = [
     url(r'Logical_Data_L2', views.logical_data_l2, name='Logical_Data_L2'),
     url(r'LD_L2_unG', views.logical_data_l2_ungrouped, name='logical_data_l2_ungrouped'),
     url(r'exe_path_L2', views.ld_exe_path_l2, name='logical_data_l2_exe_path'),
+    url(r'trace_file_upload', views.trace_file_upload, name='trace_file_upload'),
 ]
 # handler404 = error_handling.error_404_view
+
+# This should be here only during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
