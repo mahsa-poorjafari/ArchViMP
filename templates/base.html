@@ -54,15 +54,30 @@
                     e.preventDefault();
                     program_name = document.getElementById("program_name").value;
                     Tracefile = document.getElementById("inputGroupFile01").value;
-                    var msg = {
-                        type: "message",
-                        text: {
-                            "program_name": program_name,
-                            "Tracefile": Tracefile
-                        },
-                        date: Date.now()
-                      };
-                    socket.send(JSON.stringify(msg));
+                    var fileExt = Tracefile.split('.').pop();
+                    console.log(fileExt);
+                    let emptyFile = document.getElementById("trace_file_upload").getElementsByClassName("empty-file")[0];
+                    let wrongFile = document.getElementById("trace_file_upload").getElementsByClassName("wrong-format")[0];
+                    if(Tracefile === ""){
+                        document.getElementById("custom-file").classList.add("invalid_field");
+                        emptyFile.style.display = "block";
+                        wrongFile.style.display = "none";
+                    }else if (Tracefile !== "" && fileExt !== "txt" || fileExt !== "text"){
+                        document.getElementById("custom-file").classList.add("invalid_field");
+                        wrongFile.style.display = "block";
+                        emptyFile.style.display = "none";
+                    }
+                    else{
+                        var msg = {
+                            type: "message",
+                            text: {
+                                "program_name": program_name,
+                                "Tracefile": Tracefile
+                            },
+                            date: Date.now()
+                        };
+                        socket.send(JSON.stringify(msg));
+                    }
                 });
             });
 
@@ -78,7 +93,7 @@
             }
 
             socket.onclose = function(e) {
-                console.error('Chat socket closed unexpectedly');
+                console.error('socket closed unexpectedly');
             };
             // Handle any errors that occur.
             socket.onerror = function(error) {

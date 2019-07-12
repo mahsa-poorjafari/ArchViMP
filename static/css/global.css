@@ -198,4 +198,5 @@
     margin-left: 0; padding-left: 1em;
 }
 
-.row.Trace_Vis {}
+.invalid_field {box-shadow: 0 .125rem .25rem #dc3545 !important; }
+.invalid_field .empty-file, .invalid_field .wrong-format{margin-top: 5em;}

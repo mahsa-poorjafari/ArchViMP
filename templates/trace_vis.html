@@ -19,17 +19,20 @@
                 <div class="form-group col-md-3">
                     <input type="text" class="form-control program_name" placeholder="Enter Name of your Program" id="program_name" name="program_name">
                 </div>
-                <div class="input-group">
+                <div class="input-group" id="custom-file">
+
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="inputGroupFileAddon01">
                             <i class="fa fa-upload" aria-hidden="true"></i>
                         </span>
                     </div>
-                    <div class="custom-file">
+                    <div class="custom-file rounded" >
                         <input type="file" name="trace_file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
-                        <div class="invalid-feedback">Please provide a valid File.</div>
-                        <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                        <label class="custom-file-label" for="inputGroupFile01">Choose File</label>
+                        <div class="invalid-feedback empty-file">Please enter a trace file.</div>
+                        <div class="invalid-feedback wrong-format">Valid format of the file is txt.</div>
                     </div>
+
                 </div>
                 <div class="form-group col-md-3">
                     <button type="submit" class="btn btn-primary">Upload</button>
