@@ -107,15 +107,16 @@ function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill,
 
 }
 
-function drawLcForLd(graph, parent, ldNode, childList, op, benchmarkName) {
+function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, benchmarkName) {
     let nodeSize = {};
     let chX = 600;
-    let chY = 50;
+    let chY = logicalCompY;
     for (let j=0; j< childList.length; j++){
         let nodeId = 'LD_L2' + op + '_' + j;
         let Text = childList[j].innerHTML;
         nodeSize = setNodeSize(Text, 'LogicalComp');
         nodeStyle(graph, 'LogicalComp');
+        console.log("============== " + Text+ " - " + chY + "   j= ", j);
         let lcNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         lcNode.source = ldNode;
         // console.table(lcNode);

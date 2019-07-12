@@ -32,14 +32,21 @@ def get_first_function(t, indx, trace_file):
         else:
             csv_file.seek(0, 0)
             thread_functioncall_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and
-                                                            row[1].lstrip() == str(t)
-                                                            and row[5].lstrip() in ["LOCAL;CONSTANT;", "CONSTANT;LOCAL;"],
+                                                row[1].lstrip() == str(t)
+                                                and row[5].lstrip() in ["LOCAL;CONSTANT;", "CONSTANT;LOCAL;",
+                                                "CONSTANT;CONSTANT;"],
                                                 csv_reader)
 
             thread_functioncall_flist = list(thread_functioncall_filter)
+
             # print("thread_functioncall_flist => \n", thread_functioncall_flist)
-            thread_functioncall_list = thread_functioncall_flist[-1] \
-                if len(thread_functioncall_flist) > 0 else None
+            if "ROSACE" in trace_file:
+                thread_functioncall_list = thread_functioncall_flist[-1] \
+                    if len(thread_functioncall_flist) > 0 else None
+            else:
+                thread_functioncall_list = thread_functioncall_flist[0] \
+                    if len(thread_functioncall_flist) > 0 else None
+
             thread_function = {t: thread_functioncall_list[3] if thread_functioncall_list is not None else None}
     csv_file.close()
     # print(t, "=>  ", thread_function)
@@ -268,6 +275,7 @@ def create_ld_thread_op(thread_var_op, op):
                 ld_l2_group[group_name] = ld_l2_group.pop(a_avoid_none[0])
                 ld_l2_group[group_name]['logical_components'].append(lc)
             else:
+                print("op= ", op, "    lc= ", lc)
                 group_name = op + lc
                 lc_list.append(lc)
                 ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": ld_vars}})

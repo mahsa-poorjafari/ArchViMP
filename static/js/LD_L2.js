@@ -57,6 +57,7 @@ function mainGrouped(container, txt, op) {
         try {
             let lcX = 50;
             let lcY = 50;
+            let logicalCompY = 50;
 
             configEdgeStyle(graph, "#000000");
             let eStyle = graph.getStylesheet().getDefaultEdgeStyle();
@@ -88,7 +89,8 @@ function mainGrouped(container, txt, op) {
 				    evt.consume();
                 });
 
-                drawLcForLd(graph, parent, ldNode, lcList, op, benchmarkName)
+                drawLcForLd(graph, parent, ldNode, lcList, logicalCompY, op, benchmarkName)
+                logicalCompY += 200;
 
             }
 

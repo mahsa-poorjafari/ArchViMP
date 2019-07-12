@@ -195,12 +195,21 @@ def logical_data_l2_ungrouped(request):
 
 
 def logical_data_l2(request):
-    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_file_path(benchmark_name)
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    file_name = None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
     threads = get_threads(trace_file)
 
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(threads, ["LOAD"], trace_file)
+    # print("\n thread_var_input =  ", thread_var_input)
     ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
     ld_input_g = group_over10_child(ld_input_lc)
 
@@ -214,7 +223,10 @@ def logical_data_l2(request):
     ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
     ld_process_g = group_over10_child(ld_process_lc)
 
-    return render(request, 'logical_data_L2.html', {'benchmark_name': benchmark_name,
+    return render(request, 'logical_data_L2.html', {'title_name': which_way,
+                                                    'file_path': trace_file,
+                                                    'raw_file_name': file_name,
+                                                    'href_id': b_parameter,
                                                     'ld_input_lc': ld_input_g,
                                                     'ld_output_lc': ld_output_g,
                                                     'ld_process_lc': ld_process_g})
