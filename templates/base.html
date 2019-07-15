@@ -47,37 +47,32 @@
             };
             // Send data from form to server
             window.addEventListener("load", function () {
-                let program_name = null;
-                let Tracefile = null;
-                let traceFileForm = document.getElementById("trace_file_upload");
+                let uploadedTraceFile = null;
+                let traceFileForm = document.getElementById("select_trace_file");
+                let emptyList = document.getElementById("empty-list");
+                let wrongFile = document.getElementsByClassName("wrong-format")[0];
+                let emptyFile = document.getElementsByClassName("empty-file")[0];
                 {#traceFileForm.addEventListener("submit", function(e) {#}
                 {#    e.preventDefault();#}
-                {#    program_name = document.getElementById("program_name").value;#}
-                {#    Tracefile = document.getElementById("inputGroupFile01").value;#}
-                {#    var fileExt = Tracefile.split('.').pop();#}
-                {#    console.log(fileExt);#}
-                {#    let emptyFile = document.getElementById("trace_file_upload").getElementsByClassName("empty-file")[0];#}
-                {#    let wrongFile = document.getElementById("trace_file_upload").getElementsByClassName("wrong-format")[0];#}
-                {#    if(Tracefile === ""){#}
-                {#        document.getElementById("custom-file").classList.add("invalid_field");#}
-                {#        emptyFile.style.display = "block";#}
-                {#        wrongFile.style.display = "none";#}
-                {#    }else if (Tracefile !== "" && fileExt !== "txt" || fileExt !== "text"){#}
-                {#        document.getElementById("custom-file").classList.add("invalid_field");#}
-                {#        wrongFile.style.display = "block";#}
-                {#        emptyFile.style.display = "none";#}
-                {#    }#}
-                {#    else{#}
-                {#        var msg = {#}
+                {#    wrongFile.style.display = "none";#}
+                {#    emptyFile.style.display = "none";#}
+                {#    uploadedTraceFile = traceFileForm.getElementsByClassName("select_tag_file")[0].value;#}
+                {##}
+                {#    if(uploadedTraceFile === "" || uploadedTraceFile === null){#}
+                {#        document.getElementById("select_tag_file").classList.add("invalid_field");#}
+                {#        emptyList.style.display = "block";#}
+                {#    }else{#}
+                {#        emptyList.style.display = "none";#}
+                {#        let msg = {#}
                 {#            type: "message",#}
                 {#            text: {#}
-                {#                "program_name": program_name,#}
-                {#                "Tracefile": Tracefile#}
+                {#                "existingTraceFile": uploadedTraceFile#}
                 {#            },#}
                 {#            date: Date.now()#}
                 {#        };#}
                 {#        socket.send(JSON.stringify(msg));#}
                 {#    }#}
+                {##}
                 {# });#}
             });
 

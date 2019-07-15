@@ -1,57 +1,26 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <div class="wrapper content col-md-2" style="overflow-wrap: break-word;">
-        <!-- Sidebar  -->
-        <nav id="sidebar">
-            <div class="sidebar-header">
-                <h3>Further Info</h3>
-                <strong>FI</strong>
-            </div>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <h2>Overall view - Thread access shared memory</h2>
+            <h3>This is a view without applying our method</h3>
 
-            <ul class="list-unstyled components">
-                <li class="active">
-                    <a href="#shared_variables" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-memory"></i>
-                        Shared Variables
-                        <span>( {{ shared_variables|length }} )</span>
-                    </a>
-                    <ul class="collapse list-unstyled action_list" id="shared_variables">
-                        {% for v in shared_variables %}
-                            <li>{{v}}</li>
-                        {% endfor %}
-                    </ul>
-                </li>
-                <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-dice-d20"></i>
-                        Threads
-                        <span>( {{ thread_ids|length }} )</span>
-                    </a>
+        </div>
+    </nav>
 
-                    <ul class="collapse list-unstyled action_list threads" id="pageSubmenu">
-                        {% for t in thread_ids %}
-                            <li>{{ t }}</li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            </ul>
-
-        </nav>
-    </div>
-    <div class="col-md-10">
-        <h3>Overall view - Thread access shared memory</h3>
+    <div class="col-md-12">
         <div class="tabs">
           <div class="tab-button-outer">
             <ul id="tab-button">
-              <li><a href="#tab01">Diagram</a></li>
-              <li><a href="#tab02">Textual</a></li>
+              <li><a href="#tab01" class="btn-info">Diagram</a></li>
+              <li><a href="#tab02" class="btn-info">Textual</a></li>
             </ul>
           </div>
             <div class="tab-select-outer">
                 <select id="tab-select">
-                    <option value="#tab01">Diagram</option>
-                    <option value="#tab02">Textual</option>
+                    <option value="#tab01" class="shadow-sm rounded">Diagram</option>
+                    <option value="#tab02" class="shadow-sm rounded">Textual</option>
                 </select>
             </div>
         </div>

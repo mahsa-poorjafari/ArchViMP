@@ -107,7 +107,7 @@ function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill,
 
 }
 
-function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, benchmarkName) {
+function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrParam) {
     let nodeSize = {};
     let chX = 600;
     let chY = logicalCompY;
@@ -123,7 +123,7 @@ function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, benchma
         graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
             let cell = evt.getProperty('cell');
             if (cell['style'] === "LogicalComp" || cell['style'] === "LogicalComp_big"){
-                window.location = "http://127.0.0.1:8000/logical_comp?b=" + benchmarkName;
+                window.location = "http://127.0.0.1:8000/logical_comp?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
             }
             evt.consume();
         });
@@ -286,9 +286,15 @@ function get_url_benchmark() {
     return benchmarkName
 
 }
+function get_url_fileName() {
+    let url_string = window.location.href;
+    let url = new URL(url_string);
+    let FileName = url.searchParams.get("FileName");
+    return FileName
+}
 
 
-function drawTdForLd(graph, parent, pNode, childList, op) {
+function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
     let nodeSize = {};
     let pX = 50;
     let pY = 2000;
@@ -342,30 +348,44 @@ function drawTdForLd(graph, parent, pNode, childList, op) {
 
         }else{
             if (pNode !== null){
-                if (Text.length > 20){
+                console.log("===========" + Text);
+                if (Text.length > 20 && childList.length <= 2) {
+                    values = [pX+300, pY-100];
+                }else if(Text.length > 20 && childList.length >= 2){
                     values = setPositionBig(pX, pY, j);
                 }else{
                     values = setPosition(pX, pY, j);
                 }
             }else{
-                values = setPositionVars(chX, chY, j);
+                values = setPositionVars(chX, chX, j);
             }
         }
         chX = values[0];
         chY = values[1];
-        let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
-        chNode.target = pNode;
-        let benchmarkName= get_url_benchmark();
-        graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
-                let cell = evt.getProperty('cell');
-                if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
-                    window.location = "http://127.0.0.1:8000/Logical_Data_L1?b=" + benchmarkName;
-                }
-                evt.consume();
-            });
-        graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+        if (Text !== ""){
+            let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
+            chNode.target = pNode;
+            graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+                    let cell = evt.getProperty('cell');
+                    if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
+                        window.location = "http://127.0.0.1:8000/logical_comp?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                    }
+                    evt.consume();
+                });
+            graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+        }
 
     }
 
 
+}
+
+function scrollToTop(scrollDuration) {
+    var scrollStep = -window.scrollY / (scrollDuration / 15),
+        scrollInterval = setInterval(function(){
+        if ( window.scrollY != 0 ) {
+            window.scrollBy( 0, scrollStep );
+        }
+        else clearInterval(scrollInterval);
+    },15);
 }

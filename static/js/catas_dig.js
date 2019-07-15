@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let varList = document.getElementById('var_list').getElementsByClassName('set_var_id');
                 // console.log(varList.length);
                 let varThrList = document.getElementById("sidebar").getElementsByClassName("threads");
+                // let varThrList = document.getElementById("sidebar").getElementsByClassName("threads");
                 let thrList = varThrList[0].getElementsByTagName("li");
                 for (let j = 0; j < thrList.length; j++) {
                     let thrId = 'thr'+j;

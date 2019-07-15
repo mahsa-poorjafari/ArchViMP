@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'LD_L2_unG', views.logical_data_l2_ungrouped, name='logical_data_l2_ungrouped'),
     url(r'exe_path_L2', views.ld_exe_path_l2, name='logical_data_l2_exe_path'),
     url(r'trace_file_upload', views.trace_file_upload, name='trace_file_upload'),
+    url(r'time_line_view', views.time_line_view, name='time_line_view'),
 ]
 # handler404 = error_handling.error_404_view
 

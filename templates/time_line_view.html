@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <h2>{{ title_name }}</h2>
+            <h4>Timeline View - Access the Shared Variables through time</h4>
+        </div>
+    </nav>
+    <div class="tabs">
+      <div class="tab-button-outer">
+        <ul id="tab-button">
+          <li><a href="#tab01" class="btn-info">Diagram</a></li>
+          <li><a href="#tab02" class="btn-info">Textual</a></li>
+        </ul>
+      </div>
+        <div class="tab-select-outer">
+            <select id="tab-select">
+                <option value="#tab01" class="shadow-sm rounded">Diagram</option>
+                <option value="#tab02" class="shadow-sm rounded">Textual</option>
+            </select>
+        </div>
+    </div>
+    <div id="tab01" class="tab-contents">
+        <div class="col-md-12 well diagram_container" id="time_line_diagram"></div>
+    </div>
+    <div id="tab02" class="tab-contents">
+        {% for k, v in thread_activity.items %}
+            <div id="k">
+                <ul class="list_level0" style="display: inline">
+                    <li class="li-list_level0">
+                        <span>{{ k }}</span>
+                        {% for ts, tv in v.items %}
+                            <p>{{ ts  }}</p>
+                            <p>{{ tv  }}</p>
+                        {% endfor %}
+                    </li>
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

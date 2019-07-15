@@ -4,16 +4,21 @@ from logical_vis.dynamic_analysis import *
 from operator import is_not
 from functools import partial
 import csv
+import os
+import collections
 from django.conf import settings
 from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
 
+settings.CURRENT_TIME = str(timezone.now()).replace(" ", "-")
+
 
 def index(request):
     context = {}
-    settings.CURRENT_TIME = str(timezone.now()).replace(" ", "-")
     current_time = str(settings.CURRENT_TIME).replace("+00:00", "").replace(":", "-").replace(".", "-")
     print("CURRENT_TIME: ", settings.CURRENT_TIME)
+    existing_files = [f for f in os.listdir(settings.MEDIA_ROOT)]
+    context['existing_files'] = existing_files
     context['error'] = ""
     # print(dict(request.FILES))
     if request.method == 'POST':
@@ -36,6 +41,16 @@ def index(request):
                 context['href_id'] = "UPLOADED"
                 context['file_path'] = fs.url(name)
                 context['raw_file_name'] = raw_file_name
+
+        elif request.POST.get('select_tag_file'):
+            uploaded_file = request.POST.get('select_tag_file')
+            file_data = uploaded_file.split(".")
+            context['url'] = os.path.join(settings.MEDIA_ROOT, uploaded_file)
+            context['program_name'] = "Unnamed Program"
+            context['href_id'] = "UPLOADED"
+            context['file_path'] = os.path.join(settings.MEDIA_ROOT, uploaded_file)
+            context['raw_file_name'] = file_data[0]
+
         else:
             context['error'] = "Please enter a trace file."
 
@@ -53,11 +68,16 @@ def trace_file_upload(request):
 
 def write_to_csv_file(data, data_name):
     print("-----------------write_to_csv_file-------------------")
-    file_name = data_name + '_' + settings.CURRENT_TIME
-    with open('output_csv/' + file_name + '.csv', 'w', encoding='utf-8') as csv_file:
+    current_time = str(settings.CURRENT_TIME).replace("+00:00", "").replace(":", "-").replace(".", "-")
+    file_name = data_name + '_' + current_time
+    # f = open('output_csv/' + file_name + '.csv', "w+")
+    # for row in data:
+    #     f.write(row + "\n")
+    # f.close()
+    with open('output_csv/' + file_name + '.txt', 'w+', encoding='utf-8') as csv_file:
         csv_writer = csv.writer(csv_file)
-        for key, value in data.items():
-            csv_writer.writerow([key, list(value)])
+        for row in data:
+            csv_writer.writerow(row)
     csv_file.close()
 
 
@@ -103,8 +123,17 @@ def thread_per_vars(shared_variables, thread_ids):
 
 
 def catastrophe(request):
+    file_name = None
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
     shared_variables_names = get_shared_var_names()
-    thread_ids = get_threads()
+    thread_ids = get_threads(trace_file)
     t_v_op = thread_per_vars(shared_variables_names, thread_ids)
     return render(request, 'catastrophe.html', {"t_v_op": t_v_op,
                                                 "t_v_op_list": list(t_v_op),
@@ -113,8 +142,8 @@ def catastrophe(request):
 
 
 def logical_data_l0(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     file_name = None
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
         trace_file = get_file_path(b_parameter, file_name=file_name)
@@ -253,5 +282,47 @@ def ld_exe_path_l2(request):
     print("parent_function_list=>  ", parent_function_list)
 
     return render(request, 'exe_path_L2.html', {'benchmark_name': benchmark_name})
+
+
+def time_line_view(request):
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    time_activity = {}
+    thread_activity = {}
+    # file_name = None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
+    threads = get_threads(trace_file)
+    for t in threads:
+        t_id = t if "Main_" not in t else t.split("_")[1]
+        print(t_id)
+        with open(trace_file, 'r') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+
+            thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
+                                               row[3] is not "" and "CONSTANT;" in row[5], csv_reader)
+            thread_list = list(thread_filter)
+            # csv_file.seek(0, 0)
+        csv_file.close()
+        # write_to_csv_file(thread_list, "timeline_" + t_id)
+        activity_dict = {k[0] for k in thread_list}
+        # print(activity_dict)
+        for ts in activity_dict:
+            thread_filter = map(lambda r: {r[3]: r[2]} if r[0] == ts else None, thread_list)
+            time_stamp_act = list(filter(partial(is_not, None), thread_filter))
+            time_stamp_act_list = list(time_stamp_act)
+            time_activity.update({ts: time_stamp_act_list})
+            # time_activity.sort()
+            # time_activity_nodups = remove_dups(time_activity)
+        od = collections.OrderedDict(sorted(time_activity.items()))
+        thread_activity.update({t: od})
+    return render(request, 'time_line_view.html', {'title_name': which_way,
+                                                   "threads": threads,
+                                                   "thread_activity": thread_activity})
 
 

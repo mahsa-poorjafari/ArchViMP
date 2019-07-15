@@ -80,16 +80,20 @@ function mainGrouped(container, txt, op) {
 
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 let benchmarkName = get_url_benchmark();
+                let fileName = get_url_fileName();
+                let ulrParam = [benchmarkName];
+                ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
 
                 graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+                    scrollToTop(1000);
 				    let cell = evt.getProperty('cell');
 				    if (cell['style'] === "logicalData_R_big" || cell['style'] === "logicalData_R"){
                         document.getElementById('lc_l1_dig').style.display = "block";
                     }
 				    evt.consume();
                 });
-
-                drawLcForLd(graph, parent, ldNode, lcList, logicalCompY, op, benchmarkName)
+                // console.log("benchmarkName------------ " + ulrParam);
+                drawLcForLd(graph, parent, ldNode, lcList, logicalCompY, op, ulrParam);
                 logicalCompY += 200;
 
             }
@@ -141,8 +145,8 @@ function logicalDataLevel1(container, txt, op) {
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
         try {
-            let lcX = 500;
-            let lcY = 0;
+            let lcX = 300;
+            let lcY = 200;
 
             configEdgeStyle(graph, "#000000");
 
@@ -156,10 +160,32 @@ function logicalDataLevel1(container, txt, op) {
                 let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
                 let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
-                lcY = (i === 0 && lcText.length > 20)? 400 : lcY + 700;
-                console.log(lcText + "-" + lcX +"--"+ lcY);
+                console.log(lcText +"   " + lcText.length + "  -  " + lcX +"--"+ lcY);
+                if (i === 0){
+                    lcX = 300;
+                    lcY = 200;
+                }else if (i === 0 && lcText.length > 20){
+                    lcY = 400;
+                }else if ((i+1)%2 === 0 && lcText.length > 20){
+                    lcY += 700;
+                    lcX += 400;
+                }else if ((i+1)%2 === 0){
+                    lcX = 300;
+                    lcY += 400;
+                }else {
+                    lcX += 300;
+                    lcY += 400;
+                }
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                drawTdForLd(graph, parent, ldNode, ldL2List, op)
+                // lcY = (i === 0 && lcText.length > 20)? 400 : (lcText.length > 20) ? lcY + 700: 200;
+
+
+                let benchmarkName = get_url_benchmark();
+                let fileName = get_url_fileName();
+                let ulrParam = [benchmarkName];
+                ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
+
+                drawTdForLd(graph, parent, ldNode, ldL2List, op, ulrParam)
             }
         }finally {
             graph.getModel().endUpdate();
