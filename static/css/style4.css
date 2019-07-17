@@ -167,7 +167,7 @@ i, span {
 #sidebar.active .dynamic-size span{padding: 0.5em; text-align: left; width: 70%}
 #sidebar.active .dynamic-size .traceVisCollapse span,
 #sidebar.active .dynamic-size .traceVisCollapse i{margin-left: 0; width: 70%}
-#sidebar .dynamic-size .traceVisCollapse .dynamic-size{margin-left: 2em; width: 70%}
+#sidebar .dynamic-size .traceVisCollapse .dynamic-size{margin-left: 2em; width: 76%}
 
 a[data-toggle="collapse"] {
     position: relative;

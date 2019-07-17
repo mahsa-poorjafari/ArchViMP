@@ -40,8 +40,8 @@ function main(container){
         try
         {
 
-            let dtX = null;
-            let dtY = null;
+            let dtX = 500;
+            let dtY = 300;
 
             configEdgeStyle(graph, "#888");
             let dataTypes = document.getElementById("logical_data_l0_textual").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
@@ -56,21 +56,10 @@ function main(container){
 
                 nodeSize = setNodeSize(dtText, 'dataType' );
                 nodeStyle(graph, 'dataType');
-                if (i === 0){
-                    // dtStList.forEach();
-                    dtX = 200;
-                    dtY = 250;
-                    }
-                    else if (i !== 0 && (i-1)%2 === 0){
-                        dtX += 800;
-                        dtY += 200;
-                    }else{
-                        dtY += 400;
-                        dtX = 200;
-                    }
 
                 let dtNode = graph.insertVertex(parent, dtId, dtText, dtX, dtY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // let dtStList = dataTypes[i].getElementsByClassName("list_level1")[0].getElementsByClassName('li-list_level1');
+                dtY += 800;
 
                 for(let j = 0; j < dtStList.length; j++){
                     let firstElement = dtStList[j].firstElementChild;

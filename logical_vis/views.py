@@ -9,6 +9,8 @@ import collections
 from django.conf import settings
 from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
+from datetime import datetime
+
 
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "-")
 
@@ -123,22 +125,26 @@ def thread_per_vars(shared_variables, thread_ids):
 
 
 def catastrophe(request):
-    file_name = None
     b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
-        trace_file = get_file_path(b_parameter, file_name=file_name)
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
         which_way = b_parameter + " File"
     else:
-        trace_file = get_file_path(b_parameter)
+        trace_file = get_trace_file_path(b_parameter)
         which_way = b_parameter + " Benchmark"
-    shared_variables_names = get_shared_var_names()
+
+    shared_variables_names = get_all_shared_var_names(b_parameter)
+    # print(shared_variables_names)
     thread_ids = get_threads(trace_file)
+    pure_thread_ids = []
+    [pure_thread_ids.append(tid.split("_")[1]) if "Main_" in tid else pure_thread_ids.append(tid) for tid in thread_ids]
     t_v_op = thread_per_vars(shared_variables_names, thread_ids)
     return render(request, 'catastrophe.html', {"t_v_op": t_v_op,
+                                                'title_name': which_way,
                                                 "t_v_op_list": list(t_v_op),
                                                 "shared_variables": shared_variables_names,
-                                                "thread_ids": thread_ids})
+                                                "thread_ids": pure_thread_ids})
 
 
 def logical_data_l0(request):
@@ -146,15 +152,15 @@ def logical_data_l0(request):
     b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
-        trace_file = get_file_path(b_parameter, file_name=file_name)
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
         which_way = b_parameter + " File"
     else:
-        trace_file = get_file_path(b_parameter)
+        trace_file = get_trace_file_path(b_parameter)
         which_way = b_parameter + " Benchmark"
 
-    # shared_variables = get_shared_var_names()
-    shared_variables_names = get_all_shared_var_names(trace_file)
-    data_types_vars = get_data_types(trace_file)
+    shared_variables_names = get_all_shared_var_names(b_parameter)
+
+    data_types_vars = get_data_types(b_parameter)
     # print("\n data_types_vars=>  ", data_types_vars)
 
     return render(request, 'logical_data_L0.html', {'data_types': data_types_vars,
@@ -170,10 +176,10 @@ def logical_comp(request):
     file_name = None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
-        trace_file = get_file_path(b_parameter, file_name=file_name)
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
         which_way = b_parameter + " File"
     else:
-        trace_file = get_file_path(b_parameter)
+        trace_file = get_trace_file_path(b_parameter)
         which_way = b_parameter + " Benchmark"
 
     thread_list = get_threads(trace_file)
@@ -196,14 +202,14 @@ def logical_data_l1(request):
     file_name = None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
-        trace_file = get_file_path(b_parameter, file_name=file_name)
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
         which_way = b_parameter + " File"
     else:
-        trace_file = get_file_path(b_parameter)
+        trace_file = get_trace_file_path(b_parameter)
         which_way = b_parameter + " Benchmark"
 
     # print("trace_file=>  ", trace_file)
-    shared_variables_names = get_all_shared_var_names(trace_file)
+    shared_variables_names = get_all_shared_var_names(b_parameter)
     struct_vars_groups = get_var_struct(shared_variables_names)
     variables = {"variables": struct_vars_groups.pop("variables")}
     return render(request, 'logical_data_L1.html', {'struct_vars': struct_vars_groups,
@@ -216,7 +222,7 @@ def logical_data_l1(request):
 
 def logical_data_l2_ungrouped(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_file_path(benchmark_name)
+    trace_file = get_trace_file_path(benchmark_name)
     threads = get_threads(trace_file)
     thread_var_op = get_thread_var_op(threads, ["LOAD"], trace_file)
     return render(request, 'logical_data_L2_Ungrouped.html', {'thread_var_op': thread_var_op,
@@ -228,42 +234,43 @@ def logical_data_l2(request):
     file_name = None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
-        trace_file = get_file_path(b_parameter, file_name=file_name)
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
         which_way = b_parameter + " File"
     else:
-        trace_file = get_file_path(b_parameter)
+        trace_file = get_trace_file_path(b_parameter)
         which_way = b_parameter + " Benchmark"
 
     threads = get_threads(trace_file)
 
     # Get the variables that are threads Input
-    thread_var_input = get_thread_var_op(threads, ["LOAD"], trace_file)
+    thread_var_input = get_thread_var_op(threads, ["LOAD"], trace_file, b_parameter)
     # print("\n thread_var_input =  ", thread_var_input)
     ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
-    ld_input_g = group_over10_child(ld_input_lc)
+    # print("\n ld_input_lc=> ", ld_input_lc)
+    # ld_input_g = group_over10_child(ld_input_lc)
 
     # Get the variables that are threads Output
-    thread_var_output = get_thread_var_op(threads, ["STORE"], trace_file)
+    thread_var_output = get_thread_var_op(threads, ["STORE"], trace_file, b_parameter)
     ld_output_lc = create_ld_thread_op(thread_var_output, "Output_")
-    ld_output_g = group_over10_child(ld_output_lc)
+    # ld_output_g = group_over10_child(ld_output_lc)
 
     # Get the variables that are threads Processed
-    thread_var_process = get_thread_var_op(threads, ["LOAD", "STORE"], trace_file)
+    thread_var_process = get_thread_var_op(threads, ["LOAD", "STORE"], trace_file, b_parameter)
     ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
-    ld_process_g = group_over10_child(ld_process_lc)
+    # ld_process_g = group_over10_child(ld_process_lc)
 
     return render(request, 'logical_data_L2.html', {'title_name': which_way,
                                                     'file_path': trace_file,
                                                     'raw_file_name': file_name,
                                                     'href_id': b_parameter,
-                                                    'ld_input_lc': ld_input_g,
-                                                    'ld_output_lc': ld_output_g,
-                                                    'ld_process_lc': ld_process_g})
+                                                    'ld_input_lc': ld_input_lc,
+                                                    'ld_output_lc': ld_output_lc,
+                                                    'ld_process_lc': ld_process_lc})
 
 
 def ld_exe_path_l2(request):
     benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_file_path(benchmark_name)
+    trace_file = get_trace_file_path(benchmark_name)
     threads = get_threads(trace_file)
     thr_func_dict = {}
     parent_function_list = []
@@ -286,19 +293,23 @@ def ld_exe_path_l2(request):
 
 def time_line_view(request):
     b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    time_activity = {}
     thread_activity = {}
     # file_name = None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
-        trace_file = get_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File"
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File=>   " + file_name
     else:
-        trace_file = get_file_path(b_parameter)
+        trace_file = get_trace_file_path(b_parameter)
         which_way = b_parameter + " Benchmark"
 
     threads = get_threads(trace_file)
+    all_time_stamp = get_time_stamp_list(trace_file)
+    if "." in all_time_stamp[-1]:
+        del all_time_stamp[-1]
+    print(all_time_stamp)
     for t in threads:
+        time_activity = {}
         t_id = t if "Main_" not in t else t.split("_")[1]
         print(t_id)
         with open(trace_file, 'r') as csv_file:
@@ -307,22 +318,25 @@ def time_line_view(request):
             thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
                                                row[3] is not "" and "CONSTANT;" in row[5], csv_reader)
             thread_list = list(thread_filter)
+            # print(thread_list)
             # csv_file.seek(0, 0)
         csv_file.close()
         # write_to_csv_file(thread_list, "timeline_" + t_id)
-        activity_dict = {k[0] for k in thread_list}
-        # print(activity_dict)
-        for ts in activity_dict:
-            thread_filter = map(lambda r: {r[3]: r[2]} if r[0] == ts else None, thread_list)
+        time_stamp_dict = {k[0] for k in thread_list}
+        time_stamp_list = list(time_stamp_dict)
+        time_stamp_list.sort()
+
+        for ts in time_stamp_list:
+            thread_filter = map(lambda r: {r[3]: r[2]} if r[0] == ts and r[1] == t_id else None, thread_list)
             time_stamp_act = list(filter(partial(is_not, None), thread_filter))
-            time_stamp_act_list = list(time_stamp_act)
-            time_activity.update({ts: time_stamp_act_list})
-            # time_activity.sort()
-            # time_activity_nodups = remove_dups(time_activity)
+            time_activity.update({ts: time_stamp_act})
+
         od = collections.OrderedDict(sorted(time_activity.items()))
         thread_activity.update({t: od})
+
     return render(request, 'time_line_view.html', {'title_name': which_way,
                                                    "threads": threads,
-                                                   "thread_activity": thread_activity})
+                                                   "thread_activity": thread_activity,
+                                                   "time_stamp_list": all_time_stamp})
 
 

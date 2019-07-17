@@ -11,9 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let graphPGroupContainer = document.getElementById('logical_data_l2_dig_process');
     mainGrouped(graphPGroupContainer, txtPContainer, "P");
 
-    let ldL1Container = document.getElementById("logical_data_l1_dig");
+    let ldL1InputContainer = document.getElementById("logical_data_l1_input_dig");
+    logicalDataLevel1(ldL1InputContainer, txtInContainer, "R");
 
-    logicalDataLevel1(ldL1Container, txtInContainer, "R");
+    let ldL1OutputContainer = document.getElementById("logical_data_l1_output_dig");
+    logicalDataLevel1(ldL1OutputContainer, txtOutContainer, "W");
+
+    let ldL1ProcessContainer = document.getElementById("logical_data_l1_process_dig");
+    logicalDataLevel1(ldL1ProcessContainer, txtPContainer, "P");
 
 });
 
@@ -83,13 +88,29 @@ function mainGrouped(container, txt, op) {
                 let fileName = get_url_fileName();
                 let ulrParam = [benchmarkName];
                 ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
-
+                let gray_menu = "";
                 graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                     scrollToTop(1000);
-				    let cell = evt.getProperty('cell');
-				    if (cell['style'] === "logicalData_R_big" || cell['style'] === "logicalData_R"){
-                        document.getElementById('lc_l1_dig').style.display = "block";
+                    let cell = evt.getProperty('cell');
+                    console.log(cell);
+                    // if (cell['style'] === "logicalData_R_big" || cell['style'] === "logicalData_R"){
+                    //     document.getElementById("lc_l1_dig_input").style.display = "block";
+                    // }
+                    switch (cell['style']) {
+                        case "logicalData_R_big":
+                        case "logicalData_R":
+                            document.getElementById("lc_l1_dig_input").style.display = "block";
+                            break;
+                        case "logicalData_W_big":
+                        case "logicalData_W":
+                            document.getElementById("lc_l1_dig_output").style.display = "block";
+                            break;
+                        case "logicalData_P":
+                        case "logicalData_P_big":
+                            document.getElementById("lc_l1_dig_process").style.display = "block";
+                            break;
                     }
+
 				    evt.consume();
                 });
                 // console.log("benchmarkName------------ " + ulrParam);
@@ -145,8 +166,8 @@ function logicalDataLevel1(container, txt, op) {
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
         try {
-            let lcX = 300;
-            let lcY = 200;
+            let lcX = null;
+            let lcY = null;
 
             configEdgeStyle(graph, "#000000");
 
@@ -160,12 +181,13 @@ function logicalDataLevel1(container, txt, op) {
                 let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
                 let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
-                console.log(lcText +"   " + lcText.length + "  -  " + lcX +"--"+ lcY);
-                if (i === 0){
-                    lcX = 300;
-                    lcY = 200;
-                }else if (i === 0 && lcText.length > 20){
+                // positioning the op_group logical data
+                if (i === 0 && lcText.length > 20){
+                    lcX = 500;
                     lcY = 400;
+                }else if (i === 0 ){
+                    lcX = 500;
+                    lcY = 300;
                 }else if ((i+1)%2 === 0 && lcText.length > 20){
                     lcY += 700;
                     lcX += 400;
@@ -176,15 +198,14 @@ function logicalDataLevel1(container, txt, op) {
                     lcX += 300;
                     lcY += 400;
                 }
+                // console.log(lcText +"   " + lcText.length + "  -  " + lcX +"--"+ lcY);
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // lcY = (i === 0 && lcText.length > 20)? 400 : (lcText.length > 20) ? lcY + 700: 200;
-
 
                 let benchmarkName = get_url_benchmark();
                 let fileName = get_url_fileName();
                 let ulrParam = [benchmarkName];
                 ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
-
                 drawTdForLd(graph, parent, ldNode, ldL2List, op, ulrParam)
             }
         }finally {
@@ -192,5 +213,4 @@ function logicalDataLevel1(container, txt, op) {
 
         }
     }
-
 }

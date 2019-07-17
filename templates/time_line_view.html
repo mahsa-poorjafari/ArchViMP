@@ -22,22 +22,41 @@
         </div>
     </div>
     <div id="tab01" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="time_line_diagram"></div>
+        <div class="col-md-2" style="margin-top: 10em">
+            {% for ts in  time_stamp_list %}
+                <p style="padding: 1em">{{ ts }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-md-10 well diagram_container" id="time_line_diagram"></div>
     </div>
-    <div id="tab02" class="tab-contents">
-        {% for k, v in thread_activity.items %}
-            <div id="k">
-                <ul class="list_level0" style="display: inline">
-                    <li class="li-list_level0">
+    <div id="tab02" class="tab-contents time_stamp_text">
+        <div class="col-md-12 text_container" style="display: block" id="time_line_text">
+            <ul class="list_level0">
+                {% for k, v in thread_activity.items %}
+
+                    <li class="li-list_level0 col-md-6">
                         <span>{{ k }}</span>
-                        {% for ts, tv in v.items %}
-                            <p>{{ ts  }}</p>
-                            <p>{{ tv  }}</p>
-                        {% endfor %}
+                        <ul class="list_level1">
+                            {% for ts, tv in v.items %}
+                                <li class="li-list_level1">
+                                    <span class="time_stamp">{{ ts }} </span>
+                                    <ul class="list_level2">
+                                        {% for k in tv %}
+                                            <li class="li-list_level2 activity">
+                                                <span class="key">{{ k }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+
+                            {% endfor %}
+                        </ul>
                     </li>
-                </ul>
-            </div>
-        {% endfor %}
+
+                {% endfor %}
+            </ul>
+        </div>
     </div>
+    <script src="{% static 'js/TimeLine_View.js' %}" type="text/javascript"></script>
 
 {% endblock %}

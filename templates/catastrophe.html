@@ -2,10 +2,14 @@
 {% load staticfiles %}
 {% block content %}
     <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <h2>Overall view - Thread access shared memory</h2>
-            <h3>This is a view without applying our method</h3>
-
+        <div  class="container-fluid">
+            <div class="col-md-12">
+                <h2>{{ title_name }} Overall view</h2>
+                <h3>This is a view without applying our method</h3>
+            </div>
+            <div class="col-md-12">
+                <p>In this view we see the interaction between technical part of the Multithreaded Program</p>
+            </div>
         </div>
     </nav>
 
@@ -14,13 +18,13 @@
           <div class="tab-button-outer">
             <ul id="tab-button">
               <li><a href="#tab01" class="btn-info">Diagram</a></li>
-              <li><a href="#tab02" class="btn-info">Textual</a></li>
+              <li><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
             </ul>
           </div>
             <div class="tab-select-outer">
                 <select id="tab-select">
                     <option value="#tab01" class="shadow-sm rounded">Diagram</option>
-                    <option value="#tab02" class="shadow-sm rounded">Textual</option>
+                    <option value="#tab02" class="shadow-sm rounded" style="display: none">Textual</option>
                 </select>
             </div>
         </div>
@@ -30,6 +34,14 @@
             <div class="col-md-12 well" id="catastrophe_diagram"></div>
         </div>
         <div id="tab02" class="tab-contents">
+            <div class="col-md-12 text_container" style="display: none" id="thread_ids_textual">
+                <ul class="threads_ids_tech">
+                    {% for t in thread_ids %}
+                        <li>{{ t }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
             <div class="col-md-12 well" id="catastrophe_textual">
                 <ul id="var_list" >
                     {% for vK, vV in t_v_op.items %}

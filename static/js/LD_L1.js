@@ -73,6 +73,7 @@ function main(container) {
                 }else{
                     let mxCells = graph.getChildVertices(graph.getDefaultParent());
                     let parentList = [];
+                    let values = [];
                     mxCells.forEach(function (node) {
                         (node.target === null) ? parentList.push(node) : "";
                     });
@@ -86,17 +87,21 @@ function main(container) {
                     // drawChild(graph, parent, null, stVarList, 'diamondThin', '1', 'variable');
                     for (let j = 0; j < varList.length; j++) {
                         let Text = varList[j].innerHTML;
+                        let LastText = (j>0) ? varList[j-1].innerHTML : "";
                         nodeSize = {};
                         nodeSize = setNodeSize(Text, "variable" );
                         let nodeId = 'var_' + j;
                         nodeStyle(graph, nodeSize['nodeIdText']);
-                        graph.insertVertex(parent, nodeId, Text, stX, stY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                        if (j%7 === 0) {
-                            stY += 200;
-                            stX = 0;
+
+                        if (Text.length >20 && LastText.length > 20 || LastText.length > 20){
+                            values = setPositionBigVars(stX, stY, j);
                         }else{
-                            stX += 200;
+                            values = setPositionVars(stX, stY, j);
                         }
+                        stX = values[0];
+                        stY = values[1];
+                        console.log("j="   + j + "   "+ Text + "  -  " + "X= " + stX + "  Y= " + stY);
+                        graph.insertVertex(parent, nodeId, Text, stX, stY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                     }
                 }
 

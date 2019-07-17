@@ -44,9 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 let varList = document.getElementById('var_list').getElementsByClassName('set_var_id');
                 // console.log(varList.length);
-                let varThrList = document.getElementById("sidebar").getElementsByClassName("threads");
+                let varThrList = document.getElementById("thread_ids_textual").getElementsByClassName("threads_ids_tech")[0];
                 // let varThrList = document.getElementById("sidebar").getElementsByClassName("threads");
-                let thrList = varThrList[0].getElementsByTagName("li");
+                let thrList = varThrList.getElementsByTagName("li");
                 for (let j = 0; j < thrList.length; j++) {
                     let thrId = 'thr'+j;
 

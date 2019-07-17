@@ -117,25 +117,23 @@
   display: table-cell;
   width: 20%;
 }
-#tab-button li#lc_l1_dig {position: relative; display: none;}
-#tab-button li#lc_l1_dig i.close{
-    position: absolute;
-    top: 0;
-    right: -1em;
-    color: #ccc;
-    height: 100%;
 
-}
-#tab-button li#lc_l1_dig a.lc_l1 {
-    background-color: #cccccc;
-    color: #1b1b1b;
-}
-#tab-button li#lc_l1_dig a.lc_l1:hover, #tab-button li#lc_l1_dig.is-active a.lc_l1{
+#tab-button li.gray_tab {display: block;}
+
+#tab-button li.gray_tab:hover{cursor: not-allowed;}
+#tab-button li.gray_tab a:hover{cursor: not-allowed; background-color: #C0C0C0}
+
+#tab-button li.gray_tab i.close {display: none;}
+
+#tab-button li.gray_tab.is-active a.lc_l1{
     border-bottom-color: transparent;
     background-color: #5a6268;
     color: #ffffff;
 }
-#tab-button li#lc_l1_dig.is-active i.close{color: #5a6268;}
+
+#tab-button li#lc_l1_dig_input.is-active i.close,
+#tab-button li#lc_l1_dig_output.is-active i.close,
+#tab-button li#lc_l1_dig_process.is-active i.close{color: #5a6268;}
 
 #tab-button li a {
     display: block;
@@ -204,3 +202,10 @@
     color: #0c5460;
 }
 .file_uploaded p {color: #1b1b1b}
+
+.time_stamp_text ul.list_level0{list-style: disc}
+.time_stamp_text ul.list_level0 ul.list_level1{list-style: number; padding-left: 0.7em}
+
+.level2 .main_tab {padding: 0px}
+.level1 .gray_tab {padding-top: 0px}
+.level1 .btn-light {background-color: #C0C0C0}

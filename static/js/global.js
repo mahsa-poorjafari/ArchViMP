@@ -116,7 +116,7 @@ function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrPara
         let Text = childList[j].innerHTML;
         nodeSize = setNodeSize(Text, 'LogicalComp');
         nodeStyle(graph, 'LogicalComp');
-        console.log("============== " + Text+ " - " + chY + "   j= ", j);
+        // console.log("============== " + Text+ " - " + chY + "   j= ", j);
         let lcNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         lcNode.source = ldNode;
         // console.table(lcNode);
@@ -137,8 +137,8 @@ function drawChildThrOP(graph, parent, pNode, childList){
     let nodeSize = {};
     let pX = 50;
     let pY = 50;
-    let chX = pX;
-    let chY = pY;
+    let chX = null;
+    let chY = null;
     if (pNode !== null){
         pX = pNode['geometry']['x'];
         pY = pNode['geometry']['y'];
@@ -300,6 +300,9 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
     let pY = 2000;
     let chX = null;
     let chY = null;
+    let bX = null;
+    let bY = null;
+    let mxCell = null;
     let Text = "";
     let nodeType = "";
     let gName = "";
@@ -311,64 +314,73 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
         chY = pY;
     }
     let pNodeText = pNode['value'];
-    console.log("----------" +pNodeText + "-------------");
-    if(childList.length > 10){
-
-    }
-
     for (let j = 0; j < childList.length; j++) {
-        let eText = childList[j].getElementsByClassName('key')[0].innerHTML;
-        if (eText === "group_over10_var" || eText === "group_over10_ld"){
-            // let valJson = JSON.parse(childList[j].getElementsByClassName('value')[0].innerHTML);
-            let elemtVal = String(childList[j].getElementsByClassName('value')[0].innerHTML);
-            let toJson = elemtVal.replace(/'/g, '"');
-            let valJson = JSON.parse(toJson);
-            let keys = Object.keys(valJson);
-            keys.forEach(function (k) {
-                if (k !== "child_list") gName = k;
-            });
-            Text = gName;
-            nodeType = valJson[String(gName)];
-        }else{
-            Text = eText;
-            nodeType = childList[j].getElementsByClassName('value')[0].innerHTML;
-        }
+
+        let Text = childList[j].getElementsByClassName('key')[0].innerHTML;
+
+        // grouping the child if their are more than 10
+        //let eText = childList[j].getElementsByClassName('key')[0].innerHTML;
+        // if (eText === "group_over10_var" || eText === "group_over10_ld"){
+        //     // let valJson = JSON.parse(childList[j].getElementsByClassName('value')[0].innerHTML);
+        //     let elemtVal = String(childList[j].getElementsByClassName('value')[0].innerHTML);
+        //     let toJson = elemtVal.replace(/'/g, '"');
+        //     let valJson = JSON.parse(toJson);
+        //     let keys = Object.keys(valJson);
+        //     keys.forEach(function (k) {
+        //         if (k !== "child_list") gName = k;
+        //     });
+        //     Text = gName;
+        //     nodeType = valJson[String(gName)];
+        // }else{
+            //Text = eText;
+            // nodeType = childList[j].getElementsByClassName('value')[0].innerHTML;
+        //}
+        nodeType = childList[j].getElementsByClassName('value')[0].innerHTML;
         let nodeIdStyle = nodeType.replace(/ /g,'');
         nodeSize = setNodeSize(Text, nodeIdStyle);
 
         let nodeId = 'var_'+ op +'_' + j;
         nodeStyle(graph,  nodeSize['nodeIdText']);
         let values = [];
-        if (pNodeText.length > 20) {
+
+        // set the right position based on the previous node
+        mxCell =  graph.getChildVertices(graph.getDefaultParent());
+
+        let graph_child_num = mxCell.length;
+        if (graph_child_num === 1){
+            // means it is the first child
             if (Text.length > 20) {
-                values = setPositionPBig(pX, pY , j);
+                values[0] = pX;
+                values[1] = pY - 200;
             } else {
-                values = setPositionPBig(pX , pY, j);
+                values[0] = pX + 50;
+                values[1] = pY - 300;
             }
 
         }else{
-            if (pNode !== null){
-                console.log("===========" + Text);
-                if (Text.length > 20 && childList.length <= 2) {
-                    values = [pX+300, pY-100];
-                }else if(Text.length > 20 && childList.length >= 2){
-                    values = setPositionBig(pX, pY, j);
-                }else{
-                    values = setPosition(pX, pY, j);
-                }
-            }else{
-                values = setPositionVars(chX, chX, j);
+
+            let indx = graph_child_num-1;
+            let PreviousNodeVal = mxCell[indx]['value'];
+            bX = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['x'] + 50: mxCell[indx]['geometry']['x'];
+            bY = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['y'] + 100 : mxCell[indx]['geometry']['y'];
+
+            if (Text.length > 20) {
+                values = setPositionLDL2Big(bX, bY, indx);
+            }else {
+                values = setPositionLDL2(bX, bY, indx);
             }
         }
         chX = values[0];
         chY = values[1];
+
+        // console.log(Text + " => " + chX +" - "+ chY + " " + j);
         if (Text !== ""){
             let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
             chNode.target = pNode;
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                     let cell = evt.getProperty('cell');
                     if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
-                        window.location = "http://127.0.0.1:8000/logical_comp?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                        window.location = "http://127.0.0.1:8000/Logical_Data_L1?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
                     }
                     evt.consume();
                 });
@@ -376,14 +388,12 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
         }
 
     }
-
-
 }
 
 function scrollToTop(scrollDuration) {
     var scrollStep = -window.scrollY / (scrollDuration / 15),
         scrollInterval = setInterval(function(){
-        if ( window.scrollY != 0 ) {
+        if ( window.scrollY !== 0 ) {
             window.scrollBy( 0, scrollStep );
         }
         else clearInterval(scrollInterval);

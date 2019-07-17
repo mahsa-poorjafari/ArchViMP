@@ -3,7 +3,7 @@
 {% block content %}
      <nav class="navbar navbar-default col-md-12">
         <div class="container-fluid">
-            <h2>{{ benchmark_name }} Benchmark</h2>
+            <h2>{{ title_name }} </h2>
             <h4>Logical Data Level 2 - Operation of Threads</h4>
         </div>
     </nav>
@@ -12,13 +12,22 @@
         <ul id="tab-button">
             <div class="tabs col-md-12">
                 <div class="col-md-12 level2">
-                  <li><a href="#tab01" class="btn-info">Input for Threads </a></li>
-                  <li><a href="#tab02" class="btn-info">Output of Threads</a></li>
-                  <li><a href="#tab03" class="btn-info">Processed by Threads</a></li>
+                  <li class="col-md-3 main_tab"><a href="#tab01" class="btn-info">Input for Threads </a></li>
+                  <li class="col-md-3 main_tab"><a href="#tab02" class="btn-info">Output of Threads</a></li>
+                  <li class="col-md-3 main_tab"><a href="#tab03" class="btn-info">Processed by Threads</a></li>
+                  <li class="col-md-3 main_tab"><a href="#tab03" class="btn-info">Thread Operations</a></li>
                 </div>
                 <div class="col-md-12 level1">
-                  <li id="lc_l1_dig">
-                      <a href="#tab04" class="btn-secondary lc_l1"> Logical Data-Thread Input-Level 1 </a>
+                  <li id="lc_l1_dig_input" class="col-md-3 gray_tab">
+                      <a href="#tab04" class="btn-light lc_l1"> Logical Data-Thread Input-Level 1 </a>
+                      <i class="far fa-window-close close"></i>
+                  </li>
+                  <li id="lc_l1_dig_output" class="col-md-3 gray_tab">
+                      <a href="#tab05" class="btn-light lc_l1"> Logical Data-Thread Output-Level 1 </a>
+                      <i class="far fa-window-close close"></i>
+                  </li>
+                  <li id="lc_l1_dig_process" class="col-md-3 gray_tab">
+                      <a href="#tab06" class="btn-light lc_l1"> Logical Data-Thread Process-Level 1 </a>
                       <i class="far fa-window-close close"></i>
                   </li>
                 </div>
@@ -30,28 +39,34 @@
                 <option value="#tab01">Input for Threads </option>
                 <option value="#tab02">Output of Threads</option>
                 <option value="#tab03">Processed by Threads</option>
-                <option value="#tab04" class="lc_l1">Logical Component Level 1</option>
-
-
+                <option value="#tab04" class="lc_l1">Logical Data Level 1 - Input</option>
+                <option value="#tab05" class="lc_l1">Logical Data Level 1 - Output</option>
+                <option value="#tab06" class="lc_l1">Logical Data Level 1 - Process</option>
             </select>
         </div>
     </div>
 
 
     <div id="tab01" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l2_dig_input"></div>
+        <div class="col-md-12 diagram_container" id="logical_data_l2_dig_input"></div>
     </div>
     <div id="tab02" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l2_dig_output"></div>
+        <div class="col-md-12 diagram_container" id="logical_data_l2_dig_output"></div>
     </div>
     <div id="tab03" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l2_dig_process"></div>
+        <div class="col-md-12 diagram_container" id="logical_data_l2_dig_process"></div>
     </div>
     <div id="tab04" class="tab-contents">
-        <div class="col-md-12 well diagram_container" id="logical_data_l1_dig"></div>
+        <div class="col-md-12 diagram_container" id="logical_data_l1_input_dig"></div>
+    </div>
+    <div id="tab05" class="tab-contents">
+        <div class="col-md-12 diagram_container" id="logical_data_l1_output_dig"></div>
+    </div>
+    <div id="tab06" class="tab-contents">
+        <div class="col-md-12 diagram_container" id="logical_data_l1_process_dig"></div>
     </div>
 
-    <div class="col-md-12 well text_container" style="display:  none" id="logical_data_l2_txt_input">
+    <div class="col-md-12 text_container" style="display:  none" id="logical_data_l2_txt_input">
         <ul class="list_level0">
             {% for ldK, ldV in ld_input_lc.items %}
                 <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
@@ -84,7 +99,7 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="col-md-12 well diagram_container" style="display: none" id="logical_data_l2_txt_output">
+    <div class="col-md-12 text_container" style="display: none" id="logical_data_l2_txt_output">
         <ul class="list_level0">
             {% for ldK, ldV in ld_output_lc.items %}
                 <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
@@ -117,7 +132,7 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="col-md-12 well diagram_container" style="display: none" id="logical_data_l2_txt_process">
+    <div class="col-md-12 text_container" style="display: none" id="logical_data_l2_txt_process">
         <ul class="list_level0">
             {% for ldK, ldV in ld_process_lc.items %}
                 <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
