@@ -259,13 +259,20 @@ def logical_data_l2(request):
     ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
     # ld_process_g = group_over10_child(ld_process_lc)
 
+    thread_list = get_threads(trace_file)
+    thr_func_dict = {}
+    for indx, t in enumerate(thread_list):
+        thr_func = get_first_function(t, indx, trace_file)
+        thr_func_dict.update(thr_func)
+
     return render(request, 'logical_data_L2.html', {'title_name': which_way,
                                                     'file_path': trace_file,
                                                     'raw_file_name': file_name,
                                                     'href_id': b_parameter,
                                                     'ld_input_lc': ld_input_lc,
                                                     'ld_output_lc': ld_output_lc,
-                                                    'ld_process_lc': ld_process_lc})
+                                                    'ld_process_lc': ld_process_lc,
+                                                    'logical_comps': thr_func_dict})
 
 
 def ld_exe_path_l2(request):

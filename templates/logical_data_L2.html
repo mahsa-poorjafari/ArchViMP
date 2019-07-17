@@ -12,21 +12,26 @@
         <ul id="tab-button">
             <div class="tabs col-md-12">
                 <div class="col-md-12 level2">
-                  <li class="col-md-3 main_tab"><a href="#tab01" class="btn-info">Input for Threads </a></li>
-                  <li class="col-md-3 main_tab"><a href="#tab02" class="btn-info">Output of Threads</a></li>
-                  <li class="col-md-3 main_tab"><a href="#tab03" class="btn-info">Processed by Threads</a></li>
-                  <li class="col-md-3 main_tab"><a href="#tab03" class="btn-info">Thread Operations</a></li>
+                    <li class="col-md-3 main_tab"><a href="#tab07" class="btn-info">Operation of Threads</a></li>
+                    <li class="col-md-3 main_tab"><a href="#tab01" class="btn-info">Input for Threads </a></li>
+                    <li class="col-md-3 main_tab"><a href="#tab02" class="btn-info">Output of Threads</a></li>
+                    <li class="col-md-3 main_tab"><a href="#tab03" class="btn-info">Processed by Threads</a></li>
                 </div>
                 <div class="col-md-12 level1">
-                  <li id="lc_l1_dig_input" class="col-md-3 gray_tab">
+
+                    <li id="lc_l1_dig_input" class="col-md-3 gray_tab">
+                      <a href="#tab07" class="btn-light lc_l1"> Logical Data-Thread operation-Level 1 </a>
+                      <i class="far fa-window-close close"></i>
+                    </li>
+                    <li id="lc_l1_dig_input" class="col-md-3 gray_tab">
                       <a href="#tab04" class="btn-light lc_l1"> Logical Data-Thread Input-Level 1 </a>
                       <i class="far fa-window-close close"></i>
-                  </li>
-                  <li id="lc_l1_dig_output" class="col-md-3 gray_tab">
+                    </li>
+                    <li id="lc_l1_dig_output" class="col-md-3 gray_tab">
                       <a href="#tab05" class="btn-light lc_l1"> Logical Data-Thread Output-Level 1 </a>
                       <i class="far fa-window-close close"></i>
-                  </li>
-                  <li id="lc_l1_dig_process" class="col-md-3 gray_tab">
+                    </li>
+                    <li id="lc_l1_dig_process" class="col-md-3 gray_tab">
                       <a href="#tab06" class="btn-light lc_l1"> Logical Data-Thread Process-Level 1 </a>
                       <i class="far fa-window-close close"></i>
                   </li>
@@ -36,6 +41,7 @@
       </div>
         <div class="tab-select-outer">
             <select id="tab-select">
+                <option value="#tab07">Operation of Threads</option>
                 <option value="#tab01">Input for Threads </option>
                 <option value="#tab02">Output of Threads</option>
                 <option value="#tab03">Processed by Threads</option>
@@ -46,7 +52,9 @@
         </div>
     </div>
 
-
+    <div id="tab07" class="tab-contents">
+        <div class="col-md-12 diagram_container" id="logical_data_l2_all_dig"></div>
+    </div>
     <div id="tab01" class="tab-contents">
         <div class="col-md-12 diagram_container" id="logical_data_l2_dig_input"></div>
     </div>
@@ -161,12 +169,21 @@
 
                             </li>
                         {% endfor %}
-                    </ul><
+                    </ul>
                 </li>
             {% endfor %}
         </ul>
     </div>
-
+    <div class="col-md-12 text_container" style="display: none" id="logical_data_l2_all">
+        <ul class="list_level0">
+            {% for t, f in logical_comps.items %}
+                <li class="li-list_level0 col-4" style="border-bottom: 1px solid #2e6da4;">
+                    <span>{{ t }}</span>
+                    <p class="thr_func">{{ f }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 
     <script src="{% static 'js/LD_L2.js' %}" type="text/javascript"></script>
 {% endblock %}

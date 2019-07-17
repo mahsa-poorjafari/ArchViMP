@@ -20,8 +20,74 @@ document.addEventListener('DOMContentLoaded', function() {
     let ldL1ProcessContainer = document.getElementById("logical_data_l1_process_dig");
     logicalDataLevel1(ldL1ProcessContainer, txtPContainer, "P");
 
+    let graphOpGroupContainer = document.getElementById("logical_data_l2_all_dig");
+    let txtOpContiner = document.getElementById("logical_data_l2_all");
+    allOperations(graphOpGroupContainer, txtOpContiner);
+
 });
 
+
+function allOperations(container, txt) {
+    // Checks if the browser is supported
+    if (!mxClient.isBrowserSupported())
+    {
+        // Displays an error message if the browser is not supported.
+        mxUtils.error('Browser is not supported!', 200, false);
+    }
+    else
+    {
+        // Disables the built-in context menu
+        mxEvent.disableContextMenu(container);
+
+        // Creates the graph inside the given container
+        var graph = new mxGraph(container);
+        //graph.setEnabled(false);
+
+
+        // graph.getStylesheet().getDefaultEdgeStyle();
+
+        // Enables rubberband selection
+        new mxRubberband(graph);
+
+        // Disables basic selection and cell handling
+        // configureStylesheet(graph);
+
+        // Gets the default parent for inserting new cells. This
+        // is normally the first child of the root (ie. layer 0).
+        let parent = graph.getDefaultParent();
+        configEdgeStyle(graph, "#000000");
+        let eStyle = graph.getStylesheet().getDefaultEdgeStyle();
+        eStyle['endSize'] = '5';
+
+        // Adds cells to the model in a single step
+        graph.getModel().beginUpdate();
+
+        try {
+            let nodeSize = {};
+            let lcX = 600;
+            let lcY = 100;
+
+            let threadsListContainer = txt.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+            let threadsList = [];
+            for (let i=0; i<= threadsListContainer.length; i++){
+                let lcId = 'LC_' + i;
+                let logicalComp = threadsListContainer[i].getElementsByTagName("p")[0].innerHTML;
+                threadsList.push(logicalComp);
+                nodeSize = setNodeSize(logicalComp, 'LogicalComp');
+                nodeStyle(graph,  nodeSize['nodeIdText']);
+                let lcNode = graph.insertVertex(parent, lcId, logicalComp, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                lcY += 300;
+            }
+
+        }finally{
+            // Updates the display
+            graph.getModel().endUpdate();
+        }
+
+    }
+
+    
+}
 
 function mainGrouped(container, txt, op) {
     // Checks if the browser is supported
