@@ -19,7 +19,9 @@ function createLine(x1,y1,x2,y2,lineId) {
 function nodeStyle(graph, nodeId) {
     let style = new Object();
     mxGraph.prototype.cellsEditable = false;
-
+    if(nodeId === "LogicalCompInactive"){
+        style[mxConstants.HIGHLIGHT_OPACITY] = 50;
+    }
     style[mxConstants.STYLE_IMAGE] = '/static/media/Notations/'+ nodeId + '.png';
     style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
     style[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
@@ -293,6 +295,12 @@ function get_url_fileName() {
     return FileName
 }
 
+function get_lc_name() {
+    let url_string = window.location.href;
+    let url = new URL(url_string);
+    let lcName = url.searchParams.get("lc");
+    return lcName
+}
 
 function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
     let nodeSize = {};

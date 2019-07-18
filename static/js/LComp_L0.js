@@ -36,24 +36,45 @@ function main(container) {
             let tW = 20;
             let tH = 300;
             let thrNode = null;
+            let styleIdNode = "LogicalComp";
+
+            let lcName = get_lc_name();
 
             for (let i=0; i<threadList.length; i++){
                 let thrId = 'thr' + i;
                 let thrText = threadList[i].getElementsByTagName("span")[0].innerHTML;
+                let thrFunc = threadList[i].getElementsByClassName('li-list_level1')[0].innerHTML.replace(/[\n\r ]/g, "");
+
                 if (thrText.includes("_")){
                     thrText = thrText.replace(/_/g, "\n");
-                    nodeStyle(graph, "mainThread");
-                    thrNode = graph.insertVertex(parent, thrId, thrText, tW, tH, 120, 80, 'mainThread');
+                    styleIdNode = "mainThread";
                     tW += 150;
                 }else {
-                    nodeStyle(graph, "thread");
-                    thrNode = graph.insertVertex(parent, thrId, thrText, tW, tH, 120, 80, 'thread');
-                    tW += 150;
+                    styleIdNode = "thread";
+
                 }
+                nodeStyle(graph, styleIdNode);
+                thrNode = graph.insertVertex(parent, thrId, thrText, tW, tH, 120, 80, styleIdNode);
+                tW += 150;
                 let funcId = "func_" + i;
-                let thrFunc = threadList[i].getElementsByClassName('li-list_level1')[0].innerHTML;
-                let funcNode = graph.insertVertex(parent, funcId, thrFunc, fW, fH, 120, 80, 'LogicalComp');
+                if (lcName !== null && lcName !== thrFunc){
+                    styleIdNode = "LogicalCompInactive";
+                }else{
+                    styleIdNode = "LogicalComp";
+                }
+                // console.table([thrFunc, lcName, styleIdNode]);
+                nodeStyle(graph, styleIdNode);
+                let funcNode = graph.insertVertex(parent, funcId, thrFunc, fW, fH, 120, 80, styleIdNode);
+
+                // if (lcName !== null ){
+                //     let style = graph.getStylesheet();
+                //     console.table(style);
+                //     style[mxConstants.STYLE_IMAGE]= '/static/media/Notations/LogicalCompInactive.png';
+                //     graph.getStylesheet().putCellStyle('LogicalComp', style);
+                // }
+
                 fW += 150;
+                thrNode.target = funcNode;
                 graph.insertEdge(parent, null, null, thrNode, funcNode, 'dashed=0;' +
                             'endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=0;');
             }

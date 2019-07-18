@@ -72,6 +72,10 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
             let ldOutY = 200;
             let ldPX = 800;
             let ldPY = 300;
+            let benchmarkName = get_url_benchmark();
+            let fileName = get_url_fileName();
+            let ulrParam = [benchmarkName];
+            ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
 
 
             let inputGroup = InContainer.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
@@ -87,6 +91,13 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
                 nodeSize = setNodeSize(logicalComp, 'LogicalComp');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
                 let lcNode = graph.insertVertex(parent, lcId, logicalComp, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+                    let cell = evt.getProperty('cell');
+                    if (cell['style'] === "LogicalComp" || cell['style'] === "LogicalComp_big"){
+                        window.location = "http://127.0.0.1:8000/logical_comp?lc="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                    }
+                    evt.consume();
+                });
                 lcY += 300;
             }
 
