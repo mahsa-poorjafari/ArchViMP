@@ -22,12 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let graphOpGroupContainer = document.getElementById("logical_data_l2_all_dig");
     let txtOpContiner = document.getElementById("logical_data_l2_all");
-    allOperations(graphOpGroupContainer, txtOpContiner);
+    allOperations(graphOpGroupContainer, txtOpContiner, txtInContainer, txtOutContainer, txtPContainer);
 
 });
 
 
-function allOperations(container, txt) {
+function allOperations(container, txt, InContainer, OutContainer, PContainer) {
     // Checks if the browser is supported
     if (!mxClient.isBrowserSupported())
     {
@@ -66,18 +66,40 @@ function allOperations(container, txt) {
             let nodeSize = {};
             let lcX = 600;
             let lcY = 100;
+            let ldInX = 100;
+            let ldInY = 400;
+            let ldOutX = 1200;
+            let ldOutY = 200;
+            let ldPX = 800;
+            let ldPY = 300;
 
-            let threadsListContainer = txt.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+
+            let inputGroup = InContainer.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+            let processGroup = PContainer.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+            let outputGroup = OutContainer.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+
+            let threadsListContainer = txt.getElementsByClassName("thr_func");
             let threadsList = [];
-            for (let i=0; i<= threadsListContainer.length; i++){
+            for (let i=0; i< threadsListContainer.length; i++){
                 let lcId = 'LC_' + i;
-                let logicalComp = threadsListContainer[i].getElementsByTagName("p")[0].innerHTML;
+                let logicalComp = threadsListContainer[i].innerHTML;
                 threadsList.push(logicalComp);
                 nodeSize = setNodeSize(logicalComp, 'LogicalComp');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
                 let lcNode = graph.insertVertex(parent, lcId, logicalComp, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 lcY += 300;
             }
+
+
+            // Draw Input groups
+            connect_to_related_LC(graph, parent, inputGroup, ldInX, ldInY, "Input");
+
+            // Draw Process groups
+            connect_to_related_LC(graph, parent, processGroup, ldPX, ldPY, "Process");
+
+            // Draw Output groups
+            connect_to_related_LC(graph, parent, outputGroup, ldOutX, ldOutY, "Output");
+
 
         }finally{
             // Updates the display

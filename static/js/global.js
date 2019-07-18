@@ -399,3 +399,46 @@ function scrollToTop(scrollDuration) {
         else clearInterval(scrollInterval);
     },15);
 }
+
+function connect_to_related_LC(graph, parent, inputGroup, X, Y, op) {
+    let nodeSize = {};
+    // get the existing element in the Graph
+    let mxCells = graph.getChildVertices(graph.getDefaultParent());
+    console.table(mxCells);
+    for (let inputNode of inputGroup){
+        let inG = inputNode.firstElementChild.innerHTML;
+        nodeSize = setNodeSize(inG, 'logicalData');
+        nodeStyle(graph,  nodeSize['nodeIdText']);
+        let ldInNode = graph.insertVertex(parent, null, inG, X, Y, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        Y += 300;
+        let ldInLc = inputNode.getElementsByClassName("list_level1")[0].getElementsByClassName("logical_components")[0].getElementsByClassName("list_level2")[0].getElementsByClassName("li-list_level2");
+        let ldLcList = [];
+        for (let lc of ldInLc){
+            ldLcList.push(lc.innerHTML.replace(/ /g,''));
+        }
+        console.log(ldLcList);
+        // connect_to_related_LC(mxCells, ldLcList, graph, ldInNode);
+        for (let node of mxCells){
+            // console.log(node['value']);
+            // console.log(ldLcList.includes(node['value']));
+            if(node['style'] === "LogicalComp" && ldLcList.includes(node['value'])){
+                switch (op) {
+                    case "Input":
+                        graph.insertEdge(parent, null, null, ldInNode, node, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+                        break;
+                    case "Process":
+                        graph.insertEdge(parent, null, null, node, ldInNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;');
+                        break;
+                    case "Output":
+                        graph.insertEdge(parent, null, null, node, ldInNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+                        break;
+                }
+
+
+            }
+
+        }
+    }
+
+
+}
