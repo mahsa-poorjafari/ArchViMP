@@ -61,43 +61,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 //console.table(thrCells);
 
                 // graph.insertVertex(parent, null, "get Elements By Tag Name getElements ByTagName", varW, varH, 120, 100, "val_10");
+                let value = [];
+                for (let i = 0; i < varList.length; i++){
 
-                for (let i = 0; i < varList.length; i++) {
                     let varText = varList[i].getElementsByTagName("span")[0].innerHTML;
+                    value = tecnical_data_catastrophe(varW, varH, i, varList, thrH);
                     // console.log("i => " + (i == 0 || i < varList.length/2));
-                    if (i == 0){
-                        varH = 50;
-                        varW = 10;
-                    }
-                    else if (i !== 0 && i < varList.length/2){
-                        varW +=150;
-                        let varH_cal = thrH - (60 * i);
-                        varH = thrH < (60 * i) ? varH_cal * -1 : varH_cal;
-                        if (((i/8)% 1) === 0){
-                            varH -= 100;
-                            varW = 10;
-                        }
-                        console.log(varText + " - "+ varH);
-                    }else{
-                        //varH += 400;
-                        varW +=150;
-                        varH = thrH + (20 * i);
-                        if (((i/8)% 1) === 0){
-                            varH += 100;
-                            varW = 10;
-                        }
-                    }
-                    // if (i !== 0 && ((i/8)% 1) === 0){
-                    //     varH += 100;
-                    //     varW = 20;
-                    // }
-                    let varId = 'val_' + i;
-                    //varW +=150;
-                    //varH += 10;
+                    varW = value[0];
+                    varH = value[1];
 
-                    let varThrList = varList[i].getElementsByTagName("ol")[0];
+                    let varId = 'val_' + i;
 
                     nodeStyle(graph, "variable");
+                    console.table([varText, varW, varH]);
                     let varNode = graph.insertVertex(parent, varId, varText, varW, varH, 120, 100, "variable");
 
 

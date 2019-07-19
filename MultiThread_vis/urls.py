@@ -22,8 +22,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', views.index, name='index'),
-    url(r'^trace_vis', views.index, name='index'),
+    url(r'^$', views.trace_vis, name='index'),
+    url(r'^trace_vis', views.trace_vis, name='index'),
     url(r'^home', views.home, name='home'),
     url(r'logical_comp', views.logical_comp, name='logical_comp'),
     url(r'cy', test_diagrams.cy, name='cy'),
@@ -37,8 +37,8 @@ urlpatterns = [
     url(r'Logical_Data_L2', views.logical_data_l2, name='Logical_Data_L2'),
     url(r'LD_L2_unG', views.logical_data_l2_ungrouped, name='logical_data_l2_ungrouped'),
     url(r'exe_path_L2', views.ld_exe_path_l2, name='logical_data_l2_exe_path'),
-    url(r'trace_file_upload', views.trace_file_upload, name='trace_file_upload'),
     url(r'time_line_view', views.time_line_view, name='time_line_view'),
+    url(r'operation_functions_L2', views.op_funcs_l2, name='time_line_view'),
 ]
 # handler404 = error_handling.error_404_view
 

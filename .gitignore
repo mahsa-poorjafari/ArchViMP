@@ -3,4 +3,5 @@
 .pydevproject
 .*.pyc
 .env/
-
+.Uploaded_files/SharedVariablesFiles/*
+.Uploaded_files/TraceFiles/*

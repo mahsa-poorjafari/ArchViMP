@@ -44,3 +44,31 @@ def get_data_types(benchmark_name):
             data_types_vars.update({dt: var_struct_list})
     csv_file.close()
     return data_types_vars
+
+
+def catch_the_trace_error(files_of_forms):
+    error = "The form is not filled properly"
+    if 'trace_file' not in files_of_forms and 'shared_var_file' not in files_of_forms:
+        error = "Please enter the files."
+
+    elif 'shared_var_file' not in files_of_forms:
+        error = "Please enter a shared variable file."
+
+    elif 'trace_file' not in files_of_forms:
+        error = "Please enter a trace file."
+
+    return error
+
+
+def catch_the_shvar_error(files_of_forms):
+    error = "The form is not filled properly"
+    if files_of_forms['selected_trace_file'] in [None, ""] and files_of_forms['selected_shared_var_file'] in [None, ""]:
+        error = "Please select files."
+
+    elif files_of_forms['selected_shared_var_file'] in [None, ""]:
+        error = "Please select a shared variable file."
+
+    elif files_of_forms['selected_trace_file'] in [None, ""]:
+        error = "Please select a trace file."
+
+    return error

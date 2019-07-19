@@ -400,3 +400,23 @@ function setPositionLDL2(pX, pY , indx) {
     return [chX, chY];
 
 }
+
+function tecnical_data_catastrophe(x, y, j, varList, thrH) {
+    let varH = y;
+    let varW = x;
+    let i = j;
+    if (i === 0){
+        varH = 50;
+        varW = 10;
+    }else if([8,24,32, 40].includes(i)) {
+        varH += 100;
+        varW = 10;
+    }else if(i === 16) {
+        varH = thrH + 400;
+        varW = 10;
+    }else if( i < 8 || i > 8) {
+        varW += 200;
+    }
+    return [varW, varH];
+
+}

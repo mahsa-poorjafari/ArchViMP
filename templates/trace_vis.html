@@ -11,53 +11,84 @@
     </nav>
     <div class="col-md-12">
         <div class="col-md-12">
-            {% if error != "" %}
-                <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% if trace_error != "" %}
+                <div class="alert alert-danger" role="alert">{{ trace_error }}</div>
             {% endif %}
         </div>
         <div class="col-md-12 trace_file_form shadow-sm">
-            <h2>You can upload your Trace file (txt) here:</h2>
+            <h2>You can <strong  class="see_it">UPLOAD</strong> your files here:</h2>
             <form method="post" enctype="multipart/form-data" class="form-inline needs-validation trace_file_upload" id="trace_file_upload" novalidate>
                 {% csrf_token %}
                 <div class="form-group col-md-3">
                     <input type="text" class="form-control program_name" placeholder="Enter Name of your Program" id="program_name" name="program_name">
+                    <small id="programNameHelp" class="form-text text-muted">Make it short</small>
                 </div>
-                <div class="input-group" id="custom-file">
 
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="inputGroupFileAddon01">
-                            <i class="fa fa-upload" aria-hidden="true"></i>
-                        </span>
-                    </div>
-                    <div class="custom-file rounded" >
-                        <input type="file" name="trace_file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
-                        <label class="custom-file-label" for="inputGroupFile01">Choose File</label>
-                        <div class="invalid-feedback empty-file">Please enter a trace file.</div>
-                        <div class="invalid-feedback wrong-format">Valid format of the file is txt.</div>
-                    </div>
+                <div class="col-md-4">
+                    <div class="input-group " id="custom-file">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroupFileAddon01">
+                                <i class="fa fa-upload" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div class="custom-file rounded" >
+                            <input type="file" name="trace_file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                            <label class="custom-file-label" for="inputGroupFile01">Choose Trace File</label>
 
+                        </div>
+
+                    </div>
+                    <div class="input-group" id="custom-file">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroupFileAddon01">
+                                <i class="fa fa-upload" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div class="custom-file rounded" >
+                            <input type="file" name="shared_var_file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                            <label class="custom-file-label" for="inputGroupFile01">Choose Shared Variable File</label>
+
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-1">
                     <button type="submit" class="btn btn-primary">Upload</button>
                 </div>
             </form>
 
         </div>
         <div class="col-md-12" style="font-size: 2em;">
-            <h2><strong>OR</strong></h2>
+            <h2>OR</h2>
+        </div>
+        <div class="col-md-12">
+            {% if shvar_error != "" %}
+                <div class="alert alert-danger" role="alert">{{ shvar_error }}</div>
+            {% endif %}
         </div>
         <div class="col-md-12 select_file_form shadow-sm">
-            <h2>You can select from the files which uploaded before:</h2>
+            <h2>You can <strong class="see_it">SELECT</strong> from the files which uploaded before:</h2>
             <form method="post" enctype="multipart/form-data" class="form-inline select_trace_file" id="select_trace_file">
                 {% csrf_token %}
-                <div class="invalid-feedback" id="empty-list">Please select a trace file from the list.</div>
-                <div class="form-group col-md-6">
-                    <select class="browser-default custom-select form-group select_tag_file" id="select_tag_file" name="select_tag_file">
-                      <option value="" selected>Chose between uploaded files</option>
-                        {% for f in existing_files %}
-                            <option value="{{ f }}">{{ f }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="invalid-feedback" id="empty-t-list">Please select a Trace Tile from the list.</div>
+                <div class="invalid-feedback" id="empty-shv-list">Please select a Shared Variable File from the list.</div>
+                <div class="col-md-3"></div>
+                <div class="col-md-6" >
+                    <div class="form-group">
+                        <select class="browser-default custom-select form-group select_tag_file" id="selected_trace_file" name="selected_trace_file">
+                          <option value="" selected>Chose between uploaded Trace Files</option>
+                            {% for f in existing_trace_files %}
+                                <option value="{{ f }}">{{ f }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="browser-default custom-select form-group select_tag_file" id="selected_shared_var_file" name="selected_shared_var_file">
+                          <option value="" selected>Chose between uploaded Shared Variables Files</option>
+                            {% for f in existing_shvar_files %}
+                                <option value="{{ f }}">{{ f }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group col-md-3">
                     <button type="submit" class="btn btn-primary">Load</button>
@@ -68,16 +99,36 @@
 
     </div>
 
-    {% if url %}
+    {% if trace_url and shvar_url %}
         <div class="col-md-12 file_uploaded">
             <div class="alert alert-success" role="alert">
                 <h3>
                     <i class="far fa-check-circle" aria-hidden="true" style="color: #155724"></i>
-                    <span>Your file has been uploaded</span>
+                    <span>Your files has been uploaded</span>
                 </h3>
                 <br/>
-                <p>Program Name: <strong> {{ program_name }} </strong></p>
-                <p>File Path:  <a href="{{ url }}" target="_blank"> {{ url }}</a> </p>
+                <p>Program Name: <strong class="see_it"> {{ program_name }} </strong></p>
+                <p>Trace File Path:  <a href="{{ trace_url }}" target="_blank"> {{ trace_url }}</a> </p>
+                <p>Shared Variables File Path:  <a href="{{ shvar_url }}" target="_blank"> {{ shvar_url }}</a> </p>
+                <p>
+                    <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
+                    <span>Please check the side bar to access the diagrams</span>
+
+                </p>
+            </div>
+        </div>
+
+    {% elif selected_trace_url and  selected_shvar_url %}
+        <div class="col-md-12 file_uploaded">
+            <div class="alert alert-success" role="alert">
+                <h3>
+                    <i class="far fa-check-circle" aria-hidden="true" style="color: #155724"></i>
+                    <span>Your files has been loaded</span>
+                </h3>
+                <br/>
+                <p>Program Name: <strong class="see_it"> {{ program_name }} </strong></p>
+                <p>Trace File Path:  <a href="{{ selected_trace_url }}" target="_blank"> {{ selected_trace_url }}</a> </p>
+                <p>Shared Variables File Path:  <a href="{{ selected_shvar_url }}" target="_blank"> {{ selected_shvar_url }}</a> </p>
                 <p>
                     <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
                     <span>Please check the side bar to access the diagrams</span>
@@ -86,7 +137,5 @@
             </div>
         </div>
     {% endif %}
-
-
 
 {% endblock %}

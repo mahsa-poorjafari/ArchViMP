@@ -2,7 +2,6 @@ import csv
 from operator import is_not
 from functools import partial
 from logical_vis.logical_data_inputs import *
-import string
 
 
 def remove_dups(a_list):
@@ -52,27 +51,6 @@ def get_first_function(t, indx, trace_file):
     csv_file.close()
     # print(t, "=>  ", thread_function)
     return thread_function
-
-
-def create_groups(thr_l, loaded_var_list, access_op):
-    var_group = {}
-    var_thrids_filter = filter(lambda t: t[1] == thr_l, loaded_var_list.items())
-    var_thrids_list = list(var_thrids_filter)
-    num_thr = len(thr_l)
-    # print("\n" + str(len(var_thrids_list)) + " variables " + str(access_op) + " by " + str(
-      #   num_thr) + " threads. List in below:")
-    # print(thr_l)
-    if str(access_op) == "MAIN":
-        group_name = "Only" + str(access_op) + "Thread"
-    else:
-        group_name = str(access_op) + "by" + str(num_thr) + "Threads"
-    # print Group_name
-    var_filter = map(lambda v: v[0], var_thrids_list)
-    a = {"var_list": list(var_filter), "G_thrIDs": thr_l}
-    var_group.update({group_name: a})
-
-    # print "var_group ", var_group
-    return var_group
 
 
 def get_var_names(var_list, op):
@@ -162,7 +140,7 @@ def create_ld_thread_op(thread_var_op, op):
                     ld_l2_group[group_name] = ld_l2_group.pop(a_avoid_none[0])
                     ld_l2_group[group_name]['logical_components'].append(lc)
                 else:
-                    print("op= ", op, "    lc= ", lc)
+                    # print("op= ", op, "    lc= ", lc)
                     group_name = op + lc
                     lc_list.append(lc)
                     ld_l2_group.update({group_name: {"logical_components": lc_list, "group_members": ld_vars}})
@@ -175,6 +153,7 @@ def get_trace_file_path(benchmark_name, *args, **kwargs):
     switcher = {
         "ROSACE": "benchmark_traces/ROSACE/TraceDataRosace.txt",
         "OCEAN": "benchmark_traces/OCEAN/Splash2ocean_contiguous_partitions.txt",
+        "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsLLVMWitFunctionsReturn.txt",
         "UPLOADED": "Uploaded_files/" + file_name + ".txt",
     }
     return switcher.get(benchmark_name, "Invalid Value")
@@ -183,6 +162,8 @@ def get_trace_file_path(benchmark_name, *args, **kwargs):
 def get_variable_file_path(benchmark_name):
     switcher = {
         "ROSACE": "benchmark_traces/ROSACE/SharedVariablesRosace.txt",
+        "ThreadFourFunction":
+            "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsLLVMWitFunctionsReturnSharedVariables.txt",
     }
     return switcher.get(benchmark_name, "Invalid Value")
 
@@ -200,7 +181,6 @@ def get_all_shared_var_names(benchmark_name):
 def get_threads(file_path):
     trace_file_path = str(file_path)
     # print("trace_file_path", trace_file_path)
-    # get_records()
     with open(trace_file_path, 'r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         main_thread_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and row[3].lstrip() == "main", csv_reader)
@@ -280,3 +260,69 @@ def get_formatted_shared_variables(var_file_path):
     csv_file.close()
     return formatted_file
 
+
+def thread_per_vars(shared_variables, thread_ids):
+    thread_vars_op = {}
+    thread_op = dict()
+
+    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
+        # csv_file.seek(0, 0)
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for v in shared_variables:
+            for t in thread_ids:
+                csv_file.seek(0, 0)
+                var_thr = list(filter(lambda r: r[3] == v and r[1] == t, csv_reader))
+                var_thr_op = list(map(lambda o: o[2], var_thr))
+                dict_var_thr_op = dict.fromkeys(var_thr_op)
+                op_list = list(dict_var_thr_op)
+                thread_op.update({t: None if not op_list else op_list})
+
+            thread_vars_op.update({v: thread_op})
+    csv_file.close()
+    # print("\n => ", thread_vars)
+    return thread_vars_op
+
+
+def get_functions_with_body(trace_file, thread_list):
+    thread_funciton_list = {}
+    for t in thread_list:
+        t_id = t.split("_")[1] if "Main_" in t else t
+        with open(trace_file, 'r') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            funciton_list = list(map(lambda r: r[3] if r[1] == t_id and r[2] == "FUNCTIONCALL" and "CONSTANT;" in r[5]
+                                 else None, csv_reader))
+            f_avoid_none = list(filter(partial(is_not, None), funciton_list))
+            f_avoid_dups = remove_dups(f_avoid_none)
+        csv_file.close()
+        thread_funciton_list.update({t_id: f_avoid_dups})
+
+        with open(trace_file, 'r') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            csv_reader_list = list(csv_reader)
+            [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
+            # The index of record are +1
+            for f in f_avoid_dups:
+                function_start_end = list(filter(lambda r: r[2] == t_id and r[4] == f, csv_reader_list))
+                print("\n -------------------------------------")
+                # print(function_start_end)
+                function_return_index = None
+                for indx, elem in enumerate(function_start_end):
+                    print(elem)
+                    next_item_index = indx + 1
+                    if len(function_start_end) > 1 and next_item_index < len(function_start_end):
+                        function_return_index = function_start_end[next_item_index][0] if\
+                                                    function_start_end[next_item_index][3] == "FUNCTIONRETURN" else\
+                                                    None
+
+                        function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
+
+                        distance = function_return_index - function_call_index if function_return_index is not None and\
+                                    function_call_index is not None else None
+                        print(distance)
+
+                csv_file.seek(0, 0)
+        csv_file.close()
+
+    # print(thread_funciton_list)
+    # print(thread_funciton_list)
+    return thread_funciton_list

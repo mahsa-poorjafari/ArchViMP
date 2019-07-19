@@ -38,7 +38,7 @@ function main(container) {
             let thrNode = null;
             let styleIdNode = "LogicalComp";
 
-            let lcName = get_lc_name();
+            let lcName = get_node_name();
 
             for (let i=0; i<threadList.length; i++){
                 let thrId = 'thr' + i;
@@ -65,13 +65,6 @@ function main(container) {
                 // console.table([thrFunc, lcName, styleIdNode]);
                 nodeStyle(graph, styleIdNode);
                 let funcNode = graph.insertVertex(parent, funcId, thrFunc, fW, fH, 120, 80, styleIdNode);
-
-                // if (lcName !== null ){
-                //     let style = graph.getStylesheet();
-                //     console.table(style);
-                //     style[mxConstants.STYLE_IMAGE]= '/static/media/Notations/LogicalCompInactive.png';
-                //     graph.getStylesheet().putCellStyle('LogicalComp', style);
-                // }
 
                 fW += 150;
                 thrNode.target = funcNode;

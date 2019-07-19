@@ -94,7 +94,7 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
                 graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                     let cell = evt.getProperty('cell');
                     if (cell['style'] === "LogicalComp" || cell['style'] === "LogicalComp_big"){
-                        window.location = "http://127.0.0.1:8000/logical_comp?lc="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                        window.location = "http://127.0.0.1:8000/logical_comp?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
                     }
                     evt.consume();
                 });

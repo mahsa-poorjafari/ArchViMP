@@ -6,66 +6,102 @@ from functools import partial
 import csv
 import os
 import collections
+import string
 from django.conf import settings
 from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
 from datetime import datetime
 
+# In this file, each functions will render a page of the web-framework
 
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "-")
 
 
-def index(request):
+def trace_vis(request):
     context = {}
     current_time = str(settings.CURRENT_TIME).replace("+00:00", "").replace(":", "-").replace(".", "-")
     print("CURRENT_TIME: ", settings.CURRENT_TIME)
-    existing_files = [f for f in os.listdir(settings.MEDIA_ROOT)]
-    context['existing_files'] = existing_files
-    context['error'] = ""
-    # print(dict(request.FILES))
+    # Get all existing trace files
+    dir_trace_files = os.path.join(settings.MEDIA_ROOT, "TraceFiles")
+    existing_trace_files = [f for f in os.listdir(dir_trace_files)]
+    context['existing_trace_files'] = existing_trace_files
+
+    # get all existing shared variable files
+    dir_shvar_files = os.path.join(settings.MEDIA_ROOT, "SharedVariablesFiles")
+    existing_shvar_files = [f for f in os.listdir(dir_shvar_files)]
+    context['existing_shvar_files'] = existing_shvar_files
+
+    context['trace_error'] = ""
+    context['shvar_error'] = ""
+
     if request.method == 'POST':
-        if 'trace_file' in request.FILES:
-            uploaded_file = request.FILES['trace_file']
-            fname = uploaded_file.name
-            file_data = fname.split(".")
-            print(file_data[-1])
-            if file_data[-1] not in ["txt"]:
-                context['error'] = "Valid format of the file is txt."
+        if 'trace_file' in request.FILES and 'shared_var_file' in request.FILES:
+            uploaded_t_file = request.FILES['trace_file']
+            trace_file_name = uploaded_t_file.name
+            trace_file_data = trace_file_name.split(".")
+
+            uploaded_shv_file = request.FILES['shared_var_file']
+            shared_var_file_name = uploaded_shv_file.name
+            shared_var_file_data = shared_var_file_name.split(".")
+
+            if trace_file_data[-1] not in ["txt"] or shared_var_file_data[-1] not in ["txt"]:
+                context['trace_error'] = "Valid format of the files is txt."
             else:
                 project_name = request.POST.get("program_name")
-                project_name = str(project_name).replace(" ", "_")
-                fs = FileSystemStorage()
-                raw_file_name = project_name + "_" + current_time
-                file_name = raw_file_name + "." + file_data[-1]
-                name = fs.save(file_name, uploaded_file)
-                context['url'] = fs.url(name)
+                project_name_capit = string.capwords(str(project_name))
+                print(project_name_capit)
+                project_name = project_name_capit.replace(" ", "").replace("_", "")
+
+                # Save the trace files
+                fs = FileSystemStorage(location="Uploaded_files/TraceFiles")
+                raw_trace_file_name = project_name + "_TraceFile_" + current_time
+                t_file_name = raw_trace_file_name + "." + trace_file_data[-1]
+                trace_name = fs.save(t_file_name, uploaded_t_file)
+                trace_file_url = fs.url(trace_name)
+
+                # Save the shared Variables files
+                fs = FileSystemStorage(location="Uploaded_files/SharedVariablesFiles")
+                raw_shvar_file_name = project_name + "_SharedVariables_" + current_time
+                sh_var_file_name = raw_shvar_file_name + "." + shared_var_file_data[-1]
+                sh_var_name = fs.save(sh_var_file_name, uploaded_t_file)
+                sh_var_file_url = fs.url(sh_var_name)
+
+                context['trace_url'] = trace_file_url
+                context['shvar_url'] = sh_var_file_url
                 context['program_name'] = project_name if project_name else "Unnamed Program"
                 context['href_id'] = "UPLOADED"
-                context['file_path'] = fs.url(name)
-                context['raw_file_name'] = raw_file_name
+                context['file_path'] = fs.url(trace_name)
+                context['trace_raw_file_name'] = raw_trace_file_name
+                context['shvar_raw_file_name'] = raw_shvar_file_name
 
-        elif request.POST.get('select_tag_file'):
-            uploaded_file = request.POST.get('select_tag_file')
-            file_data = uploaded_file.split(".")
-            context['url'] = os.path.join(settings.MEDIA_ROOT, uploaded_file)
+        elif request.POST.get('selected_trace_file') not in [None, ""] and request.POST.get('selected_shared_var_file') not in [None, ""]:
+            selected_trace_file = request.POST.get('selected_trace_file')
+            selected_shared_var_file = request.POST.get('selected_shared_var_file')
+            selected_trace_file_data = selected_trace_file.split(".")
+            selected_shvar_file_data = selected_shared_var_file.split(".")
+
+            context['selected_trace_url'] = os.path.join(dir_trace_files, selected_trace_file)
+            context['selected_shvar_url'] = os.path.join(dir_shvar_files, selected_shared_var_file)
             context['program_name'] = "Unnamed Program"
             context['href_id'] = "UPLOADED"
-            context['file_path'] = os.path.join(settings.MEDIA_ROOT, uploaded_file)
-            context['raw_file_name'] = file_data[0]
+            # context['file_path'] = os.path.join(settings.MEDIA_ROOT, uploaded_file)
+            context['trace_raw_file_name'] = selected_trace_file_data[0]
+            context['shvar_raw_file_name'] = selected_shvar_file_data[0]
 
+        elif request.POST.get('selected_trace_file') in [None, ""] or\
+                request.POST.get('selected_shared_var_file') in [None, ""]:
+            context['shvar_error'] = catch_the_shvar_error(dict(request.POST))
+
+            # else:
+                # context['trace_error'] = catch_the_trace_error(dict(request.FILES))
         else:
-            context['error'] = "Please enter a trace file."
+            print("Something went wrong...!")
 
     return render(request, 'trace_vis.html', context)
 
 
 def home(request):
-
     return render(request, 'home.html')
-
-
-def trace_file_upload(request):
-    return render(request, 'upload_file.html')
 
 
 def write_to_csv_file(data, data_name):
@@ -81,47 +117,6 @@ def write_to_csv_file(data, data_name):
         for row in data:
             csv_writer.writerow(row)
     csv_file.close()
-
-
-def get_shared_var_names():
-    with open('logical_vis/shared_variables.txt', 'r') as csv_file:
-        csv_file.seek(0, 0)
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        var_names = map(lambda var: var[0], csv_reader)
-        shared_variables_names = list(var_names)
-        # print("Number of Shared Variables: ", shared_variables_names)
-    csv_file.close()
-    return shared_variables_names
-
-
-def get_records():
-    with open('logical_vis/PowerWindowRosace.txt') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-    csv_file.close()
-    print("csv_reader=>  ", type(csv_reader))
-    return csv_reader
-
-
-def thread_per_vars(shared_variables, thread_ids):
-    thread_vars_op = {}
-    thread_op = dict()
-
-    with open('logical_vis/PowerWindowRosace.txt', 'r') as csv_file:
-        # csv_file.seek(0, 0)
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for v in shared_variables:
-            for t in thread_ids:
-                csv_file.seek(0, 0)
-                var_thr = list(filter(lambda r: r[3] == v and r[1] == t, csv_reader))
-                var_thr_op = list(map(lambda o: o[2], var_thr))
-                dict_var_thr_op = dict.fromkeys(var_thr_op)
-                op_list = list(dict_var_thr_op)
-                thread_op.update({t: None if not op_list else op_list})
-
-            thread_vars_op.update({v: thread_op})
-    csv_file.close()
-    # print("\n => ", thread_vars)
-    return thread_vars_op
 
 
 def catastrophe(request):
@@ -299,9 +294,9 @@ def ld_exe_path_l2(request):
 
 
 def time_line_view(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     thread_activity = {}
     # file_name = None
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
         trace_file = get_trace_file_path(b_parameter, file_name=file_name)
@@ -347,3 +342,16 @@ def time_line_view(request):
                                                    "time_stamp_list": all_time_stamp})
 
 
+def op_funcs_l2(request):
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File=>   " + file_name
+    else:
+        trace_file = get_trace_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
+    threads = get_threads(trace_file)
+    all_func_in_thread = get_functions_with_body(trace_file, threads)
+    return render(request, 'operation_functions.html', {'title_name': which_way})

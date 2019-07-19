@@ -125,7 +125,7 @@ function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrPara
         graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
             let cell = evt.getProperty('cell');
             if (cell['style'] === "LogicalComp" || cell['style'] === "LogicalComp_big"){
-                window.location = "http://127.0.0.1:8000/logical_comp?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                window.location = "http://127.0.0.1:8000/logical_comp?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
             }
             evt.consume();
         });
@@ -295,11 +295,11 @@ function get_url_fileName() {
     return FileName
 }
 
-function get_lc_name() {
+function get_node_name() {
     let url_string = window.location.href;
     let url = new URL(url_string);
-    let lcName = url.searchParams.get("lc");
-    return lcName
+    let nodeName = url.searchParams.get("node");
+    return nodeName
 }
 
 function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
@@ -388,7 +388,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                     let cell = evt.getProperty('cell');
                     if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
-                        window.location = "http://127.0.0.1:8000/Logical_Data_L1?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                        window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
                     }
                     evt.consume();
                 });
