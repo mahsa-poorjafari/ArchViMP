@@ -3,15 +3,16 @@
 {% block content %}
      <nav class="navbar navbar-default">
         <div class="container-fluid">
-            <h2>{{ title_name }} - Logical Data Level 0 </h2>
-            <h4>Logical Data are struct that contains Technical Data as their child</h4>
+            <h2>{{ title_name }}  </h2>
+            <h3> Logical Data - Level 1</h3>
+            <h4>Technical Data to Logical Data</h4>
         </div>
     </nav>
     <div class="tabs">
       <div class="tab-button-outer">
         <ul id="tab-button">
-          <li><a href="#tab01" class="btn-info">Diagram</a></li>
-          <li><a href="#tab02" class="btn-info">Textual</a></li>
+          <li><a href="#tab01" class="btn-info" style="display: none">Diagram</a></li>
+          <li><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
         </ul>
       </div>
         <div class="tab-select-outer">
@@ -22,11 +23,10 @@
         </div>
     </div>
 
-
     <div id="tab01" class="tab-contents">
         <div class="col-md-12 well diagram_container" id="logical_data_l1_diagram"></div>
     </div>
-    <div id="tab02" class="tab-contents">
+    <div id="tab02" class="tab-contents" style="display: none">
         <div class="col-md-12 well textual_container" id="logical_data_l1_textual">
             <ul class="list_level0">
                 {% for sK, sV in struct_vars.items %}

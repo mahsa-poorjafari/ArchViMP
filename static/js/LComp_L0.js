@@ -21,6 +21,7 @@ function main(container) {
         // Enables rubberband selection
         new mxRubberband(graph);
         var parent = graph.getDefaultParent();
+        graph.keepEdgesInBackground = true;
 
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();

@@ -32,6 +32,7 @@ function main(container){
         // Gets the default parent for inserting new cells. This
         // is normally the first child of the root (ie. layer 0).
         var parent = graph.getDefaultParent();
+        graph.keepEdgesInBackground = true;
 
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();

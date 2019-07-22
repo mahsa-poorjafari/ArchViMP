@@ -58,7 +58,7 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
         configEdgeStyle(graph, "#000000");
         let eStyle = graph.getStylesheet().getDefaultEdgeStyle();
         eStyle['endSize'] = '5';
-
+        graph.keepEdgesInBackground = true;
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
 

@@ -179,8 +179,8 @@ def logical_comp(request):
 
     thread_list = get_threads(trace_file)
     thr_func_dict = {}
-    for indx, t in enumerate(thread_list):
-        thr_func = get_first_function(t, indx, trace_file)
+    for t in thread_list:
+        thr_func = get_first_function(t, trace_file)
         thr_func_dict.update(thr_func)
     # print("thr_func_list => ", thr_func_dict)
 
@@ -224,7 +224,7 @@ def logical_data_l2_ungrouped(request):
                                                               'benchmark_name': benchmark_name})
 
 
-def logical_data_l2(request):
+def logical_data_l3(request):
     b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     file_name = None
     if b_parameter == "UPLOADED":
@@ -256,11 +256,11 @@ def logical_data_l2(request):
 
     thread_list = get_threads(trace_file)
     thr_func_dict = {}
-    for indx, t in enumerate(thread_list):
-        thr_func = get_first_function(t, indx, trace_file)
+    for t in thread_list:
+        thr_func = get_first_function(t, trace_file)
         thr_func_dict.update(thr_func)
 
-    return render(request, 'logical_data_L2.html', {'title_name': which_way,
+    return render(request, 'logical_data_L3.html', {'title_name': which_way,
                                                     'file_path': trace_file,
                                                     'raw_file_name': file_name,
                                                     'href_id': b_parameter,
@@ -276,8 +276,8 @@ def ld_exe_path_l2(request):
     threads = get_threads(trace_file)
     thr_func_dict = {}
     parent_function_list = []
-    for indx, t in enumerate(threads):
-        thr_func = get_first_function(t, indx, trace_file)
+    for t in threads:
+        thr_func = get_first_function(t, trace_file)
         thr_func_dict.update(thr_func)
 
     print("thr_func_dict=>  ", thr_func_dict)
@@ -353,5 +353,12 @@ def op_funcs_l2(request):
         which_way = b_parameter + " Benchmark"
 
     threads = get_threads(trace_file)
-    all_func_in_thread = get_functions_with_body(trace_file, threads)
-    return render(request, 'operation_functions.html', {'title_name': which_way})
+    shared_vars_names = get_all_shared_var_names(b_parameter)
+    print("shared_vars_names=   ", shared_vars_names)
+    all_func_body_in_thread = get_functions_with_body(trace_file, threads)
+    print("================= \n")
+    print(all_func_body_in_thread)
+    for t, fun_list in all_func_body_in_thread.items():
+        for fun, body in fun_list.items():
+            funcitons_shared_vars = list(filter(lambda line: line[4] in shared_vars_names, body))
+    return render(request, 'ld_l2_operation_functions.html', {'title_name': which_way})

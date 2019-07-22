@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Enables rubberband selection
             new mxRubberband(graph);
             let parent = graph.getDefaultParent();
+            graph.keepEdgesInBackground = true;
 
             // Adds cells to the model in a single step
             graph.getModel().beginUpdate();

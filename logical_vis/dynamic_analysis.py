@@ -11,7 +11,7 @@ def remove_dups(a_list):
     return the_list
 
 
-def get_first_function(t, indx, trace_file):
+def get_first_function(t, trace_file):
     with open(trace_file, 'r') as csv_file:
         csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -70,8 +70,8 @@ def get_thread_var_op(threads, op, trace_file, b_param):
 
     thread_var_op = {}
     thr_func_dict = {}
-    for indx, t in enumerate(threads):
-        thr_func = get_first_function(t, indx, trace_file)
+    for t in threads:
+        thr_func = get_first_function(t, trace_file)
         thr_func_dict.update(thr_func)
 
     # What I need is: To show the inputs-LD of each threads
@@ -285,7 +285,9 @@ def thread_per_vars(shared_variables, thread_ids):
 
 def get_functions_with_body(trace_file, thread_list):
     thread_funciton_list = {}
+    thread_funcitons = {}
     for t in thread_list:
+        funciton_body_list = {}
         t_id = t.split("_")[1] if "Main_" in t else t
         with open(trace_file, 'r') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
@@ -295,34 +297,36 @@ def get_functions_with_body(trace_file, thread_list):
             f_avoid_dups = remove_dups(f_avoid_none)
         csv_file.close()
         thread_funciton_list.update({t_id: f_avoid_dups})
-
+        print("f_avoid_dups   ", f_avoid_dups)
+        thr_func = get_first_function(t, trace_file)
+        thr_func_list = list(thr_func.values())
         with open(trace_file, 'r') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             csv_reader_list = list(csv_reader)
             [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
             # The index of record are +1
             for f in f_avoid_dups:
-                function_start_end = list(filter(lambda r: r[2] == t_id and r[4] == f, csv_reader_list))
-                print("\n -------------------------------------")
-                # print(function_start_end)
-                function_return_index = None
-                for indx, elem in enumerate(function_start_end):
-                    print(elem)
-                    next_item_index = indx + 1
-                    if len(function_start_end) > 1 and next_item_index < len(function_start_end):
-                        function_return_index = function_start_end[next_item_index][0] if\
-                                                    function_start_end[next_item_index][3] == "FUNCTIONRETURN" else\
-                                                    None
+                if f not in thr_func_list:
+                    function_start_end = list(filter(lambda r: r[2] == t_id and r[4] == f, csv_reader_list))
+                    # print("\n -------------------------------------")
+                    for indx, elem in enumerate(function_start_end):
+                        # print(elem)
+                        next_item_index = indx + 1
+                        if len(function_start_end) > 1 and next_item_index < len(function_start_end):
+                            function_return_index = function_start_end[next_item_index][0] if \
+                                function_start_end[next_item_index][3] == "FUNCTIONRETURN" else \
+                                None
 
-                        function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
+                            function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
 
-                        distance = function_return_index - function_call_index if function_return_index is not None and\
-                                    function_call_index is not None else None
-                        print(distance)
+                            distance = function_return_index - function_call_index if function_return_index is not None and \
+                                                                                      function_call_index is not None else None
+
+                            if not distance <= 1:
+                                funciton_body_list.update({f: csv_reader_list[function_call_index:function_return_index]})
 
                 csv_file.seek(0, 0)
         csv_file.close()
-
-    # print(thread_funciton_list)
-    # print(thread_funciton_list)
-    return thread_funciton_list
+        if len(funciton_body_list) > 0:
+            thread_funcitons.update({t_id: funciton_body_list})
+    return thread_funcitons
