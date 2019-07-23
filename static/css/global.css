@@ -119,10 +119,6 @@
 }
 
 #tab-button li.gray_tab {display: block;}
-
-#tab-button li.gray_tab:hover{cursor: not-allowed;}
-#tab-button li.gray_tab a:hover{cursor: not-allowed; background-color: #C0C0C0}
-
 #tab-button li.gray_tab i.close {display: none;}
 
 #tab-button li.gray_tab.is-active a.lc_l1{

@@ -11,18 +11,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let graphPGroupContainer = document.getElementById('logical_data_l2_dig_process');
     mainGrouped(graphPGroupContainer, txtPContainer, "P");
 
-    let ldL1InputContainer = document.getElementById("logical_data_l1_input_dig");
-    logicalDataLevel1(ldL1InputContainer, txtInContainer, "R");
+    // let ldL1InputContainer = document.getElementById("logical_data_l1_input_dig");
+    // logicalDataLevel1(ldL1InputContainer, txtInContainer, "R");
+    //
+    // let ldL1OutputContainer = document.getElementById("logical_data_l1_output_dig");
+    // logicalDataLevel1(ldL1OutputContainer, txtOutContainer, "W");
+    //
+    // let ldL1ProcessContainer = document.getElementById("logical_data_l1_process_dig");
+    // logicalDataLevel1(ldL1ProcessContainer, txtPContainer, "P");
 
-    let ldL1OutputContainer = document.getElementById("logical_data_l1_output_dig");
-    logicalDataLevel1(ldL1OutputContainer, txtOutContainer, "W");
-
-    let ldL1ProcessContainer = document.getElementById("logical_data_l1_process_dig");
-    logicalDataLevel1(ldL1ProcessContainer, txtPContainer, "P");
-
-    let graphOpGroupContainer = document.getElementById("logical_data_l2_all_dig");
-    let txtOpContiner = document.getElementById("logical_data_l2_all");
+    let graphOpGroupContainer = document.getElementById("logical_data_l3_all_dig");
+    let ldL2Container = document.getElementById("logical_data_l2_all_dig");
+    let txtOpContiner = document.getElementById("logical_component_l1_holder");
     allOperations(graphOpGroupContainer, txtOpContiner, txtInContainer, txtOutContainer, txtPContainer);
+    allLogicalDataLevel1(ldL2Container, txtInContainer, txtOutContainer, txtPContainer );
 
 });
 
@@ -41,16 +43,9 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
 
         // Creates the graph inside the given container
         var graph = new mxGraph(container);
-        //graph.setEnabled(false);
-
-
-        // graph.getStylesheet().getDefaultEdgeStyle();
-
+;
         // Enables rubberband selection
         new mxRubberband(graph);
-
-        // Disables basic selection and cell handling
-        // configureStylesheet(graph);
 
         // Gets the default parent for inserting new cells. This
         // is normally the first child of the root (ie. layer 0).
@@ -103,13 +98,13 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
 
 
             // Draw Input groups
-            connect_to_related_LC(graph, parent, inputGroup, ldInX, ldInY, "Input");
+            connect_to_related_LC(graph, parent, inputGroup, ldInX, ldInY, "R");
 
             // Draw Process groups
-            connect_to_related_LC(graph, parent, processGroup, ldPX, ldPY, "Process");
+            connect_to_related_LC(graph, parent, processGroup, ldPX, ldPY, "P");
 
             // Draw Output groups
-            connect_to_related_LC(graph, parent, outputGroup, ldOutX, ldOutY, "Output");
+            connect_to_related_LC(graph, parent, outputGroup, ldOutX, ldOutY, "W");
 
 
         }finally{
@@ -191,7 +186,7 @@ function mainGrouped(container, txt, op) {
                 graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                     scrollToTop(1000);
                     let cell = evt.getProperty('cell');
-                    console.log(cell);
+
                     // if (cell['style'] === "logicalData_R_big" || cell['style'] === "logicalData_R"){
                     //     document.getElementById("lc_l1_dig_input").style.display = "block";
                     // }
@@ -215,18 +210,78 @@ function mainGrouped(container, txt, op) {
                 // console.log("benchmarkName------------ " + ulrParam);
                 drawLcForLd(graph, parent, ldNode, lcList, logicalCompY, op, ulrParam);
                 logicalCompY += 200;
-
             }
-
 
         }finally{
             // Updates the display
             graph.getModel().endUpdate();
         }
-
     }
 }
 
+
+function allLogicalDataLevel1(container, InContainer, OutContainer, PContainer) {
+    // Checks if the browser is supported
+    if (!mxClient.isBrowserSupported())
+    {
+        // Displays an error message if the browser is not supported.
+        mxUtils.error('Browser is not supported!', 200, false);
+    }
+    else
+    {
+        // Disables the built-in context menu
+        mxEvent.disableContextMenu(container);
+
+        // Creates the graph inside the given container
+        var graph = new mxGraph(container);
+        // Enables rubberband selection
+        new mxRubberband(graph);
+
+        // Disables basic selection and cell handling
+        // configureStylesheet(graph);
+
+        // Gets the default parent for inserting new cells. This
+        // is normally the first child of the root (ie. layer 0).
+        let parent = graph.getDefaultParent();
+        graph.keepEdgesInBackground = true;
+        // Highlights the vertices when the mouse enters
+        let highlight = new mxCellTracker(graph, '#337ab7');
+
+        // Adds cells to the model in a single step
+        graph.getModel().beginUpdate();
+        try {
+            let varX = 500;
+            let varY = 50;
+            let nodeSize = {};
+            let benchmarkName = get_url_benchmark();
+            let fileName = get_url_fileName();
+            let ulrParam = [benchmarkName];
+            ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
+            configEdgeStyle(graph, "#000000");
+            let sharedVarList = document.getElementById("shared_vars_holder").getElementsByClassName("shared_var_list")[0].getElementsByTagName("li");
+            for (v of sharedVarList){
+                let vText = v.innerHTML.replace(/(\r\n)/g,'');
+                console.table([vText]);
+                nodeSize = setNodeSize(vText, 'variable');
+                nodeStyle(graph,  nodeSize['nodeIdText']);
+                let varNode = graph.insertVertex(parent, null, vText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                varY += 200;
+            }
+            let groupLdVars = [];
+            getLdL1AllVars(InContainer, "R", graph, parent, 10, 100);
+            console.log("In");
+            getLdL1AllVars(PContainer, "P", graph, parent, 800, 400);
+            console.log("Process");
+            getLdL1AllVars(OutContainer, "W", graph, parent, 1100, 50);
+            console.log("Out");
+            //console.table(groupLdVars);
+
+        }finally {
+            graph.getModel().endUpdate();
+        }
+    }
+
+}
 
 function logicalDataLevel1(container, txt, op) {
     // Checks if the browser is supported
@@ -256,9 +311,6 @@ function logicalDataLevel1(container, txt, op) {
         // Gets the default parent for inserting new cells. This
         // is normally the first child of the root (ie. layer 0).
         let parent = graph.getDefaultParent();
-
-
-
         // Highlights the vertices when the mouse enters
         let highlight = new mxCellTracker(graph, '#337ab7');
 

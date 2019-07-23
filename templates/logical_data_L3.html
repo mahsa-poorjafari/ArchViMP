@@ -20,22 +20,22 @@
                 </div>
                 <div class="col-md-12 level1">
 
-                    <li id="lc_l1_dig_input" class="col-md-3 gray_tab">
-                      <a href="#tab07" class="btn-light lc_l1"> Logical Data-Thread operation-Level 1 </a>
+                    <li id="ld_l1_dig_all" class="col-md-3 gray_tab">
+                      <a href="#tab08" class="btn-light lc_l1"> Logical Data-Thread operation-Level 1 </a>
                       <i class="far fa-window-close close"></i>
                     </li>
-                    <li id="lc_l1_dig_input" class="col-md-3 gray_tab">
-                      <a href="#tab04" class="btn-light lc_l1"> Logical Data-Thread Input-Level 1 </a>
-                      <i class="far fa-window-close close"></i>
-                    </li>
-                    <li id="lc_l1_dig_output" class="col-md-3 gray_tab">
-                      <a href="#tab05" class="btn-light lc_l1"> Logical Data-Thread Output-Level 1 </a>
-                      <i class="far fa-window-close close"></i>
-                    </li>
-                    <li id="lc_l1_dig_process" class="col-md-3 gray_tab">
-                      <a href="#tab06" class="btn-light lc_l1"> Logical Data-Thread Process-Level 1 </a>
-                      <i class="far fa-window-close close"></i>
-                  </li>
+{#                    <li id="lc_l1_dig_input" class="col-md-3 gray_tab">#}
+{#                      <a href="#tab04" class="btn-light lc_l1"> Logical Data-Thread Input-Level 1 </a>#}
+{#                      <i class="far fa-window-close close"></i>#}
+{#                    </li>#}
+{#                    <li id="lc_l1_dig_output" class="col-md-3 gray_tab">#}
+{#                      <a href="#tab05" class="btn-light lc_l1"> Logical Data-Thread Output-Level 1 </a>#}
+{#                      <i class="far fa-window-close close"></i>#}
+{#                    </li>#}
+{#                    <li id="lc_l1_dig_process" class="col-md-3 gray_tab">#}
+{#                      <a href="#tab06" class="btn-light lc_l1"> Logical Data-Thread Process-Level 1 </a>#}
+{#                      <i class="far fa-window-close close"></i>#}
+{#                  </li>#}
                 </div>
             </div>
         </ul>
@@ -43,6 +43,7 @@
         <div class="tab-select-outer">
             <select id="tab-select">
                 <option value="#tab07">Operation of Threads</option>
+                <option value="#tab08">Logical Data Level 1 - Operation of Threads</option>
                 <option value="#tab01">Input for Threads </option>
                 <option value="#tab02">Output of Threads</option>
                 <option value="#tab03">Processed by Threads</option>
@@ -54,6 +55,9 @@
     </div>
 
     <div id="tab07" class="tab-contents">
+        <div class="col-md-12 diagram_container" id="logical_data_l3_all_dig"></div>
+    </div>
+    <div id="tab08" class="tab-contents">
         <div class="col-md-12 diagram_container" id="logical_data_l2_all_dig"></div>
     </div>
     <div id="tab01" class="tab-contents">
@@ -88,7 +92,7 @@
                                 {% if vK == "group_members" %}
                                     <ul class="list_level2">
                                         {% for k, v in vV.items %}
-                                            <li class="li-list_level2 test">
+                                            <li class="li-list_level2 ">
                                                 <span class="key">{{ k }}</span>
                                                 <span class="value">{{ v }}</span>
                                             </li>
@@ -175,7 +179,14 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="col-md-12 text_container" style="display: none" id="logical_data_l2_all">
+    <div class="col-md-12 text_container" style="display: none" id="shared_vars_holder">
+        <ul class="shared_var_list">
+            {% for var in shared_vars_names %}
+                <li class="col-4">{{ var }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-12 text_container" style="display: none" id="logical_component_l1_holder">
         <ul class="thread_list">
             {% for t, f in logical_comps.items %}
                 <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">

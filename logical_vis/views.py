@@ -236,6 +236,7 @@ def logical_data_l3(request):
         which_way = b_parameter + " Benchmark"
 
     threads = get_threads(trace_file)
+    shared_vars_names = get_all_shared_var_names(b_parameter)
 
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(threads, ["LOAD"], trace_file, b_parameter)
@@ -267,7 +268,8 @@ def logical_data_l3(request):
                                                     'ld_input_lc': ld_input_lc,
                                                     'ld_output_lc': ld_output_lc,
                                                     'ld_process_lc': ld_process_lc,
-                                                    'logical_comps': thr_func_dict})
+                                                    'logical_comps': thr_func_dict,
+                                                    'shared_vars_names': shared_vars_names})
 
 
 def ld_exe_path_l2(request):
@@ -358,7 +360,13 @@ def op_funcs_l2(request):
     all_func_body_in_thread = get_functions_with_body(trace_file, threads)
     print("================= \n")
     print(all_func_body_in_thread)
+    thread_function_shared_var = {}
     for t, fun_list in all_func_body_in_thread.items():
         for fun, body in fun_list.items():
-            funcitons_shared_vars = list(filter(lambda line: line[4] in shared_vars_names, body))
-    return render(request, 'ld_l2_operation_functions.html', {'title_name': which_way})
+            funcitons_shared_vars = map(lambda line: line[4] if line[4] in shared_vars_names else None, body)
+            funcitons_shared_vars_nonone = list(filter(partial(is_not, None), funcitons_shared_vars))
+            if len(funcitons_shared_vars_nonone) > 0:
+                thread_function_shared_var.update({t: {fun: funcitons_shared_vars_nonone}})
+    print(thread_function_shared_var)
+    return render(request, 'ld_l2_operation_functions.html', {'title_name': which_way,
+                                                              'thread_function_shared_var': thread_function_shared_var})

@@ -1,11 +1,38 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default" xmlns="http://www.w3.org/1999/html">
         <div class="container-fluid">
             <h2>{{ title_name }} </h2>
             <h2> Logical Data - Level 2 </h2>
             <h4> Operation of Functions</h4>
         </div>
     </nav>
+    <div class="tabs">
+        {% if not thread_function_shared_var %}
+            <div class="alert alert-danger" role="alert">
+                No group for this level of Logical Data has been created.</br>
+                The list of function is Empty
+            </div>
+        {% endif %}
+        <div class="tab-button-outer">
+            <ul id="tab-button">
+                <li><a href="#tab01" class="btn-info" style="display: none">Diagram</a></li>
+                <li><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
+            </ul>
+            </div>
+            <div class="tab-select-outer">
+                <select id="tab-select">
+                    <option value="#tab01">Diagram</option>
+                    <option value="#tab02">Textual</option>
+                </select>
+            </div>
+    </div>
+    <div id="tab01" class="tab-contents">
+        <div class="col-md-12 well diagram_container" id="logical_data_l2_function_diagram"></div>
+    </div>
+    <div id="tab02" class="tab-contents" style="display: none">
+        <div class="col-md-12 well textual_container" id="logical_data_l2_function_textual">
+        </div>
+    </div>
 {% endblock %}

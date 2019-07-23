@@ -323,7 +323,7 @@ def get_functions_with_body(trace_file, thread_list):
                                                                                       function_call_index is not None else None
 
                             if not distance <= 1:
-                                funciton_body_list.update({f: csv_reader_list[function_call_index:function_return_index]})
+                                funciton_body_list.update({f: csv_reader_list[function_call_index+1:function_return_index]})
 
                 csv_file.seek(0, 0)
         csv_file.close()

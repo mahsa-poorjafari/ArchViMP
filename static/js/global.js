@@ -412,10 +412,11 @@ function connect_to_related_LC(graph, parent, inputGroup, X, Y, op) {
     let nodeSize = {};
     // get the existing element in the Graph
     let mxCells = graph.getChildVertices(graph.getDefaultParent());
-    console.table(mxCells);
+
     for (let inputNode of inputGroup){
         let inG = inputNode.firstElementChild.innerHTML;
-        nodeSize = setNodeSize(inG, 'logicalData');
+        nodeSize = setNodeSize(inG, 'logicalData_' + op);
+
         nodeStyle(graph,  nodeSize['nodeIdText']);
         let ldInNode = graph.insertVertex(parent, null, inG, X, Y, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         Y += 300;
@@ -424,20 +425,20 @@ function connect_to_related_LC(graph, parent, inputGroup, X, Y, op) {
         for (let lc of ldInLc){
             ldLcList.push(lc.innerHTML.replace(/ /g,''));
         }
-        console.log(ldLcList);
+
         // connect_to_related_LC(mxCells, ldLcList, graph, ldInNode);
         for (let node of mxCells){
             // console.log(node['value']);
             // console.log(ldLcList.includes(node['value']));
             if(node['style'] === "LogicalComp" && ldLcList.includes(node['value'])){
                 switch (op) {
-                    case "Input":
+                    case "R":
                         graph.insertEdge(parent, null, null, ldInNode, node, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
                         break;
-                    case "Process":
+                    case "P":
                         graph.insertEdge(parent, null, null, node, ldInNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;');
                         break;
-                    case "Output":
+                    case "W":
                         graph.insertEdge(parent, null, null, node, ldInNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
                         break;
                 }
@@ -449,4 +450,36 @@ function connect_to_related_LC(graph, parent, inputGroup, X, Y, op) {
     }
 
 
+}
+
+function getLdL1AllVars(container, op, graph, parent, X, Y) {
+    let ldGroup = container.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+    let nodeSize = {};
+    // let groupLdVars = [];
+    let groupText = null;
+    let ldX =X;
+    let ldY =Y;
+    let mxCells =  graph.getChildVertices(graph.getDefaultParent());
+    for (let item of ldGroup){
+        groupText = item.firstElementChild.innerHTML;
+        nodeSize = setNodeSize(groupText, 'logicalData_' + op);
+        nodeStyle(graph,  nodeSize['nodeIdText']);
+        let ldSharedVarList = [];
+        let ldAccessList = item.getElementsByClassName("list_level1")[0].getElementsByClassName('group_members')[0];
+        let VarList = ldAccessList.getElementsByClassName('list_level2')[0].getElementsByTagName('li');
+        for (v of VarList){
+            ldSharedVarList.push(v.firstElementChild.innerHTML.replace(/ /g,''));
+        }
+        // groupLdVars[groupText] = ldSharedVarList;
+        let ldNode = graph.insertVertex(parent, null, groupText, ldX, ldY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        // console.table([groupText, ldSharedVarList]);
+        ldY += 200;
+
+        for (let node of mxCells){
+            if(node['style'] === "variable" && ldSharedVarList.includes(node['value'])){
+                ldNode.target= node;
+                graph.insertEdge(parent, null, null, node, ldNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+            }
+        }
+    }
 }
