@@ -30,7 +30,7 @@ function main(container) {
             // let varW = 20;
             let stX = null;
             let stY = null;
-
+            let ldName = get_node_name();
             configEdgeStyle(graph, "#000000");
 
             let structList = document.getElementById("logical_data_l1_textual").getElementsByClassName("list_level0")[0].getElementsByTagName("li");
@@ -48,8 +48,16 @@ function main(container) {
 
                 let stText = structList[i].getElementsByTagName("span")[0].innerHTML;
                 let stVarList = structList[i].getElementsByTagName("lo");
+                let styleIdNode = "logicalData";
+                if (ldName !== null && ldName !== stText){
+                    styleIdNode = "LogicalDataInactive";
+                }else{
+                    styleIdNode = "logicalData";
+                }
+                // console.table([thrFunc, lcName, styleIdNode]);
+                nodeStyle(graph, styleIdNode);
 
-                nodeSize = setNodeSize(stText, 'logicalData' );
+                nodeSize = setNodeSize(stText, styleIdNode );
 
                 if (stText !== "variables") {
                     let stId = 'st' + i;
@@ -100,19 +108,14 @@ function main(container) {
                         }
                         stX = values[0];
                         stY = values[1];
-                        console.log("j="   + j + "   "+ Text + "  -  " + "X= " + stX + "  Y= " + stY);
                         graph.insertVertex(parent, nodeId, Text, stX, stY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                     }
                 }
 
-
             }
             // console.table( graph.getChildVertices(graph.getDefaultParent()));
 
-        }
-
-        finally
-        {
+        }finally{
             // Updates the display
             graph.getModel().endUpdate();
         }

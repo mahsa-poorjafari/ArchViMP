@@ -21,10 +21,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // logicalDataLevel1(ldL1ProcessContainer, txtPContainer, "P");
 
     let graphOpGroupContainer = document.getElementById("logical_data_l3_all_dig");
+    let allL3GroupContainer = document.getElementById("all_logical_data_l3_dig");
     let ldL2Container = document.getElementById("logical_data_l2_all_dig");
     let txtOpContiner = document.getElementById("logical_component_l1_holder");
     allOperations(graphOpGroupContainer, txtOpContiner, txtInContainer, txtOutContainer, txtPContainer);
     allLogicalDataLevel1(ldL2Container, txtInContainer, txtOutContainer, txtPContainer );
+    showAllL3GroupContainer(allL3GroupContainer, txtInContainer, txtOutContainer, txtPContainer );
 
 });
 
@@ -259,27 +261,79 @@ function allLogicalDataLevel1(container, InContainer, OutContainer, PContainer) 
             ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
             configEdgeStyle(graph, "#000000");
             let sharedVarList = document.getElementById("shared_vars_holder").getElementsByClassName("shared_var_list")[0].getElementsByTagName("li");
-            for (v of sharedVarList){
+            for (let v of sharedVarList){
                 let vText = v.innerHTML.replace(/(\r\n)/g,'');
-                console.table([vText]);
-                nodeSize = setNodeSize(vText, 'variable');
+                let styleNode = (vText !== "variables") ? "logicalData" : "variable";
+                nodeSize = setNodeSize(vText, styleNode);
                 nodeStyle(graph,  nodeSize['nodeIdText']);
-                let varNode = graph.insertVertex(parent, null, vText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                graph.insertVertex(parent, null, vText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+                    let cell = evt.getProperty('cell');
+                    if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
+                        window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                    }
+                    evt.consume();
+                });
                 varY += 200;
             }
-            let groupLdVars = [];
-            getLdL1AllVars(InContainer, "R", graph, parent, 10, 100);
-            console.log("In");
-            getLdL1AllVars(PContainer, "P", graph, parent, 800, 400);
-            console.log("Process");
-            getLdL1AllVars(OutContainer, "W", graph, parent, 1100, 50);
-            console.log("Out");
-            //console.table(groupLdVars);
+
+            getLdL1AllVars(InContainer, "R", graph, parent, 10, 200);
+            getLdL1AllVars(PContainer, "P", graph, parent, 900, 400);
+            getLdL1AllVars(OutContainer, "W", graph, parent, 1200, 100);
 
         }finally {
             graph.getModel().endUpdate();
         }
     }
+
+}
+
+function showAllL3GroupContainer(container, InContainer, OutContainer, PContainer) {
+    // Checks if the browser is supported
+    if (!mxClient.isBrowserSupported())
+    {
+        // Displays an error message if the browser is not supported.
+        mxUtils.error('Browser is not supported!', 200, false);
+    }
+    else
+    {
+        // Disables the built-in context menu
+        mxEvent.disableContextMenu(container);
+
+        // Creates the graph inside the given container
+        var graph = new mxGraph(container);
+        // Enables rubberband selection
+        new mxRubberband(graph);
+
+        // Disables basic selection and cell handling
+        // configureStylesheet(graph);
+
+        // Gets the default parent for inserting new cells. This
+        // is normally the first child of the root (ie. layer 0).
+        let parent = graph.getDefaultParent();
+        graph.keepEdgesInBackground = true;
+        // Highlights the vertices when the mouse enters
+        let highlight = new mxCellTracker(graph, '#337ab7');
+
+        // Adds cells to the model in a single step
+        graph.getModel().beginUpdate();
+        try {
+            let benchmarkName = get_url_benchmark();
+            let fileName = get_url_fileName();
+            let ulrParam = [benchmarkName];
+
+            ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
+            configEdgeStyle(graph, "#000000");
+
+            showLdL3(InContainer, "R",graph, parent, 50, 50);
+            showLdL3(PContainer, "R",graph, parent, 500, 50);
+            showLdL3(OutContainer, "R",graph, parent, 900, 50);
+
+        }finally {
+            graph.getModel().endUpdate();
+        }
+    }
+
 
 }
 

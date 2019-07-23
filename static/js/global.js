@@ -214,12 +214,9 @@ function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill,
         chX = pX;
         chY = pY;
     }
-    // let chX = pX;
-    // let chY = pY;
     for (let j = 0; j < childList.length; j++) {
         let Text = childList[j].innerHTML;
         nodeSize = {};
-
         nodeSize = setNodeSize(Text, nodeIdStyle );
         // console.log(nodeSize['nodeIdText']);
         let nodeId = 'var_' + j;
@@ -227,6 +224,7 @@ function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill,
         let values = [];
         if (pNode !== null){
             if (Text.length > 20){
+                console.table([Text, j]);
                 values = setPositionBig(pX, pY, j);
             }else{
                 values = setPosition(pX, pY, j);
@@ -243,7 +241,6 @@ function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill,
         graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=' + endArrowShape + ';sourcePerimeterSpacing=0;startFill=0;endFill=' + endArrowFill + ';');
 
     }
-
 }
 
 let activeLi = document.getElementsByClassName("action_list");
@@ -386,12 +383,12 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
             let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
             chNode.target = pNode;
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
-                    let cell = evt.getProperty('cell');
-                    if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
-                        window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-                    }
-                    evt.consume();
-                });
+                let cell = evt.getProperty('cell');
+                if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
+                    window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                }
+                evt.consume();
+            });
             graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
         }
 
@@ -467,7 +464,7 @@ function getLdL1AllVars(container, op, graph, parent, X, Y) {
         let ldSharedVarList = [];
         let ldAccessList = item.getElementsByClassName("list_level1")[0].getElementsByClassName('group_members')[0];
         let VarList = ldAccessList.getElementsByClassName('list_level2')[0].getElementsByTagName('li');
-        for (v of VarList){
+        for (let v of VarList){
             ldSharedVarList.push(v.firstElementChild.innerHTML.replace(/ /g,''));
         }
         // groupLdVars[groupText] = ldSharedVarList;
@@ -476,10 +473,31 @@ function getLdL1AllVars(container, op, graph, parent, X, Y) {
         ldY += 200;
 
         for (let node of mxCells){
-            if(node['style'] === "variable" && ldSharedVarList.includes(node['value'])){
+            if(ldSharedVarList.includes(node['value'])){
                 ldNode.target= node;
                 graph.insertEdge(parent, null, null, node, ldNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
             }
         }
     }
+}
+
+function showLdL3(container, op, graph, parent, X, Y) {
+    let groupList = [];
+    let ldText = null;
+    let varX = X;
+    let varY = Y;
+    let nodeSize = {};
+    let group = container.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+    for(let g of group){
+        groupList.push(g.firstElementChild.innerHTML.replace(/(\r\n)/g,''));
+    }
+    for (let ld = 0; ld < groupList.length; ld++){
+        ldText = groupList[ld];
+        nodeSize = setNodeSize(ldText, 'logicalData_' + op);
+        nodeStyle(graph,  nodeSize['nodeIdText']);
+        graph.insertVertex(parent, null, ldText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        varX = X;
+        varY += 200;
+    }
+
 }

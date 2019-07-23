@@ -62,8 +62,8 @@ function setPositionBig(pX, pY, switchVar) {
     switch (switchVar) {
 
         case 0:
-            chX = pX - 200;
-            chY = pY + 250;
+            chX = pX + 300;
+            chY = pY - 50;
             break;
         case 1:
             chX = pX - 200;

@@ -26,9 +26,7 @@ function main(container) {
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
 
-
         try {
-
             let threadList = document.getElementById("logical_comp_textual").getElementsByClassName("list_level0")[0].getElementsByClassName('li-list_level0');
             nodeStyle(graph, 'LogicalComp');
             configEdgeStyle(graph, "#000000");
@@ -38,9 +36,7 @@ function main(container) {
             let tH = 300;
             let thrNode = null;
             let styleIdNode = "LogicalComp";
-
             let lcName = get_node_name();
-
             for (let i=0; i<threadList.length; i++){
                 let thrId = 'thr' + i;
                 let thrText = threadList[i].getElementsByTagName("span")[0].innerHTML;

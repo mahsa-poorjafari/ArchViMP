@@ -16,7 +16,6 @@ from datetime import datetime
 
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "-")
 
-
 def trace_vis(request):
     context = {}
     current_time = str(settings.CURRENT_TIME).replace("+00:00", "").replace(":", "-").replace(".", "-")
@@ -237,7 +236,8 @@ def logical_data_l3(request):
 
     threads = get_threads(trace_file)
     shared_vars_names = get_all_shared_var_names(b_parameter)
-
+    struct_vars_groups = get_var_struct(shared_vars_names)
+    print(struct_vars_groups)
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(threads, ["LOAD"], trace_file, b_parameter)
     # print("\n thread_var_input =  ", thread_var_input)
@@ -269,7 +269,7 @@ def logical_data_l3(request):
                                                     'ld_output_lc': ld_output_lc,
                                                     'ld_process_lc': ld_process_lc,
                                                     'logical_comps': thr_func_dict,
-                                                    'shared_vars_names': shared_vars_names})
+                                                    'shared_vars_names': struct_vars_groups})
 
 
 def ld_exe_path_l2(request):
