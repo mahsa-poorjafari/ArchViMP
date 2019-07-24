@@ -91,7 +91,7 @@
                     <ul class="list_level1">
                         {% for vK, vV in ldV.items %}
                             <li class="li-list_level1 {{ vK }}">
-                                <span>{{ vK }} </span>
+                                <span>{{ vK }}</span>
 
                                 {% if vK == "group_members" %}
                                     <ul class="list_level2">
@@ -105,7 +105,7 @@
                                 {% else %}
                                     <ul class="list_level2">
                                         {% for v in vV %}
-                                            <li class="li-list_level2">{{ v }} </li>
+                                            <li class="li-list_level2">{{ v }}</li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -124,21 +124,21 @@
                     <ul class="list_level1">
                         {% for vK, vV in ldV.items %}
                             <li class="li-list_level1 {{ vK }}">
-                                <span>{{ vK }} </span>
+                                <span>{{ vK }}</span>
 
                                 {% if vK == "group_members" %}
                                     <ul class="list_level2">
                                         {% for k, v in vV.items %}
                                             <li class="li-list_level2 test">
-                                                <span class="key">{{ k }} </span>
-                                                <span class="value">{{ v }} </span>
+                                                <span class="key">{{ k }}</span>
+                                                <span class="value">{{ v }}</span>
                                             </li>
                                         {% endfor %}
                                     </ul>
                                 {% else %}
                                     <ul class="list_level2">
                                         {% for v in vV %}
-                                            <li class="li-list_level2">{{ v }} </li>
+                                            <li class="li-list_level2">{{ v }}</li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -185,8 +185,17 @@
     </div>
     <div class="col-md-12 text_container" style="display: none" id="shared_vars_holder">
         <ul class="shared_var_list">
-            {% for var in shared_vars_names %}
-                <li class="col-4">{{ var }}</li>
+            {% for name, var in shared_vars_names.items %}
+                <li class="li-list_level2">
+                    <span>{{ name }}</span>
+                    {% if name == 'variables' %}
+                        <ul class="list_level1">
+                            {% for v in var %}
+                                <li class="li-list_level0">{{ v }} </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
             {% endfor %}
         </ul>
     </div>
@@ -196,6 +205,18 @@
                 <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
                     <span>{{ t }}</span>
                     <p class="thr_func">{{ f }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-12 text_container" style="display: block" id="thread_var_input">
+        <ul class="thread_list">
+            {% for lc, td in thread_var_input.items %}
+                <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
+                    <span>{{ lc }}</span>
+                    {% for name, type in td.items %}
+                        <p class="td_lc">{{ name }}</p>
+                    {% endfor %}
                 </li>
             {% endfor %}
         </ul>

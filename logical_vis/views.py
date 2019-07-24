@@ -16,6 +16,7 @@ from datetime import datetime
 
 settings.CURRENT_TIME = str(timezone.now()).replace(" ", "-")
 
+
 def trace_vis(request):
     context = {}
     current_time = str(settings.CURRENT_TIME).replace("+00:00", "").replace(":", "-").replace(".", "-")
@@ -90,7 +91,6 @@ def trace_vis(request):
         elif request.POST.get('selected_trace_file') in [None, ""] or\
                 request.POST.get('selected_shared_var_file') in [None, ""]:
             context['shvar_error'] = catch_the_shvar_error(dict(request.POST))
-
             # else:
                 # context['trace_error'] = catch_the_trace_error(dict(request.FILES))
         else:
@@ -215,17 +215,26 @@ def logical_data_l1(request):
 
 
 def logical_data_l2_ungrouped(request):
-    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_trace_file_path(benchmark_name)
+    thr_func_dict = {}
+    shared_var_and_pointer = []
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    trace_file = get_trace_file_path(b_parameter)
+    shared_vars_names = get_all_shared_var_names(b_parameter)
+    [shared_var_and_pointer.append(p.replace("{", "").replace("}", "")) if "{" in p and "}" in p else
+     shared_var_and_pointer.append(p) for p in shared_vars_names]
     threads = get_threads(trace_file)
-    thread_var_op = get_thread_var_op(threads, ["LOAD"], trace_file)
+    for t in threads:
+        thr_func = get_first_function(t, trace_file)
+        thr_func_dict.update(thr_func)
+    thread_var_op = get_thread_var_op(thr_func_dict, ["LOAD"], trace_file, shared_var_and_pointer)
     return render(request, 'logical_data_L2_Ungrouped.html', {'thread_var_op': thread_var_op,
-                                                              'benchmark_name': benchmark_name})
+                                                              'benchmark_name': b_parameter})
 
 
 def logical_data_l3(request):
     b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
     file_name = None
+    thr_func_dict = {}
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
         trace_file = get_trace_file_path(b_parameter, file_name=file_name)
@@ -234,26 +243,34 @@ def logical_data_l3(request):
         trace_file = get_trace_file_path(b_parameter)
         which_way = b_parameter + " Benchmark"
 
+    ld_input_lc = []
+    ld_output_lc = []
+    ld_process_lc = []
     threads = get_threads(trace_file)
     shared_vars_names = get_all_shared_var_names(b_parameter)
     struct_vars_groups = get_var_struct(shared_vars_names)
-    print(struct_vars_groups)
+    # remove brackets for pointers in order to catch their records
+    shared_var_and_pointer = []
+    [shared_var_and_pointer.append(p.replace("{", "").replace("}", "")) if "{" in p and "}" in p else
+     shared_var_and_pointer.append(p) for p in shared_vars_names]
+
+    for t in threads:
+        thr_func = get_first_function(t, trace_file)
+        thr_func_dict.update(thr_func)
+
     # Get the variables that are threads Input
-    thread_var_input = get_thread_var_op(threads, ["LOAD"], trace_file, b_parameter)
-    # print("\n thread_var_input =  ", thread_var_input)
-    ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
-    # print("\n ld_input_lc=> ", ld_input_lc)
-    # ld_input_g = group_over10_child(ld_input_lc)
-
+    thread_var_input = get_thread_var_op(thr_func_dict, ["LOAD"], trace_file, shared_var_and_pointer)
+    print("\n thread_var_input =  ", thread_var_input)
     # Get the variables that are threads Output
-    thread_var_output = get_thread_var_op(threads, ["STORE"], trace_file, b_parameter)
-    ld_output_lc = create_ld_thread_op(thread_var_output, "Output_")
-    # ld_output_g = group_over10_child(ld_output_lc)
-
+    thread_var_output = get_thread_var_op(thr_func_dict, ["STORE"], trace_file, shared_var_and_pointer)
     # Get the variables that are threads Processed
-    thread_var_process = get_thread_var_op(threads, ["LOAD", "STORE"], trace_file, b_parameter)
-    ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
-    # ld_process_g = group_over10_child(ld_process_lc)
+    thread_var_process = get_thread_var_op(thr_func_dict, ["LOAD", "STORE"], trace_file, shared_var_and_pointer)
+    if len(struct_vars_groups) > 9:
+        ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
+        ld_output_lc = create_ld_thread_op(thread_var_output, "Output_")
+        # ld_output_g = group_over10_child(ld_output_lc)
+        ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
+        # ld_process_g = group_over10_child(ld_process_lc)
 
     thread_list = get_threads(trace_file)
     thr_func_dict = {}
@@ -261,38 +278,64 @@ def logical_data_l3(request):
         thr_func = get_first_function(t, trace_file)
         thr_func_dict.update(thr_func)
 
-    return render(request, 'logical_data_L3.html', {'title_name': which_way,
-                                                    'file_path': trace_file,
-                                                    'raw_file_name': file_name,
-                                                    'href_id': b_parameter,
-                                                    'ld_input_lc': ld_input_lc,
-                                                    'ld_output_lc': ld_output_lc,
-                                                    'ld_process_lc': ld_process_lc,
-                                                    'logical_comps': thr_func_dict,
-                                                    'shared_vars_names': struct_vars_groups})
+    return render(request, 'logical_data_L3.html', {'title_name': which_way, 'file_path': trace_file,
+                                                    'raw_file_name': file_name, 'href_id': b_parameter,
+                                                    'ld_input_lc': ld_input_lc, 'ld_output_lc': ld_output_lc,
+                                                    'ld_process_lc': ld_process_lc, 'logical_comps': thr_func_dict,
+                                                    'shared_vars_names': struct_vars_groups,
+                                                    'thread_var_input': thread_var_input})
 
 
 def ld_exe_path_l2(request):
-    benchmark_name = request.GET.get('b') if (request.GET.get('b')) else None
-    trace_file = get_trace_file_path(benchmark_name)
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_trace_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
+    shared_vars_names = get_all_shared_var_names(b_parameter)
     threads = get_threads(trace_file)
     thr_func_dict = {}
-    parent_function_list = []
+    thr_function_body_exe_paths = {}
+
     for t in threads:
         thr_func = get_first_function(t, trace_file)
-        thr_func_dict.update(thr_func)
+        if not len(list(thr_func.values())) > 1:
+            first_funciton_name = list(thr_func.values())[0]
+            first_funciton_body = get_first_function_body(first_funciton_name, trace_file)
+            thr_func_dict.update({t: {first_funciton_name: first_funciton_body}})
+            function_shared_vars = list(filter(lambda r: r[4] in shared_vars_names and r[3] in ["LOAD", "STORE"],
+                                               first_funciton_body))
+            if len(function_shared_vars) > 1:
+                thr_function_body_exe_paths.update({
+                    t: {
+                        "function_name": first_funciton_name,
+                        "function_body": function_shared_vars,
+                        "function_body_length": len(function_shared_vars)
+                    }
+                })
 
-    print("thr_func_dict=>  ", thr_func_dict)
+    # print("\n ", thr_function_body_exe_paths)
+    exe_paths_set = thr_function_body_exe_paths
+    while len(exe_paths_set) > 0:
+        smallest_set = min(exe_paths_set, key=lambda k: exe_paths_set[k]['function_body_length'])
+        # print(smallest_set)
+        smallest_exe_path_set = exe_paths_set.pop(smallest_set)
+        exe_path = retrieve_exe_path(smallest_exe_path_set)
+        # print(exe_path)
 
     # I start to catch the first ExePath from the Main thread
     # For that purpose I have to get the function body of the first/parent function of the main thread
     # get the first/parent function of the main thread
-    main_pfuntion_name = [v if "Main_" in k else parent_function_list.append(v) for k, v in thr_func_dict.items()]
+    # main_pfuntion_name = [v if "Main_" in k else parent_function_list.append(v) for k, v in thr_func_dict.items()]
     # main_pfuntion_name = list(filter(partial(is_not, None), main_pfuntion_name_with_none))
-    main_pfuntion_name = main_pfuntion_name[0] if len(main_pfuntion_name) is 1 else None
-    print("parent_function_list=>  ", parent_function_list)
+    # main_pfuntion_name = main_pfuntion_name[0] if len(main_pfuntion_name) is 1 else None
+    # print("parent_function_list=>  ", parent_function_list)
 
-    return render(request, 'exe_path_L2.html', {'benchmark_name': benchmark_name})
+    return render(request, 'exe_path_L2.html', {'title_name': which_way})
 
 
 def time_line_view(request):

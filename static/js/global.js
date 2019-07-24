@@ -113,7 +113,7 @@ function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrPara
     let nodeSize = {};
     let chX = 600;
     let chY = logicalCompY;
-    for (let j=0; j< childList.length; j++){
+    for (let j = 0; j < childList.length; j++) {
         let nodeId = 'LD_L2' + op + '_' + j;
         let Text = childList[j].innerHTML;
         nodeSize = setNodeSize(Text, 'LogicalComp');
@@ -161,7 +161,7 @@ function drawChildThrOP(graph, parent, pNode, childList){
         }
     });
 
-    for (let j=0; j< childList.length; j++){
+    for (let j = 0; j < childList.length; j++) {
         let nodeId = 'thr_in_' + j;
         let Text = childList[j].getElementsByClassName('key')[0].innerHTML;
 
@@ -405,17 +405,28 @@ function scrollToTop(scrollDuration) {
     },15);
 }
 
-function connect_to_related_LC(graph, parent, inputGroup, X, Y, op) {
+function connect_LD_to_related_LC(graph, parent, inputGroup, X, Y, op) {
     let nodeSize = {};
     // get the existing element in the Graph
     let mxCells = graph.getChildVertices(graph.getDefaultParent());
 
     for (let inputNode of inputGroup){
         let inG = inputNode.firstElementChild.innerHTML;
-        nodeSize = setNodeSize(inG, 'logicalData_' + op);
+        nodeSize = setNodeSize(inG,  'logicalData_' + op);
 
         nodeStyle(graph,  nodeSize['nodeIdText']);
         let ldInNode = graph.insertVertex(parent, null, inG, X, Y, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+            let cell = evt.getProperty('cell');
+            if (cell['style'].includes('logicalData_')){
+                let allTabContentsDivs = document.getElementsByClassName('tab-contents');
+                for (let tagCon of allTabContentsDivs){
+                    tagCon.style.display = 'none';
+                }
+                document.getElementById('tab08').style.display = 'block';
+            }
+            evt.consume();
+        });
         Y += 300;
         let ldInLc = inputNode.getElementsByClassName("list_level1")[0].getElementsByClassName("logical_components")[0].getElementsByClassName("list_level2")[0].getElementsByClassName("li-list_level2");
         let ldLcList = [];
@@ -431,12 +442,16 @@ function connect_to_related_LC(graph, parent, inputGroup, X, Y, op) {
                 switch (op) {
                     case "R":
                         graph.insertEdge(parent, null, null, ldInNode, node, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+                        ldInNode.target = node;
                         break;
                     case "P":
                         graph.insertEdge(parent, null, null, node, ldInNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;');
+                        ldInNode.source = node;
                         break;
                     case "W":
                         graph.insertEdge(parent, null, null, node, ldInNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+                        ldInNode.target = node;
+                        ldInNode.source = node;
                         break;
                 }
 
@@ -449,6 +464,73 @@ function connect_to_related_LC(graph, parent, inputGroup, X, Y, op) {
 
 }
 
+function connect_TD_to_related_LC(graph, parent, listGroup, op) {
+    let tdRelatedLc = listGroup.getElementsByClassName('thread_list')[0].getElementsByClassName('li_thread_id');
+    // let logicalComponents = [];
+    // let technicaData = [];
+    // for (let inG of listGroup){
+    //     let lcList = inG.getElementsByClassName('list_level1')[0].getElementsByClassName('logical_components')[0].getElementsByClassName('list_level2');
+    //     for (let lc of lcList){
+    //         logicalComponents.push(lc.firstElementChild.innerHTML.replace(/ /g,''));
+    //     }
+    // }
+    // for (let inG of listGroup){
+    //     let lcList = inG.getElementsByClassName('list_level1')[0].getElementsByClassName('group_members')[0].getElementsByClassName('list_level2');
+    //     for (let lc of lcList){
+    //         technicaData.push(lc.getElementsByClassName('key')[0].innerHTML.replace(/ /g,''));
+    //     }
+    // }
+    // console.log(logicalComponents);
+    // console.log(technicaData);
+    let lcNode = null;
+    let tdNode = null;
+    let mxCells = graph.getChildVertices(graph.getDefaultParent());
+    for (let element of tdRelatedLc){
+        let lcName = element.firstElementChild.innerHTML.replace(/ /g,'');
+        let tdList = element.getElementsByClassName('td_lc');
+        let tdNodeList = [];
+        let tdNames = [];
+        for (let td of tdList){
+            tdNames.push(td.innerHTML.replace(/ /g,''));
+        }
+        console.log(lcName +" -- " + tdNames);
+        for (let node of mxCells){
+            if(node['style'].includes("LogicalComp") && lcName === node['value']){
+                lcNode = node;
+                mxCells.forEach(function (cell) {
+                    if (cell['style'].includes("variable") && tdNames.includes(cell['value'])){
+                        tdNodeList.push(cell);
+                    }
+                });
+            }
+            tdNodeList.forEach(function (tdCell) {
+               if (lcNode !== null){
+                   switch (op) {
+                       case "R":
+
+                           if (tdCell.target === null || tdCell.target['value'] !== lcNode['value']) {
+                               graph.insertEdge(parent, null, null, tdCell, lcNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+                               tdCell.target = lcNode;
+                           }
+                           break;
+                       case "P":
+                           graph.insertEdge(parent, null, null, lcNode, tdCell, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;');
+                           tdCell.target = lcNode;
+                           tdCell.source = lcNode;
+                           break;
+                       case "W":
+                           graph.insertEdge(parent, null, null, lcNode, tdCell, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+                           lcNode.source = tdCell;
+                           break;
+                    }
+               }
+            });
+
+        }
+        console.table(mxCells);
+    }
+}
+
 function getLdL1AllVars(container, op, graph, parent, X, Y) {
     let ldGroup = container.getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
     let nodeSize = {};
@@ -459,22 +541,27 @@ function getLdL1AllVars(container, op, graph, parent, X, Y) {
     let mxCells =  graph.getChildVertices(graph.getDefaultParent());
     for (let item of ldGroup){
         groupText = item.firstElementChild.innerHTML;
+
         nodeSize = setNodeSize(groupText, 'logicalData_' + op);
         nodeStyle(graph,  nodeSize['nodeIdText']);
         let ldSharedVarList = [];
         let ldAccessList = item.getElementsByClassName("list_level1")[0].getElementsByClassName('group_members')[0];
         let VarList = ldAccessList.getElementsByClassName('list_level2')[0].getElementsByTagName('li');
+
         for (let v of VarList){
-            ldSharedVarList.push(v.firstElementChild.innerHTML.replace(/ /g,''));
+            let childName = v.getElementsByClassName('key')[0].innerHTML;
+            let childNodeType = v.getElementsByClassName('value')[0].innerHTML;
+            ldSharedVarList.push(childName.replace(/ /g,''));
         }
+
         // groupLdVars[groupText] = ldSharedVarList;
         let ldNode = graph.insertVertex(parent, null, groupText, ldX, ldY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         // console.table([groupText, ldSharedVarList]);
         ldY += 200;
 
         for (let node of mxCells){
-            if(ldSharedVarList.includes(node['value'])){
-                ldNode.target= node;
+            if(ldSharedVarList.includes(node['value'].replace(/ /g,''))){
+                ldNode.source= node;
                 graph.insertEdge(parent, null, null, node, ldNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
             }
         }
@@ -496,6 +583,17 @@ function showLdL3(container, op, graph, parent, X, Y) {
         nodeSize = setNodeSize(ldText, 'logicalData_' + op);
         nodeStyle(graph,  nodeSize['nodeIdText']);
         graph.insertVertex(parent, null, ldText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+            let cell = evt.getProperty('cell');
+            if (cell['style'].includes('logicalData_')){
+                let allTabContentsDivs = document.getElementsByClassName('tab-contents');
+                for (let tagCon of allTabContentsDivs){
+                    tagCon.style.display = 'none';
+                }
+                document.getElementById('tab08').style.display = 'block';
+            }
+            evt.consume();
+        });
         varX = X;
         varY += 200;
     }

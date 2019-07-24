@@ -2,6 +2,7 @@ import csv
 from operator import is_not
 from functools import partial
 from logical_vis.logical_data_inputs import *
+import itertools
 
 
 def remove_dups(a_list):
@@ -20,11 +21,11 @@ def get_first_function(t, trace_file):
             b = t.split('_')
             csv_file.seek(0, 0)
             thread_functioncall_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and
-                                        row[1].lstrip() == b[1]
-                                        and "CONSTANT;" in row[5].lstrip(), csv_reader)
+                                                row[1].lstrip() == b[1], csv_reader)
+            #                             and "CONSTANT;" in row[5].lstrip(), csv_reader)
 
             thread_functioncall_flist = list(thread_functioncall_filter)
-
+            # print(thread_functioncall_flist)
             thread_functioncall_list = thread_functioncall_flist[0] \
                 if len(thread_functioncall_flist) > 0 else None
 
@@ -38,7 +39,6 @@ def get_first_function(t, trace_file):
                                                 csv_reader)
 
             thread_functioncall_flist = list(thread_functioncall_filter)
-
             # print("thread_functioncall_flist => \n", thread_functioncall_flist)
             if "ROSACE" in trace_file:
                 thread_functioncall_list = thread_functioncall_flist[-1] \
@@ -57,62 +57,53 @@ def get_var_names(var_list, op):
     var_names = map(lambda var: var[3], var_list)
     # Remover Duplicates
     var_name_list = remove_dups(list(var_names))
-    # print("Number of ACTUAL variables of " + op + "= ", len(var_name_list))
     return var_name_list
 
 
-def get_thread_var_op(threads, op, trace_file, b_param):
-    # print("get_thread_var_op   =>", op)
-    shared_pointer = []
-    shared_var_names = get_all_shared_var_names(b_param)
-    [shared_pointer.append(p.replace("{", "").replace("}", "")) if "{" in p and "}" in p else None
-     for p in shared_var_names]
-
+def get_thread_var_op(thr_func_dict, op, trace_file, shared_var_and_pointer):
     thread_var_op = {}
-    thr_func_dict = {}
-    for t in threads:
-        thr_func = get_first_function(t, trace_file)
-        thr_func_dict.update(thr_func)
-
-    # What I need is: To show the inputs-LD of each threads
+    # What I need is?: To show the inputs-LD of each threads
     # For that, I built an dict: {'first function of each thread as the key': [list of variables or structs]}
     with open(trace_file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for tK, fV in thr_func_dict.items():
             thread_var_dict = {}
-            if "Main_" in tK:
-                t_id = tK.strip("Main_")
-            else:
-                t_id = tK
-
+            # get the pure thread id
+            t_id = tK.strip("Main_") if "Main_" in tK else tK
+            # get all records for this thead
             thread_records = filter(lambda row: row[1] == t_id and row[2] in op, csv_reader)
+
             # Filter the records based on operation
-            thread_pointers_filter = filter(lambda row: row[4] in shared_pointer, list(thread_records))
+            thread_pointers_filter = filter(lambda row: row[4] in shared_var_and_pointer or
+                                            row[3] in shared_var_and_pointer, list(thread_records))
             thread_pointers_list = list(thread_pointers_filter)
+            # Some of the Pointers don't have any names, So I assigned their memory address to specify them as well as/
+            # fill the gap.
             thread_access_pointer_map = map(lambda row: ["{" + row[4] + "}" if row[3] is "" else row[3], row[0], row[1],
                                             row[2], row[5]], thread_pointers_list)
             thread_access_pointer_list = list(thread_access_pointer_map)
-            # print(t_id, "\n", thread_access_pointer_list)
+            # print(thread_access_pointer_list)
 
             csv_file.seek(0, 0)
 
-            thread_vars_filter = filter(lambda row: row[3] in shared_var_names, list(thread_records))
-            list_thread_vars = list(thread_vars_filter)
-            thread_access_vars_map = map(lambda row: [row[3], row[0], row[1], row[2], row[5]], list_thread_vars)
-            thread_access_vars_list = list(thread_access_vars_map)
-            [thread_access_vars_list.append(a) for a in thread_access_pointer_list]
-
-            csv_file.seek(0, 0)
-            if len(list_thread_vars) > 1:
+            # thread_vars_filter = filter(lambda row: row[3] in shared_var_and_pointer, list(thread_records))
+            # list_thread_vars = list(thread_vars_filter)
+            # thread_access_vars_map = map(lambda row: [row[3], row[0], row[1], row[2], row[5]], list_thread_vars)
+            # thread_access_vars_list = list(thread_access_vars_map)
+            # [thread_access_vars_list.append(a) for a in thread_access_pointer_list]
+            # print(thread_access_vars_list)
+            # csv_file.seek(0, 0)
+            if len(shared_var_and_pointer) > 1:
                 # if it is struct, only show it as logicalData
                 # need to specify the type of elements
                 thread_vars_list = [[v[0].split(".")[0], v[1], v[2], v[3], "logicalData"] if "." in v[0]
-                                    else [v[0], v[1], v[2], v[3], "variable"] for v in thread_access_vars_list]
+                                    else [v[0], v[1], v[2], v[3], "variable"] for v in thread_access_pointer_list]
 
                 # remove duplicate rows
                 thread_var_dict.update({i[0]: i[4] for i in thread_vars_list})
 
             thread_var_op.update({fV: thread_var_dict})
+
     csv_file.close()
     return thread_var_op
 
@@ -297,7 +288,6 @@ def get_functions_with_body(trace_file, thread_list):
             f_avoid_dups = remove_dups(f_avoid_none)
         csv_file.close()
         thread_funciton_list.update({t_id: f_avoid_dups})
-        print("f_avoid_dups   ", f_avoid_dups)
         thr_func = get_first_function(t, trace_file)
         thr_func_list = list(thr_func.values())
         with open(trace_file, 'r') as csv_file:
@@ -322,11 +312,39 @@ def get_functions_with_body(trace_file, thread_list):
                             distance = function_return_index - function_call_index if function_return_index is not None and \
                                                                                       function_call_index is not None else None
 
-                            if not distance <= 1:
-                                funciton_body_list.update({f: csv_reader_list[function_call_index+1:function_return_index]})
+                            if distance is not None and not distance <= 1:
+                                funciton_body_list.update({f: csv_reader_list[function_call_index+1: function_return_index]})
 
                 csv_file.seek(0, 0)
         csv_file.close()
         if len(funciton_body_list) > 0:
             thread_funcitons.update({t_id: funciton_body_list})
     return thread_funcitons
+
+
+def get_first_function_body(function_name, trace_file):
+
+    with open(trace_file, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        csv_reader_list = list(csv_reader)
+        [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
+    csv_file.close()
+    function_begin = list(filter(lambda r: r[3] == "FUNCTIONCALL" and r[4] == function_name, csv_reader_list))
+    function_end = list(filter(lambda r: r[3] == "FUNCTIONRETURN" and r[4] == function_name, csv_reader_list))
+    function_body = csv_reader_list[function_begin[0][0]:function_end[0][0]+1]
+
+    return function_body
+
+
+def retrieve_exe_path(exe_path_set):
+    # print(exe_path_set)
+    exe_path = list(map(lambda r: [r[3], r[4]], exe_path_set['function_body']))
+    print("\n Operation on vars => ", exe_path)
+    var_exe_path = []
+    var_op = []
+    for indx, item in enumerate(exe_path):
+        if len(var_exe_path) < 0 or item not in var_exe_path:
+            var_exe_path.append(item)
+    print("exe_path =>  ", var_exe_path)
+
+    return exe_path

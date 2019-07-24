@@ -90,24 +90,46 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
                 let lcNode = graph.insertVertex(parent, lcId, logicalComp, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                     let cell = evt.getProperty('cell');
-                    if (cell['style'] === "LogicalComp" || cell['style'] === "LogicalComp_big"){
+                    if (cell['style'].includes("LogicalComp")){
                         window.location = "http://127.0.0.1:8000/logical_comp?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
                     }
                     evt.consume();
                 });
                 lcY += 300;
             }
+            let listOfTechnicalData = [];
+            let listOfShareVars = document.getElementById('shared_vars_holder').getElementsByClassName('shared_var_list')[0];
+            let listOfLogicalData = listOfShareVars.getElementsByClassName('li-list_level2');
+            for (let ld of listOfLogicalData){
+                if (ld.firstElementChild.innerHTML === 'variables'){
+                    listOfTechnicalData = ld.getElementsByClassName('list_level1')[0].getElementsByClassName('li-list_level0');
+                }
+            }
 
+            if ( listOfLogicalData.length > 9 || listOfTechnicalData.length > 9 ) {
+                // Draw Input groups
+                connect_LD_to_related_LC(graph, parent, inputGroup, ldInX, ldInY, "R");
 
-            // Draw Input groups
-            connect_to_related_LC(graph, parent, inputGroup, ldInX, ldInY, "R");
+                // Draw Process groups
+                connect_LD_to_related_LC(graph, parent, processGroup, ldPX, ldPY, "P");
 
-            // Draw Process groups
-            connect_to_related_LC(graph, parent, processGroup, ldPX, ldPY, "P");
-
-            // Draw Output groups
-            connect_to_related_LC(graph, parent, outputGroup, ldOutX, ldOutY, "W");
-
+                // Draw Output groups
+                connect_LD_to_related_LC(graph, parent, outputGroup, ldOutX, ldOutY, "W");
+            }else{
+                let tdX = 10;
+                let tdY = 200;
+                for (let td of listOfTechnicalData){
+                    let tdText = td.innerHTML.replace(/ /g,'');
+                    nodeSize = setNodeSize(tdText,  'variable');
+                    nodeStyle(graph,  nodeSize['nodeIdText']);
+                    graph.insertVertex(parent, null, tdText, tdX, tdY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                    tdY += 400;
+                }
+                let inputTds = document.getElementById('thread_var_input');
+                connect_TD_to_related_LC(graph, parent, inputTds, "R");
+                // connect_TD_to_related_LC(graph, parent, processGroup, "P");
+                // connect_TD_to_related_LC(graph, parent, outputGroup, "W");
+            }
 
         }finally{
             // Updates the display
@@ -260,21 +282,34 @@ function allLogicalDataLevel1(container, InContainer, OutContainer, PContainer) 
             let ulrParam = [benchmarkName];
             ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
             configEdgeStyle(graph, "#000000");
-            let sharedVarList = document.getElementById("shared_vars_holder").getElementsByClassName("shared_var_list")[0].getElementsByTagName("li");
-            for (let v of sharedVarList){
-                let vText = v.innerHTML.replace(/(\r\n)/g,'');
-                let styleNode = (vText !== "variables") ? "logicalData" : "variable";
-                nodeSize = setNodeSize(vText, styleNode);
-                nodeStyle(graph,  nodeSize['nodeIdText']);
-                graph.insertVertex(parent, null, vText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
-                    let cell = evt.getProperty('cell');
-                    if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
-                        window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+            let childList = document.getElementById("shared_vars_holder").getElementsByClassName("shared_var_list")[0].getElementsByClassName("li-list_level2");
+
+            for (let v of childList){
+                let vText = v.firstElementChild.innerHTML.replace(/(\r\n)/g,'');
+
+                if (vText !== "variables"){
+                    nodeSize = setNodeSize(vText, 'logicalData');
+                    nodeStyle(graph,  nodeSize['nodeIdText']);
+                    graph.insertVertex(parent, null, vText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                    graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+                        let cell = evt.getProperty('cell');
+                        if (cell['style'].includes("logicalData")){
+                            window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                        }
+                        evt.consume();
+                    });
+                    varY += 200;
+                }else{
+                    let sharedVarList = v.getElementsByClassName('list_level1')[0].getElementsByClassName('li-list_level0');
+                    for (let tD of sharedVarList){
+                        let tDText = tD.innerText;
+                        nodeSize = setNodeSize(vText, 'variable');
+                        nodeStyle(graph,  nodeSize['nodeIdText']);
+                        graph.insertVertex(parent, null, tDText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                        varY += 200;
                     }
-                    evt.consume();
-                });
-                varY += 200;
+                }
+                // varY += 200;
             }
 
             getLdL1AllVars(InContainer, "R", graph, parent, 10, 200);

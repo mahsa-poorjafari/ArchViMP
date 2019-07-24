@@ -3,8 +3,9 @@
 {% block content %}
      <nav class="navbar navbar-default col-md-12">
         <div class="container-fluid">
-            <h2>{{ benchmark_name }} Benchmark</h2>
-            <h4>Logical Data Level 2 - Execution Path for Threads</h4>
+            <h2>{{ title_name }} </h2>
+            <h3>Logical Data Level 2</h3>
+            <h4>Execution Path for Threads</h4>
         </div>
     </nav>
     <div class="tabs col-md-12">
@@ -12,13 +13,13 @@
         <ul id="tab-button">
             <div class="tabs col-md-12">
                 <div class="col-md-12 level2">
-                  <li><a href="#tab01" class="btn-info">Execution Path for Threads </a></li>
+                  <li class="col-md-3"><a href="#tab01" class="btn-info">Execution Path for Threads </a></li>
                 </div>
                 <div class="col-md-12 level1">
-                  <li id="lc_l1_dig">
-                      <a href="#tab02" class="btn-secondary lc_l1"> Logical Data- Thread Exe Path -Level 1 </a>
+                    <li id="ld_l1_dig_all" class="col-md-3 gray_tab">
+                      <a href="#tab02" class="btn-light lc_l1"> Logical Data- Thread Exe Path -Level 1 </a>
                       <i class="far fa-window-close close"></i>
-                  </li>
+                    </li>
                 </div>
             </div>
         </ul>
@@ -41,6 +42,6 @@
         <div class="col-md-12 well diagram_container" id="exe_path_l1_dig"></div>
     </div>
 
-    <div class="col-md-12 well text_container" style="display:  none" id="exe_path_l2_txt">
+    <div class="col-md-12 well text_container" style="display:  block" id="exe_path_l2_txt">
     </div>
 {% endblock %}
