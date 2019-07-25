@@ -21,7 +21,6 @@ function mainViewTimeLine(container, txt) {
         var graph = new mxGraph(container);
         //graph.setEnabled(false);
 
-
         // graph.getStylesheet().getDefaultEdgeStyle();
 
         // Enables rubberband selection
@@ -34,15 +33,12 @@ function mainViewTimeLine(container, txt) {
         // is normally the first child of the root (ie. layer 0).
         let parent = graph.getDefaultParent();
 
-
-
         // Highlights the vertices when the mouse enters
         let highlight = new mxCellTracker(graph, '#337ab7');
 
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
         try {
-
 
             let timeStamps = txt.getElementsByClassName("time_stamp");
 
@@ -56,6 +52,7 @@ function mainViewTimeLine(container, txt) {
                 let lcId = 'LC_' + i;
                 let lcFirstElement = lcs[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
+                let childW = null;
                 if (lcText.includes("_")){
                     lcText = lcText.replace(/_/g, "\n");
                     nodeStyle(graph, "mainThread");
@@ -63,10 +60,17 @@ function mainViewTimeLine(container, txt) {
                 }else {
                     nodeStyle(graph, "thread");
                     lcNode = graph.insertVertex(parent, lcId, lcText, lcW, lcY, 100, 60, 'thread');
+                    childW = lcW;
                 }
-                lcW += 200;
-            }
+                lcW += 300;
+                let sharedVarsAccess =  lcs[i].getElementsByClassName('list_level1')[0].getElementsByClassName('li-list_level1');
+                for (let accessList of sharedVarsAccess){
+                    let accessTime = accessList.firstElementChild.innerHTML.replace(/_/g, "\n");
+                    let accessVars = accessList.getElementsByClassName('list_level2')[0].getElementsByClassName('li-list_level2');
 
+                    drawChildTimeLine(accessVars, accessTime, graph, parent, childW)
+                }
+            }
 
         }finally{
             // Updates the display

@@ -413,17 +413,26 @@ function connect_LD_to_related_LC(graph, parent, inputGroup, X, Y, op) {
     for (let inputNode of inputGroup){
         let inG = inputNode.firstElementChild.innerHTML;
         nodeSize = setNodeSize(inG,  'logicalData_' + op);
-
         nodeStyle(graph,  nodeSize['nodeIdText']);
         let ldInNode = graph.insertVertex(parent, null, inG, X, Y, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        let allTabContentsDivs = document.getElementsByClassName('tab-contents');
         graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
             let cell = evt.getProperty('cell');
-            if (cell['style'].includes('logicalData_')){
-                let allTabContentsDivs = document.getElementsByClassName('tab-contents');
+            if (cell['style'].includes('logicalData_') && cell['value'].includes('Input') ){
                 for (let tagCon of allTabContentsDivs){
                     tagCon.style.display = 'none';
+                    document.getElementById('tab04').style.display = 'block';
                 }
-                document.getElementById('tab08').style.display = 'block';
+            }else if (cell['style'].includes('logicalData_') && cell['value'].includes('Output') ){
+                for (let tagCon of allTabContentsDivs){
+                    tagCon.style.display = 'none';
+                    document.getElementById('tab05').style.display = 'block';
+                }
+            }else if (cell['style'].includes('logicalData_') && cell['value'].includes('Process')){
+                for (let tagCon of allTabContentsDivs){
+                    tagCon.style.display = 'none';
+                    document.getElementById('tab06').style.display = 'block';
+                }
             }
             evt.consume();
         });
@@ -583,14 +592,24 @@ function showLdL3(container, op, graph, parent, X, Y) {
         nodeSize = setNodeSize(ldText, 'logicalData_' + op);
         nodeStyle(graph,  nodeSize['nodeIdText']);
         graph.insertVertex(parent, null, ldText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+        let allTabContentsDivs = document.getElementsByClassName('tab-contents');
         graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
             let cell = evt.getProperty('cell');
-            if (cell['style'].includes('logicalData_')){
-                let allTabContentsDivs = document.getElementsByClassName('tab-contents');
+            if (cell['style'].includes('logicalData_') && cell['value'].includes('Input') ){
                 for (let tagCon of allTabContentsDivs){
                     tagCon.style.display = 'none';
+                    document.getElementById('tab04').style.display = 'block';
                 }
-                document.getElementById('tab08').style.display = 'block';
+            }else if (cell['style'].includes('logicalData_') && cell['value'].includes('Output') ){
+                for (let tagCon of allTabContentsDivs){
+                    tagCon.style.display = 'none';
+                    document.getElementById('tab05').style.display = 'block';
+                }
+            }else if (cell['style'].includes('logicalData_') && cell['value'].includes('Process')){
+                for (let tagCon of allTabContentsDivs){
+                    tagCon.style.display = 'none';
+                    document.getElementById('tab06').style.display = 'block';
+                }
             }
             evt.consume();
         });
@@ -598,4 +617,44 @@ function showLdL3(container, op, graph, parent, X, Y) {
         varY += 200;
     }
 
+}
+
+function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
+    let nodeSize = {};
+    let nodePosition = [];
+    let time_stamp_list = document.getElementById('time_stamp_list').getElementsByTagName('p');
+    for (let ts of time_stamp_list){
+        if (ts.innerHTML.replace(/_/g, "\n") === timeStamp){
+            nodePosition[0] = ts.offsetLeft;
+            nodePosition[1] = ts.offsetTop;
+            // console.log(nodePosition);
+            // console.log(timeStamp + "--" + ts.innerHTML);
+        }
+    }
+    // let childX = nodePosition[0];
+    let childY = nodePosition[1] + 70;
+    let childType = "variable_";
+    let op = null;
+    for (let i=0; i < childList.length; i++){
+        let childText = childList[i].firstElementChild.innerHTML.replace(/_/g, "\n");
+        let childOp = childList[i].getElementsByClassName('val')[0].innerHTML.replace(/_/g, "\n");
+        let childType = childList[i].getElementsByClassName('node_type')[0].innerHTML.replace(/_/g, "\n");
+        if (i > 0 && childList[i] === childList[i-1] ){
+             console.log(childList[i-1]);
+        }
+
+        switch (childOp) {
+            case "LOAD":
+                op = "R";
+                break;
+            case "STORE":
+                op = "W";
+                break;
+        }
+        // console.log(childText +"__" + childX + "--" + childY + "__" + childType);
+        nodeSize = setNodeSize(childText, childType + "_" + op);
+        nodeStyle(graph,  nodeSize['nodeIdText']);
+        graph.insertVertex(parent, null, childText, childX, childY, 80, 50, nodeSize['nodeIdText']);
+        childX += 80;
+    }
 }

@@ -14,37 +14,44 @@
             <div class="tabs col-md-12">
                 <div class="col-md-12 level2">
                     <li class="col-md-3 main_tab"><a href="#tab07" class="btn-info">Operation of Threads</a></li>
-                    <li class="col-md-3 main_tab"><a href="#tab09" class="btn-info">All Logical Data L3</a></li>
-                    <li class="col-md-3 main_tab"><a href="#tab01" class="btn-info">Input for Threads </a></li>
-                    <li class="col-md-3 main_tab"><a href="#tab02" class="btn-info">Output of Threads</a></li>
-                    <li class="col-md-3 main_tab"><a href="#tab03" class="btn-info">Processed by Threads</a></li>
+                    {% if ld_input_lc or ld_process_lc or ld_output_lc %}
+                        <li class="col-md-3 main_tab"><a href="#tab09" class="btn-info">All Logical Data L3</a></li>
+                        <li class="col-md-3 main_tab"><a href="#tab01" class="btn-info">Input for Threads </a></li>
+                        <li class="col-md-3 main_tab"><a href="#tab02" class="btn-info">Output of Threads</a></li>
+                        <li class="col-md-3 main_tab"><a href="#tab03" class="btn-info">Processed by Threads</a></li>
+                    {%  else %}
+                        <li class="col-md-3 main_tab"><a href="#tab08" class="btn-info">All Technical Data L0</a></li>
+                    {% endif %}
                 </div>
-                <div class="col-md-12 level1">
+                {% if ld_input_lc or ld_process_lc or ld_output_lc %}
+                    <div class="col-md-12 level1">
 
-                    <li id="ld_l1_dig_all" class="col-md-3 gray_tab">
-                      <a href="#tab08" class="btn-light lc_l1"> Logical Data-Thread operation-Level 1 </a>
-                      <i class="far fa-window-close close"></i>
-                    </li>
-{#                    <li id="lc_l1_dig_input" class="col-md-3 gray_tab">#}
-{#                      <a href="#tab04" class="btn-light lc_l1"> Logical Data-Thread Input-Level 1 </a>#}
-{#                      <i class="far fa-window-close close"></i>#}
-{#                    </li>#}
-{#                    <li id="lc_l1_dig_output" class="col-md-3 gray_tab">#}
-{#                      <a href="#tab05" class="btn-light lc_l1"> Logical Data-Thread Output-Level 1 </a>#}
-{#                      <i class="far fa-window-close close"></i>#}
-{#                    </li>#}
-{#                    <li id="lc_l1_dig_process" class="col-md-3 gray_tab">#}
-{#                      <a href="#tab06" class="btn-light lc_l1"> Logical Data-Thread Process-Level 1 </a>#}
-{#                      <i class="far fa-window-close close"></i>#}
-{#                  </li>#}
-                </div>
+    {#                    <li id="ld_l1_dig_all" class="col-md-3 gray_tab">#}
+    {#                      <a href="#tab08" class="btn-light lc_l1"> Logical Data-Thread operation-Level 1 </a>#}
+    {#                      <i class="far fa-window-close close"></i>#}
+    {#                    </li>#}
+                        <li class="col-md-3 gray_tab"></li>
+                        <li class="col-md-3 gray_tab"></li>
+                        <li id="lc_l1_dig_input" class="col-md-3 gray_tab">
+                          <a href="#tab04" class="btn-light lc_l1"> Logical Data-Thread Input-Level 1 </a>
+                          <i class="far fa-window-close close"></i>
+                        </li>
+                        <li id="lc_l1_dig_output" class="col-md-3 gray_tab">
+                          <a href="#tab05" class="btn-light lc_l1"> Logical Data-Thread Output-Level 1 </a>
+                          <i class="far fa-window-close close"></i>
+                        </li>
+                        <li id="lc_l1_dig_process" class="col-md-3 gray_tab">
+                          <a href="#tab06" class="btn-light lc_l1"> Logical Data-Thread Process-Level 1 </a>
+                          <i class="far fa-window-close close"></i>
+                      </li>
+                    </div>
+                {% endif %}
             </div>
         </ul>
       </div>
         <div class="tab-select-outer">
             <select id="tab-select">
                 <option value="#tab07">Operation of Threads</option>
-                <option value="#tab08">Logical Data Level 1 - Operation of Threads</option>
                 <option value="#tab01">Input for Threads </option>
                 <option value="#tab02">Output of Threads</option>
                 <option value="#tab03">Processed by Threads</option>
@@ -149,6 +156,7 @@
             {% endfor %}
         </ul>
     </div>
+
     <div class="col-md-12 text_container" style="display: none" id="logical_data_l2_txt_process">
         <ul class="list_level0">
             {% for ldK, ldV in ld_process_lc.items %}
@@ -212,6 +220,31 @@
     <div class="col-md-12 text_container" style="display: block" id="thread_var_input">
         <ul class="thread_list">
             {% for lc, td in thread_var_input.items %}
+                <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
+                    <span>{{ lc }}</span>
+                    {% for name, type in td.items %}
+                        <p class="td_lc">{{ name }}</p>
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="col-md-12 text_container" style="display: block" id="thread_var_process">
+        <ul class="thread_list">
+            {% for lc, td in thread_var_process.items %}
+                <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
+                    <span>{{ lc }}</span>
+                    {% for name, type in td.items %}
+                        <p class="td_lc">{{ name }}</p>
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-12 text_container" style="display: block" id="thread_var_output">
+        <ul class="thread_list">
+            {% for lc, td in thread_var_output.items %}
                 <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
                     <span>{{ lc }}</span>
                     {% for name, type in td.items %}

@@ -8,12 +8,13 @@
         </div>
     </nav>
     <div class="tabs">
-      <div class="tab-button-outer">
-        <ul id="tab-button">
-          <li><a href="#tab01" class="btn-info">Diagram</a></li>
-          <li><a href="#tab02" class="btn-info">Textual</a></li>
-        </ul>
-      </div>
+        <div class="tab-button-outer">
+
+            <ul id="tab-button">
+              <li><a href="#tab01" class="btn-info" style="display:block">Diagram</a></li>
+              <li><a href="#tab02" class="btn-info">Textual</a></li>
+            </ul>
+        </div>
         <div class="tab-select-outer">
             <select id="tab-select">
                 <option value="#tab01" class="shadow-sm rounded">Diagram</option>
@@ -22,9 +23,9 @@
         </div>
     </div>
     <div id="tab01" class="tab-contents">
-        <div class="col-md-2" style="margin-top: 10em">
+        <div class="col-md-2" style="margin-top: 10em" id="time_stamp_list">
             {% for ts in  time_stamp_list %}
-                <p style="padding: 1em">{{ ts }}</p>
+                <p style="padding: 2em">{{ ts }}</p>
             {% endfor %}
         </div>
         <div class="col-md-10 well diagram_container" id="time_line_diagram"></div>
@@ -39,11 +40,14 @@
                         <ul class="list_level1">
                             {% for ts, tv in v.items %}
                                 <li class="li-list_level1">
-                                    <span class="time_stamp">{{ ts }} </span>
+                                    <span class="time_stamp">{{ ts }}</span>
                                     <ul class="list_level2">
                                         {% for k in tv %}
                                             <li class="li-list_level2 activity">
-                                                <span class="key">{{ k }}</span>
+                                                {% for kkey, kval in k.items %}
+                                                    <span class="key">{{ kkey }}</span>
+                                                    <span class="val {{ kkey }}">{{ kval }}</span>
+                                                {% endfor %}
                                             </li>
                                         {% endfor %}
                                     </ul>

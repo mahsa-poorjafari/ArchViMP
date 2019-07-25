@@ -10,6 +10,7 @@ import string
 from django.conf import settings
 from django.utils import timezone
 from django.core.files.storage import FileSystemStorage
+import time
 from datetime import datetime
 
 # In this file, each functions will render a page of the web-framework
@@ -283,7 +284,9 @@ def logical_data_l3(request):
                                                     'ld_input_lc': ld_input_lc, 'ld_output_lc': ld_output_lc,
                                                     'ld_process_lc': ld_process_lc, 'logical_comps': thr_func_dict,
                                                     'shared_vars_names': struct_vars_groups,
-                                                    'thread_var_input': thread_var_input})
+                                                    'thread_var_input': thread_var_input,
+                                                    'thread_var_output': thread_var_output,
+                                                    'thread_var_process': thread_var_process})
 
 
 def ld_exe_path_l2(request):
@@ -354,7 +357,6 @@ def time_line_view(request):
     all_time_stamp = get_time_stamp_list(trace_file)
     if "." in all_time_stamp[-1]:
         del all_time_stamp[-1]
-    print(all_time_stamp)
     for t in threads:
         time_activity = {}
         t_id = t if "Main_" not in t else t.split("_")[1]
@@ -374,9 +376,17 @@ def time_line_view(request):
         time_stamp_list.sort()
 
         for ts in time_stamp_list:
-            thread_filter = map(lambda r: {r[3]: r[2]} if r[0] == ts and r[1] == t_id else None, thread_list)
+            activity_list = []
+            thread_filter = map(lambda r: {r[3].split(".")[0] if "." in r[3] else r[3]: r[2],
+                                "node_type": "logicalData" if "." in r[3] else "variable"} if r[0] == ts and
+                                r[1] == t_id else None, thread_list)
             time_stamp_act = list(filter(partial(is_not, None), thread_filter))
-            time_activity.update({ts: time_stamp_act})
+            for indx, item in enumerate(time_stamp_act):
+                if indx is 0 or item != time_stamp_act[indx-1]:
+                    activity_list.append(item)
+
+            # print(activity_list)
+            time_activity.update({ts: activity_list})
 
         od = collections.OrderedDict(sorted(time_activity.items()))
         thread_activity.update({t: od})

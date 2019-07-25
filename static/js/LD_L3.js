@@ -11,21 +11,21 @@ document.addEventListener('DOMContentLoaded', function() {
     let graphPGroupContainer = document.getElementById('logical_data_l2_dig_process');
     mainGrouped(graphPGroupContainer, txtPContainer, "P");
 
-    // let ldL1InputContainer = document.getElementById("logical_data_l1_input_dig");
-    // logicalDataLevel1(ldL1InputContainer, txtInContainer, "R");
-    //
-    // let ldL1OutputContainer = document.getElementById("logical_data_l1_output_dig");
-    // logicalDataLevel1(ldL1OutputContainer, txtOutContainer, "W");
-    //
-    // let ldL1ProcessContainer = document.getElementById("logical_data_l1_process_dig");
-    // logicalDataLevel1(ldL1ProcessContainer, txtPContainer, "P");
+    let ldL1InputContainer = document.getElementById("logical_data_l1_input_dig");
+    logicalDataLevel1(ldL1InputContainer, txtInContainer, "R");
+
+    let ldL1OutputContainer = document.getElementById("logical_data_l1_output_dig");
+    logicalDataLevel1(ldL1OutputContainer, txtOutContainer, "W");
+
+    let ldL1ProcessContainer = document.getElementById("logical_data_l1_process_dig");
+    logicalDataLevel1(ldL1ProcessContainer, txtPContainer, "P");
 
     let graphOpGroupContainer = document.getElementById("logical_data_l3_all_dig");
     let allL3GroupContainer = document.getElementById("all_logical_data_l3_dig");
     let ldL2Container = document.getElementById("logical_data_l2_all_dig");
     let txtOpContiner = document.getElementById("logical_component_l1_holder");
     allOperations(graphOpGroupContainer, txtOpContiner, txtInContainer, txtOutContainer, txtPContainer);
-    allLogicalDataLevel1(ldL2Container, txtInContainer, txtOutContainer, txtPContainer );
+    // allLogicalDataLevel1(ldL2Container, txtInContainer, txtOutContainer, txtPContainer );
     showAllL3GroupContainer(allL3GroupContainer, txtInContainer, txtOutContainer, txtPContainer );
 
 });
@@ -126,9 +126,11 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
                     tdY += 400;
                 }
                 let inputTds = document.getElementById('thread_var_input');
+                let processTds = document.getElementById('thread_var_process');
+                let outputTds = document.getElementById('thread_var_output');
                 connect_TD_to_related_LC(graph, parent, inputTds, "R");
-                // connect_TD_to_related_LC(graph, parent, processGroup, "P");
-                // connect_TD_to_related_LC(graph, parent, outputGroup, "W");
+                connect_TD_to_related_LC(graph, parent, processTds, "P");
+                connect_TD_to_related_LC(graph, parent, outputTds, "W");
             }
 
         }finally{
@@ -420,25 +422,31 @@ function logicalDataLevel1(container, txt, op) {
                 nodeSize = setNodeSize(lcText, 'logicalData_' + op);
                 let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
                 let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
+                console.log(ldL2List.length);
                 nodeStyle(graph,  nodeSize['nodeIdText']);
                 // positioning the op_group logical data
                 if (i === 0 && lcText.length > 20){
+                    console.log("reached i===0 && >20");
                     lcX = 500;
                     lcY = 400;
                 }else if (i === 0 ){
+                    console.log("reached i===0");
                     lcX = 500;
                     lcY = 300;
-                }else if ((i+1)%2 === 0 && lcText.length > 20){
-                    lcY += 700;
-                    lcX += 400;
-                }else if ((i+1)%2 === 0){
-                    lcX = 300;
-                    lcY += 400;
+                }else if ( lcText.length > 20 && ldL2List.length > 20){
+                    console.log("(i+1)%2 === 0 and >20");
+                    lcY += 800;
+                    lcX = 600;
+                }else if (lcText.length > 20 && ldL2List.length <= 20){
+                    console.log("(i+1)%2 === 0 ");
+                    lcX = 500;
+                    lcY += 500;
                 }else {
-                    lcX += 300;
+                    console.log("reached else");
+                    lcX = 500;
                     lcY += 400;
                 }
-                // console.log(lcText +"   " + lcText.length + "  -  " + lcX +"--"+ lcY);
+                console.log(lcText +"   " + lcText.length + "  -  " + lcX +"--"+ lcY + "--i--" + i);
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // lcY = (i === 0 && lcText.length > 20)? 400 : (lcText.length > 20) ? lcY + 700: 200;
 
