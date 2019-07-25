@@ -633,28 +633,31 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
     }
     // let childX = nodePosition[0];
     let childY = nodePosition[1] + 70;
-    let childType = "variable_";
+    let childOp = null;
+    let childType = "logicalData";
+    let nodeType = "logicalData";
     let op = null;
     for (let i=0; i < childList.length; i++){
         let childText = childList[i].firstElementChild.innerHTML.replace(/_/g, "\n");
-        let childOp = childList[i].getElementsByClassName('val')[0].innerHTML.replace(/_/g, "\n");
-        let childType = childList[i].getElementsByClassName('node_type')[0].innerHTML.replace(/_/g, "\n");
-        if (i > 0 && childList[i] === childList[i-1] ){
-             console.log(childList[i-1]);
-        }
-
-        switch (childOp) {
-            case "LOAD":
-                op = "R";
-                break;
-            case "STORE":
-                op = "W";
-                break;
+        if (childText === "noGroup"){
+            childText = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('key')[0].innerHTML.replace(/_/g, "\n");
+            childOp = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('val')[0].innerHTML.replace(/_/g, "\n");
+            childType = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('node_type')[0].innerHTML.replace(/_/g, "\n");
+            switch (childOp) {
+                case "LOAD":
+                    op = "R";
+                    break;
+                case "STORE":
+                    op = "W";
+                    break;
+            }
+            nodeType = childType + "_" + op;
         }
         // console.log(childText +"__" + childX + "--" + childY + "__" + childType);
-        nodeSize = setNodeSize(childText, childType + "_" + op);
+        nodeSize = setNodeSize(childText, nodeType);
         nodeStyle(graph,  nodeSize['nodeIdText']);
-        graph.insertVertex(parent, null, childText, childX, childY, 80, 50, nodeSize['nodeIdText']);
+        graph.insertVertex(parent, null, childText, childX, childY, 150, 70, nodeSize['nodeIdText']);
         childX += 80;
+
     }
 }

@@ -384,13 +384,14 @@ def time_line_view(request):
             for indx, item in enumerate(time_stamp_act):
                 if indx is 0 or item != time_stamp_act[indx-1]:
                     activity_list.append(item)
-
-            # print(activity_list)
-            time_activity.update({ts: activity_list})
+            if len(activity_list) > 1:
+                t_ld_name = t_id + "-" + ts
+                time_activity.update({ts: {t_ld_name: activity_list}})
+            else:
+                time_activity.update({ts: {"noGroup": activity_list}})
 
         od = collections.OrderedDict(sorted(time_activity.items()))
         thread_activity.update({t: od})
-
     return render(request, 'time_line_view.html', {'title_name': which_way,
                                                    "threads": threads,
                                                    "thread_activity": thread_activity,
