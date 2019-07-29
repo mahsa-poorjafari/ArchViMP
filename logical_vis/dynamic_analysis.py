@@ -309,11 +309,13 @@ def get_functions_with_body(trace_file, thread_list):
 
                             function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
 
-                            distance = function_return_index - function_call_index if function_return_index is not None and \
-                                                                                      function_call_index is not None else None
+                            distance = function_return_index - function_call_index if function_return_index is not None \
+                                                                                      and function_call_index is not \
+                                                                                      None else None
 
                             if distance is not None and not distance <= 1:
-                                funciton_body_list.update({f: csv_reader_list[function_call_index+1: function_return_index]})
+                                funciton_body_list.update({f: csv_reader_list[function_call_index+1:
+                                                                              function_return_index]})
 
                 csv_file.seek(0, 0)
         csv_file.close()

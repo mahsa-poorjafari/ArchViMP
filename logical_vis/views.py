@@ -410,7 +410,7 @@ def op_funcs_l2(request):
 
     threads = get_threads(trace_file)
     shared_vars_names = get_all_shared_var_names(b_parameter)
-    print("shared_vars_names=   ", shared_vars_names)
+    # print("shared_vars_names=   ", shared_vars_names)
     all_func_body_in_thread = get_functions_with_body(trace_file, threads)
     print("================= \n")
     print(all_func_body_in_thread)
