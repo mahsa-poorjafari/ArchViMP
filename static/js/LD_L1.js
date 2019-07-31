@@ -76,7 +76,7 @@ function main(container) {
                         stX = 200;
                     }
                     stNode = graph.insertVertex(parent, stId, stText, stX, stY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                    drawChild(graph, parent, stNode, stVarList, 'diamondThin', '1', 'variable');
+                    drawChild(graph, parent, stNode, stVarList, 'diamondThin', '1', 0, 'variable');
 
                 }else{
                     let mxCells = graph.getChildVertices(graph.getDefaultParent());

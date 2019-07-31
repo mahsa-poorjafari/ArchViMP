@@ -44,10 +44,14 @@ function main(container){
             let dtX = 500;
             let dtY = 300;
 
-            configEdgeStyle(graph, "#888");
+            configEdgeStyle(graph, "#000");
             let dataTypes = document.getElementById("logical_data_l0_textual").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
             let nodeSize = {};
             // console.log(dataTypes);
+            let benchmarkName = get_url_benchmark();
+            let fileName = get_url_fileName();
+            let ulrParam = [benchmarkName];
+            ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
             for (let i = 0; i < dataTypes.length; i++) {
                 let dtId = 'dT'+i;
                 let dtFirstElement = dataTypes[i].firstElementChild;
@@ -68,10 +72,10 @@ function main(container){
 
 
                     if (stText !== "variables" && stText !== "variables ") {
-                        drawChildLD(graph, parent, dtNode, firstElement, 'block', '0', j);
+                        drawChildLD(graph, parent, dtNode, firstElement, 'open', '0', j, ulrParam);
                     }else{
                         let varList = dtStList[j].getElementsByClassName("list_level2")[0].getElementsByTagName("li");
-                        drawChild(graph, parent, dtNode, varList, 'block', '0', 'variable');
+                        drawChild(graph, parent, dtNode, varList, 'open', '0', 1 ,'variable');
                     }
 
                 }

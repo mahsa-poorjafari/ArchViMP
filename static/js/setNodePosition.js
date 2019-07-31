@@ -351,15 +351,17 @@ function setPositionLDL2(pX, pY , indx) {
         case 1:
         case 2:
             chX = pX - 150;
-            chY = pY + 100;
+            chY = pY + 200;
             break;
         case 3:
+            chX = pX;
+            chY = pY + 200;
         case 4:
         case 5:
         case 6:
         case 7:
-            chX = pX + 50;
-            chY = pY + 100;
+            chX = pX + indx * 30;
+            chY = pY + 150;
             break;
         case 8:
         case 9:

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <nav class="navbar navbar-default" xmlns="http://www.w3.org/1999/html">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <h2>{{ title_name }} </h2>
             <h2> Logical Data - Level 2 </h2>
@@ -14,6 +14,8 @@
                 No group for this level of Logical Data has been created.</br>
                 The list of function is Empty
             </div>
+        {% else %}
+            {{ thread_function_shared_var }}
         {% endif %}
         <div class="tab-button-outer">
             <ul id="tab-button">
@@ -31,7 +33,7 @@
     <div id="tab01" class="tab-contents">
         <div class="col-md-12 well diagram_container" id="logical_data_l2_function_diagram"></div>
     </div>
-    <div id="tab02" class="tab-contents" style="display: none">
+    <div id="tab02" class="tab-contents" style="display: block">
         <div class="col-md-12 well textual_container" id="logical_data_l2_function_textual">
         </div>
     </div>

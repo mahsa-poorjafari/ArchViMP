@@ -1,0 +1,376 @@
+Create file: traces/trace_2019.07.30.09.56.45.txt.
+JAVA:Modification rule: 801, pthread_create, , , , , 
+JAVA:Modification rule: 801, pthread_exit, , , , , 
+JAVA:Modification rule: 801, pthread_join, , , , , 
+JAVA:Modification rule: 801, pthread_mutex_init, , , , , 
+JAVA:Modification rule: 801, pthread_mutex_lock, , , , , 
+JAVA:Modification rule: 801, pthread_mutex_unlock, , , , , 
+JAVA:Modification rule: 801, strcat, , , , , 
+JAVA:Modification rule: 801, strcmp, , , , , 
+JAVA:Modification rule: 801, getGradeStatus, , , , , 
+JAVA:Modification rule: 801, gradeResult, , , , , 
+pthread_create - sum.
+pthread_create - sumPlus.
+pthread_create - diff.
+pthread_create - incrementSharedVars.
+Function sum.
+Function sumPlus.
+Function diff.
+Function incrementSharedVars.
+Execute function:	sum
+Execute function:	sumPlus
+Execute function:	diff
+Execute function:	incrementSharedVars
+LLVM ENDS!!!
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [14208992] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+--------- Check for nested decisions -------------
+--------- return from (Check for nested decisions) -------------
+Function dummyFunction:
+	Decision [2691146] START-Line(0) END-Line(0):
+	Decision [33042477] START-Line(0) END-Line(0):
+	Decision [24572920] START-Line(0) END-Line(0):
+		- Nested decision [14208992] START-Line(0) END-Line(0):
+Function getYear:
+	Decision [26111414] START-Line(64) END-Line(67):
+	Decision [28021517] START-Line(67) END-Line(68):
+Function getAverage:
+	Decision [20231693] START-Line(74) END-Line(76):
+	Decision [27751520] START-Line(76) END-Line(78):
+	Decision [26893823] START-Line(78) END-Line(81):
+	Decision [14063930] START-Line(81) END-Line(0):
+	Decision [3326003] START-Line(0) END-Line(0):
+	Decision [11714529] START-Line(0) END-Line(82):
+Function addNewMajor:
+Function sum:
+Function sumPlus:
+	Decision [24408301] START-Line(137) END-Line(139):
+	Decision [29437872] START-Line(139) END-Line(143):
+	Decision [18503843] START-Line(143) END-Line(145):
+	Decision [3711894] START-Line(145) END-Line(148):
+	Decision [2180324] START-Line(148) END-Line(0):
+	Decision [7816767] START-Line(0) END-Line(0):
+	Decision [24237394] START-Line(0) END-Line(0):
+	Decision [16053625] START-Line(0) END-Line(150):
+Function diff:
+Function incrementSharedVars:
+Function main:
+	Decision [7771239] START-Line(195) END-Line(199):
+	Decision [15630312] START-Line(203) END-Line(207):
+	Decision [17230114] START-Line(209) END-Line(213):
+	Decision [14845382] START-Line(215) END-Line(219):
+Function getgradeStatus:
+	Decision [1828305] START-Line(230) END-Line(250):
+	Decision [20961093] START-Line(251) END-Line(255):
+
+Sequence of access arranged by different threads:
+
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [20085625] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [major.majorCode] {396663560}:
+	Thread [6245422]main:
+	Thread [16249706]diff:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:45:995,16249706,STORE,major.majorCode,396663560,INT;CONSTANT;,2,threadFourFunctions_V3.c,87
+	Thread [11567059]incrementSharedVars:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:022,11567059,STORE,major.majorCode,396663560,INT;CONSTANT;,5,threadFourFunctions_V3.c,87
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [19140780] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [major.degreeLevel] {396663564}:
+	Thread [6245422]main:
+	Thread [16249706]diff:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:45:995,16249706,STORE,major.degreeLevel,396663564,INT;CONSTANT;,2,threadFourFunctions_V3.c,88
+	Thread [11567059]incrementSharedVars:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:022,11567059,STORE,major.degreeLevel,396663564,INT;CONSTANT;,2,threadFourFunctions_V3.c,88
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [2900468] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+Variable [major.specializationCredit] {396663568}:
+	Thread [6245422]main:
+	Thread [6800315]sum:
+		Function getAverage:
+			Accesses within logical decisions:
+				Logical decision: START(0); END(82)
+					09:56:45:925,6800315,LOAD,major.specializationCredit,396663568,INT;CONSTANT;,60,threadFourFunctions_V3.c,81
+			- Conditional ONLY variable.
+	Thread [16249706]diff:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:45:995,16249706,STORE,major.specializationCredit,396663568,INT;CONSTANT;,34,threadFourFunctions_V3.c,89
+		Function getAverage:
+			Accesses within logical decisions:
+				Logical decision: START(0); END(82)
+					09:56:46:007,16249706,LOAD,major.specializationCredit,396663568,INT;CONSTANT;,34,threadFourFunctions_V3.c,81
+			- Conditional ONLY variable.
+	Thread [11567059]incrementSharedVars:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:022,11567059,STORE,major.specializationCredit,396663568,INT;CONSTANT;,34,threadFourFunctions_V3.c,89
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [25179403] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [major.supplementCredit] {396663572}:
+	Thread [6245422]main:
+	Thread [16249706]diff:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:45:995,16249706,STORE,major.supplementCredit,396663572,INT;CONSTANT;,20,threadFourFunctions_V3.c,90
+	Thread [11567059]incrementSharedVars:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:022,11567059,STORE,major.supplementCredit,396663572,INT;CONSTANT;,20,threadFourFunctions_V3.c,90
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [24077489] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [major.theoryCredit] {396663580}:
+	Thread [6245422]main:
+	Thread [16249706]diff:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:001,16249706,STORE,major.theoryCredit,396663580,INT;CONSTANT;,8,threadFourFunctions_V3.c,91
+	Thread [11567059]incrementSharedVars:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:022,11567059,STORE,major.theoryCredit,396663580,INT;CONSTANT;,8,threadFourFunctions_V3.c,91
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [10600128] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [major.thesisCredit] {396663584}:
+	Thread [6245422]main:
+	Thread [16249706]diff:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:001,16249706,STORE,major.thesisCredit,396663584,INT;CONSTANT;,30,threadFourFunctions_V3.c,92
+	Thread [11567059]incrementSharedVars:
+		Function addNewMajor:
+			Accesses outside logical decisions:
+				09:56:46:026,11567059,STORE,major.thesisCredit,396663584,INT;CONSTANT;,30,threadFourFunctions_V3.c,92
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [9599617] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [14695349] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [leapYear] {396513272}:
+	Thread [6245422]main:
+		Function dummyFunction:
+			Accesses outside logical decisions:
+				09:56:45:878,6245422,STORE,leapYear,396513272,INT;CONSTANT;,0,threadFourFunctions_V3.c,49
+				09:56:45:878,6245422,LOAD,leapYear,396513272,INT;CONSTANT;,0,threadFourFunctions_V3.c,51
+	Thread [27329553]sumPlus:
+		Function dummyFunction:
+			Accesses outside logical decisions:
+				09:56:45:960,27329553,STORE,leapYear,396513272,INT;CONSTANT;,0,threadFourFunctions_V3.c,49
+				09:56:45:960,27329553,LOAD,leapYear,396513272,INT;CONSTANT;,0,threadFourFunctions_V3.c,51
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [9212660] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [31748187] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [year] {396513976}:
+	Thread [6245422]main:
+		Function getYear:
+			Accesses outside logical decisions:
+				09:56:45:878,6245422,LOAD,year,396513976,INT;CONSTANT;,2013,threadFourFunctions_V3.c,69
+		Function dummyFunction:
+			Accesses outside logical decisions:
+				09:56:45:872,6245422,LOAD,year,396513976,INT;CONSTANT;,2013,threadFourFunctions_V3.c,49
+				09:56:45:872,6245422,LOAD,year,396513976,INT;CONSTANT;,2013,threadFourFunctions_V3.c,49
+	Thread [27329553]sumPlus:
+		Function dummyFunction:
+			Accesses outside logical decisions:
+				09:56:45:959,27329553,LOAD,year,396513976,INT;CONSTANT;,2013,threadFourFunctions_V3.c,49
+				09:56:45:960,27329553,LOAD,year,396513976,INT;CONSTANT;,2013,threadFourFunctions_V3.c,49
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [1263764] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [22543536] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+Variable [grade] {396514008}:
+	Thread [6245422]main:
+	Thread [6800315]sum:
+		Function getAverage:
+			Accesses within logical decisions:
+				Logical decision: START(0); END(82)
+					09:56:45:928,6800315,LOAD,grade,396514008,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,81
+			- Conditional ONLY variable.
+	Thread [27329553]sumPlus:
+		Function sumPlus:
+			Accesses within logical decisions:
+				Logical decision: START(0); END(152)
+					09:56:45:971,27329553,STORE,grade,396514008,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,136
+					09:56:45:971,27329553,STORE,grade,396514008,FLOAT;CONSTANT;,3,threadFourFunctions_V3.c,138
+				Logical decision: START(137); END(139)
+					09:56:45:971,27329553,STORE,grade,396514008,FLOAT;CONSTANT;,3,threadFourFunctions_V3.c,138
+			- Conditional ONLY variable.
+		Function dummyFunction:
+			Accesses outside logical decisions:
+				09:56:45:960,27329553,STORE,grade,396514008,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,50
+	Thread [16249706]diff:
+		Function getAverage:
+			Accesses within logical decisions:
+				Logical decision: START(0); END(82)
+					09:56:46:007,16249706,LOAD,grade,396514008,FLOAT;CONSTANT;,3,threadFourFunctions_V3.c,81
+			- Conditional ONLY variable.
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [24559708] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+--------- Check for nested decisions -------------
+(dummyFunction) :Truth table, decision [22158529] B(5)-0, END B(7)-0:
+-----------------------------------------
+0. B(5)false	B(7)false	
+1. B(5)true	B(6)true	
+-----------------------------------------
+--------- return from (Check for nested decisions) -------------
+Variable [result] {396513560}:
+	Thread [6245422]main:
+	Thread [6800315]sum:
+		Function sum:
+			Accesses outside logical decisions:
+				09:56:45:937,6800315,STORE,result,396513560,INT;CONSTANT;,10,threadFourFunctions_V3.c,109
+				09:56:45:937,6800315,STORE,result,396513560,INT;CONSTANT;,10,threadFourFunctions_V3.c,111
+				09:56:45:953,6800315,LOAD,result,396513560,INT;CONSTANT;,10,threadFourFunctions_V3.c,124
+	Thread [27329553]sumPlus:
+		Function sumPlus:
+			Accesses within logical decisions:
+				Logical decision: START(0); END(152)
+					09:56:45:964,27329553,STORE,result,396513560,INT;CONSTANT;,10,threadFourFunctions_V3.c,133
+					09:56:45:971,27329553,STORE,result,396513560,INT;CONSTANT;,10,threadFourFunctions_V3.c,135
+					09:56:45:971,27329553,LOAD,result,396513560,INT;CONSTANT;,10,threadFourFunctions_V3.c,137
+					09:56:45:971,27329553,LOAD,result,396513560,INT;CONSTANT;,10,threadFourFunctions_V3.c,150
+			- Conditional ONLY variable.
+	Thread [16249706]diff:
+		Function diff:
+			Accesses outside logical decisions:
+				09:56:45:980,16249706,STORE,result,396513560,INT;CONSTANT;,-5,threadFourFunctions_V3.c,163
+isVariableSingleFunctionContextAccess.addAccessWithinLogicalDecision(acc, dec);
+Variable [average] {396514040}:
+	Thread [6800315]sum:
+	Thread [16249706]diff:
+		Function getAverage:
+			Accesses within logical decisions:
+				Logical decision: START(0); END(82)
+					09:56:46:007,16249706,STORE,average,396514040,FLOAT;CONSTANT;,56,threadFourFunctions_V3.c,81
+			- Conditional ONLY variable.
+Variable [sharedVar1] {396514200}:
+	Thread [6800315]sum:
+		Function sum:
+			Accesses outside logical decisions:
+				09:56:45:930,6800315,STORE,sharedVar1,396514200,INT;CONSTANT;,2,threadFourFunctions_V3.c,101
+				09:56:45:946,6800315,LOAD,sharedVar1,396514200,INT;CONSTANT;,2,threadFourFunctions_V3.c,113
+				09:56:45:946,6800315,STORE,sharedVar1,396514200,INT;CONSTANT;,3,threadFourFunctions_V3.c,113
+				09:56:45:946,6800315,LOAD,sharedVar1,396514200,INT;CONSTANT;,3,threadFourFunctions_V3.c,117
+				09:56:45:946,6800315,STORE,sharedVar1,396514200,INT;CONSTANT;,4,threadFourFunctions_V3.c,117
+				09:56:45:953,6800315,LOAD,sharedVar1,396514200,INT;CONSTANT;,4,threadFourFunctions_V3.c,121
+				09:56:45:953,6800315,STORE,sharedVar1,396514200,INT;CONSTANT;,5,threadFourFunctions_V3.c,121
+	Thread [16249706]diff:
+		Function diff:
+			Accesses outside logical decisions:
+				09:56:46:001,16249706,LOAD,sharedVar1,396514200,INT;CONSTANT;,5,threadFourFunctions_V3.c,170
+				09:56:46:001,16249706,STORE,sharedVar1,396514200,INT;CONSTANT;,6,threadFourFunctions_V3.c,170
+	Thread [11567059]incrementSharedVars:
+		Function incrementSharedVars:
+			Accesses outside logical decisions:
+				09:56:46:012,11567059,LOAD,sharedVar1,396514200,INT;CONSTANT;,6,threadFourFunctions_V3.c,180
+Variable [sharedVar2] {396514232}:
+	Thread [6800315]sum:
+		Function sum:
+			Accesses outside logical decisions:
+				09:56:45:930,6800315,STORE,sharedVar2,396514232,INT;CONSTANT;,2,threadFourFunctions_V3.c,105
+	Thread [16249706]diff:
+		Function diff:
+			Accesses outside logical decisions:
+				09:56:45:977,16249706,LOAD,sharedVar2,396514232,INT;CONSTANT;,2,threadFourFunctions_V3.c,157
+				09:56:45:977,16249706,STORE,sharedVar2,396514232,INT;CONSTANT;,3,threadFourFunctions_V3.c,157
+				09:56:45:985,16249706,LOAD,sharedVar2,396514232,INT;CONSTANT;,3,threadFourFunctions_V3.c,165
+				09:56:45:985,16249706,STORE,sharedVar2,396514232,INT;CONSTANT;,4,threadFourFunctions_V3.c,165
+				09:56:45:985,16249706,LOAD,sharedVar2,396514232,INT;CONSTANT;,4,threadFourFunctions_V3.c,167
+				09:56:45:985,16249706,STORE,sharedVar2,396514232,INT;CONSTANT;,5,threadFourFunctions_V3.c,167
+	Thread [11567059]incrementSharedVars:
+		Function incrementSharedVars:
+			Accesses outside logical decisions:
+				09:56:46:012,11567059,LOAD,sharedVar2,396514232,INT;CONSTANT;,5,threadFourFunctions_V3.c,178
+				09:56:46:012,11567059,STORE,sharedVar2,396514232,INT;CONSTANT;,6,threadFourFunctions_V3.c,178
+main::Year = 2013.
+MAIN::result = 0.
+sum::result = 10.
+sum::result = 10.

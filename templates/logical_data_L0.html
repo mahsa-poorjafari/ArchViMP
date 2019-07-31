@@ -8,7 +8,17 @@
             <h4>Technical Data</h4>
         </div>
     </nav>
-
+    {% if data_types_names|length > 0 %}
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
+            There are <strong class="see_it" style="text-decoration: underline;">{{ data_types_names|length }}</strong> number of DataTypes:
+            <ul>
+                {% for dt in data_types_names %}
+                    <li><strong> {{ forloop.counter }}- {{ dt }}</strong></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <div class="tabs">
       <div class="tab-button-outer">
         <ul id="tab-button">

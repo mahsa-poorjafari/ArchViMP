@@ -31,14 +31,14 @@ urlpatterns = [
     url(r'no_canvas', test_diagrams.no_canvas, name='no_canvas'),
     url(r'gojs', test_diagrams.gojs, name='gojs'),
     url(r'mxGraph', test_diagrams.mxgraph, name='mxGraph'),
-    url(r'Logical_Data_L0', views.logical_data_l0, name='logical_data_L0'),
+    url(r'Logical_Data_L0', views.logical_data_l0, name='technical_data_L0'),
     url(r'catastrophe', views.catastrophe, name='catastrophe'),
     url(r'Logical_Data_L1', views.logical_data_l1, name='Logical_Data_L1'),
-    url(r'Logical_Data_L3', views.logical_data_l3, name='Logical_Data_L3'),
+    url(r'Logical_Data_L3', views.logical_data_l3, name='structural_view_L3'),
     url(r'LD_L2_unG', views.logical_data_l2_ungrouped, name='logical_data_l2_ungrouped'),
     url(r'exe_path_L2', views.ld_exe_path_l2, name='logical_data_l2_exe_path'),
     url(r'time_line_view', views.time_line_view, name='time_line_view'),
-    url(r'operation_functions_L2', views.op_funcs_l2, name='time_line_view'),
+    url(r'operation_functions_L2', views.functions_ld_l2, name='logical_data_l2_funcitons'),
 ]
 # handler404 = error_handling.error_404_view
 

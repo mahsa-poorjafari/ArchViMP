@@ -53,6 +53,7 @@ function setNodeSize(nodeText, nodeIdStyle){
     let nodeIdText = null;
     let Width = null;
     let Height = null;
+    console.log(nodeIdStyle);
     if (nodeText.length > 20){
         nodeIdText = nodeIdStyle + '_big';
         if(nodeIdStyle.search(/_R/)){
@@ -78,7 +79,7 @@ function setNodeSize(nodeText, nodeIdStyle){
     return nodeStyle;
 }
 
-function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill, nthChild){
+function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill, nthChild, ulrParam){
 
     let pX = 1000;
     let pY = 200;
@@ -104,9 +105,15 @@ function drawChildLD(graph, parent, pNode, element, endArrowShape, endArrowFill,
     nodeStyle(graph, nodeSize['nodeIdText']);
     let chNode = graph.insertVertex(parent, Text, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
     chNode.target = pNode;
+    graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+            let cell = evt.getProperty('cell');
+            if (cell['style'].includes("logicalData")){
+                let cellValue = cell['value'].replace(/ /g,'');
+                window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+            }
+            evt.consume();
+        });
     graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=' + endArrowShape + ';sourcePerimeterSpacing=0;startFill=0;endFill=' + endArrowFill + ';');
-
-
 }
 
 function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrParam) {
@@ -131,7 +138,6 @@ function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrPara
         });
         graph.insertEdge(parent, null, null, ldNode, lcNode , 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
         chY += 200;
-
     }
 }
 
@@ -194,13 +200,10 @@ function drawChildThrOP(graph, parent, pNode, childList){
             chNode = nodes[Text];
         }
         graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
-
-
     }
-
 }
 
-function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill, nodeIdStyle){
+function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill, dashed, nodeIdStyle){
     let nodeSize = {};
     let pX = 50;
     let pY = 50;
@@ -238,8 +241,7 @@ function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill,
         }
         let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         chNode.target = pNode;
-        graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=' + endArrowShape + ';sourcePerimeterSpacing=0;startFill=0;endFill=' + endArrowFill + ';');
-
+        graph.insertEdge(parent, null, null, chNode, pNode, 'dashed='+ dashed +';endArrow=' + endArrowShape + ';sourcePerimeterSpacing=0;startFill=0;endFill=' + endArrowFill + ';');
     }
 }
 
@@ -384,7 +386,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
             chNode.target = pNode;
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                 let cell = evt.getProperty('cell');
-                if (cell['style'] === "logicalData" || cell['style'] === "logicalData_big"){
+                if (cell['style'].includes("logicalData")){
                     window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
                 }
                 evt.consume();
@@ -463,14 +465,9 @@ function connect_LD_to_related_LC(graph, parent, inputGroup, X, Y, op) {
                         ldInNode.source = node;
                         break;
                 }
-
-
             }
-
         }
     }
-
-
 }
 
 function connect_TD_to_related_LC(graph, parent, listGroup, op) {

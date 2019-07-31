@@ -12,9 +12,16 @@ def remove_dups(a_list):
     return the_list
 
 
+def get_file_records(file_path):
+    with open(file_path, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        csv_reader_list = list(csv_reader)
+    csv_file.close()
+    return csv_reader_list
+
+
 def get_first_function(t, trace_file):
     with open(trace_file, 'r') as csv_file:
-        csv_file.seek(0, 0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         if "Main_" in t:
             # print("t=>  ", t)
@@ -150,6 +157,14 @@ def get_trace_file_path(benchmark_name, *args, **kwargs):
     return switcher.get(benchmark_name, "Invalid Value")
 
 
+def get_logical_decision_file_path(benchmark_name, *args, **kwargs):
+    # file_name = kwargs.get('file_name') if kwargs.get('file_name') is not None else ""
+    switcher = {
+        "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/LogicalDec_sharedVars.txt",
+    }
+    return switcher.get(benchmark_name, "Invalid Value")
+
+
 def get_variable_file_path(benchmark_name):
     switcher = {
         "ROSACE": "benchmark_traces/ROSACE/SharedVariablesRosace.txt",
@@ -221,11 +236,11 @@ def group_over10_child(ld_lc):
 
 
 def get_time_stamp_list(trace_file):
-    with open(trace_file, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        time_stamps = map(lambda v: v[0], csv_reader)
-        time_stamps_list = list(time_stamps)
-    csv_file.close()
+    csv_reader_list = get_file_records(trace_file)
+
+    time_stamps = map(lambda v: v[0], csv_reader_list)
+    time_stamps_list = list(time_stamps)
+
     time_stamps_no_dups = remove_dups(time_stamps_list)
     time_stamps_no_dups.sort()
     return time_stamps_no_dups
@@ -277,6 +292,8 @@ def thread_per_vars(shared_variables, thread_ids):
 def get_functions_with_body(trace_file, thread_list):
     thread_funciton_list = {}
     thread_funcitons = {}
+    thr_func_list = []
+    f_avoid_dups = []
     for t in thread_list:
         funciton_body_list = {}
         t_id = t.split("_")[1] if "Main_" in t else t
@@ -286,51 +303,58 @@ def get_functions_with_body(trace_file, thread_list):
                                  else None, csv_reader))
             f_avoid_none = list(filter(partial(is_not, None), funciton_list))
             f_avoid_dups = remove_dups(f_avoid_none)
+
         csv_file.close()
         thread_funciton_list.update({t_id: f_avoid_dups})
         thr_func = get_first_function(t, trace_file)
-        thr_func_list = list(thr_func.values())
-        with open(trace_file, 'r') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            csv_reader_list = list(csv_reader)
-            [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
-            # The index of record are +1
-            for f in f_avoid_dups:
-                if f not in thr_func_list:
-                    function_start_end = list(filter(lambda r: r[2] == t_id and r[4] == f, csv_reader_list))
-                    # print("\n -------------------------------------")
-                    for indx, elem in enumerate(function_start_end):
-                        # print(elem)
-                        next_item_index = indx + 1
-                        if len(function_start_end) > 1 and next_item_index < len(function_start_end):
-                            function_return_index = function_start_end[next_item_index][0] if \
-                                function_start_end[next_item_index][3] == "FUNCTIONRETURN" else \
-                                None
-
-                            function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
-
-                            distance = function_return_index - function_call_index if function_return_index is not None \
-                                                                                      and function_call_index is not \
-                                                                                      None else None
-
-                            if distance is not None and not distance <= 1:
-                                funciton_body_list.update({f: csv_reader_list[function_call_index+1:
-                                                                              function_return_index]})
-
-                csv_file.seek(0, 0)
-        csv_file.close()
-        if len(funciton_body_list) > 0:
-            thread_funcitons.update({t_id: funciton_body_list})
-    return thread_funcitons
-
-
-def get_first_function_body(function_name, trace_file):
+        thr_func_list.append(list(thr_func.values())[0])
 
     with open(trace_file, 'r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         csv_reader_list = list(csv_reader)
         [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
-    csv_file.close()
+        # The index of record are +1
+        for k, f_list in thread_funciton_list.items():
+            [f_list.remove(i) for i in f_list if i in thr_func_list]
+            for f in f_list:
+                function_start_end = list(filter(lambda r: r[2] == k and r[4] == f and r[3] in ["FUNCTIONCALL", "FUNCTIONRETURN"]
+                                                 , csv_reader_list))
+                print("function_start_end==>>  ", function_start_end)
+                for indx, elem in enumerate(function_start_end):
+                    # print("elem--------------------")
+                    # print(elem)
+                    next_item_index = indx + 1
+                    # print("next_item_index", next_item_index)
+                    if len(function_start_end) > 1 and next_item_index < len(function_start_end):
+                        function_return_index = function_start_end[next_item_index][0] if \
+                            function_start_end[next_item_index][3] == "FUNCTIONRETURN" else \
+                            None
+
+                        function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
+                        print("function_call_index==>>  ", function_call_index)
+                        print("function_return_index==>>  ", function_return_index)
+                        distance = function_return_index - function_call_index if function_return_index is not None \
+                                                                                  and function_call_index is not \
+                                                                                  None else None
+
+                        if distance is not None and not distance <= 1:
+                            f_body = csv_reader_list[function_call_index+1:function_return_index]
+                            print("\n f_body   \n", f_body)
+                            funciton_body_list.update({f: csv_reader_list[function_call_index+1:
+                                                                          function_return_index]})
+                        if len(funciton_body_list) > 0:
+                            thread_funcitons.update({k: funciton_body_list})
+
+            csv_file.seek(0, 0)
+        csv_file.close()
+    # print("\n thread_funcitons          => ", thread_funcitons)
+    return thread_funcitons
+
+
+def get_first_function_body(function_name, trace_file):
+    csv_reader_list = get_file_records(trace_file)
+    [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
+
     function_begin = list(filter(lambda r: r[3] == "FUNCTIONCALL" and r[4] == function_name, csv_reader_list))
     function_end = list(filter(lambda r: r[3] == "FUNCTIONRETURN" and r[4] == function_name, csv_reader_list))
     function_body = csv_reader_list[function_begin[0][0]:function_end[0][0]+1]
@@ -350,3 +374,76 @@ def retrieve_exe_path(exe_path_set):
     print("exe_path =>  ", var_exe_path)
 
     return exe_path
+
+
+def get_all_functions(logical_decision_file):
+    csv_reader_list = get_file_records(logical_decision_file)
+    function_records = list(filter(lambda r: r[0] == "Function", csv_reader_list))
+
+    all_function_list = {f[1] for f in function_records}
+    print(all_function_list)
+    return all_function_list
+
+
+def get_lc_functions(logical_decision_file):
+    csv_reader_list = get_file_records(logical_decision_file)
+    function_records = list(filter(lambda r: r[0] == "Thread", csv_reader_list))
+
+    lc_function_list = {f[2] for f in function_records}
+    print(lc_function_list)
+    return lc_function_list
+
+
+def get_vars_exe_block(logical_decision_file):
+    csv_reader_list = get_file_records(logical_decision_file)
+    [r.insert(0, indx) for indx, r in enumerate(csv_reader_list)]
+    variable_records = list(filter(lambda r: r[1] == "Variable", csv_reader_list))
+    # print(variable_records)
+
+    variable_access_infos = {}
+    block_begin = None
+    block_end = None
+    for indx, var_record in enumerate(variable_records):
+        if indx+1 < len(variable_records):
+            block_begin = var_record[0]
+            block_end = variable_records[indx+1][0]
+        var_exe_block = csv_reader_list[block_begin:block_end]
+        var_infos = var_access_info(var_exe_block)
+        variable_access_infos.update(var_infos)
+        # vars_info.update({var_record[3]: var_record[2], "exe_block": var_exe_block})
+    print(variable_access_infos)
+    return variable_access_infos
+
+
+def var_access_info(var_exe_block):
+    print("\n _______________________")
+    # print(var_exe_block)
+    thr = []
+    func = []
+    var = {}
+    var_id = None
+    var_name = None
+    for indx, r in enumerate(var_exe_block):
+        # print("\n", r)
+        if r[1] == "Variable":
+            var_id = r[3]
+            var_name = r[2]
+        elif r[1] == "Thread":
+            thr.append(r[2])
+        elif r[1] == "Function":
+            if r[2] not in func:
+                func.append(r[2])
+            if var_exe_block[indx+1][1] == "Accesses":
+                print(var_exe_block[indx+1])
+
+    if var_id is not None:
+        var = {var_id: {
+                   "varName": var_name,
+                   "threadList": thr,
+                   "funcitonList": func
+               }}
+    # var.update({"threadList": thr})
+    # var.update({"funcitonList": func})
+    # print(var)
+    return var
+

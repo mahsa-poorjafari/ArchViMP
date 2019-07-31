@@ -24,12 +24,14 @@ def trace_vis(request):
     print("CURRENT_TIME: ", settings.CURRENT_TIME)
     # Get all existing trace files
     dir_trace_files = os.path.join(settings.MEDIA_ROOT, "TraceFiles")
-    existing_trace_files = [f for f in os.listdir(dir_trace_files)]
+    existing_trace_files = [f if '.txt' in f else '' for f in os.listdir(dir_trace_files)]
+    print(existing_trace_files)
     context['existing_trace_files'] = existing_trace_files
 
     # get all existing shared variable files
     dir_shvar_files = os.path.join(settings.MEDIA_ROOT, "SharedVariablesFiles")
-    existing_shvar_files = [f for f in os.listdir(dir_shvar_files)]
+    existing_shvar_files = [f if '.txt' in f else '' for f in os.listdir(dir_shvar_files)]
+    print(existing_shvar_files)
     context['existing_shvar_files'] = existing_shvar_files
 
     context['trace_error'] = ""
@@ -156,14 +158,16 @@ def logical_data_l0(request):
     shared_variables_names = get_all_shared_var_names(b_parameter)
 
     data_types_vars = get_data_types(b_parameter)
-    # print("\n data_types_vars=>  ", data_types_vars)
+    data_types_names = list(data_types_vars.keys())
+    print("\n data_types_vars=>  ", data_types_vars.keys())
 
     return render(request, 'logical_data_L0.html', {'data_types': data_types_vars,
                                                     'shared_variables': shared_variables_names,
                                                     'title_name': which_way,
                                                     'file_path': trace_file,
                                                     'raw_file_name': file_name,
-                                                    'href_id': b_parameter})
+                                                    'href_id': b_parameter,
+                                                    'data_types_names': data_types_names})
 
 
 def logical_comp(request):
@@ -206,8 +210,11 @@ def logical_data_l1(request):
     # print("trace_file=>  ", trace_file)
     shared_variables_names = get_all_shared_var_names(b_parameter)
     struct_vars_groups = get_var_struct(shared_variables_names)
+    struct_names = list(struct_vars_groups.keys())
+    struct_names.remove("variables")
     variables = {"variables": struct_vars_groups.pop("variables")}
     return render(request, 'logical_data_L1.html', {'struct_vars': struct_vars_groups,
+                                                    'struct_names': struct_names,
                                                     'variable_list': variables,
                                                     'title_name': which_way,
                                                     'file_path': trace_file,
@@ -413,7 +420,7 @@ def op_funcs_l2(request):
     # print("shared_vars_names=   ", shared_vars_names)
     all_func_body_in_thread = get_functions_with_body(trace_file, threads)
     print("================= \n")
-    print(all_func_body_in_thread)
+    # print(all_func_body_in_thread)
     thread_function_shared_var = {}
     for t, fun_list in all_func_body_in_thread.items():
         for fun, body in fun_list.items():
@@ -421,6 +428,40 @@ def op_funcs_l2(request):
             funcitons_shared_vars_nonone = list(filter(partial(is_not, None), funcitons_shared_vars))
             if len(funcitons_shared_vars_nonone) > 0:
                 thread_function_shared_var.update({t: {fun: funcitons_shared_vars_nonone}})
-    print(thread_function_shared_var)
+    # print(thread_function_shared_var)
     return render(request, 'ld_l2_operation_functions.html', {'title_name': which_way,
                                                               'thread_function_shared_var': thread_function_shared_var})
+
+
+def functions_ld_l2(request):
+    logical_decision_file = None
+    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File=>   " + file_name
+    else:
+        logical_decision_file = get_logical_decision_file_path(b_parameter)
+        trace_file = get_trace_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+    threads = get_threads(trace_file)
+    # all funcitons that are exist
+    all_functions = get_all_functions(logical_decision_file)
+    # first functions that threads execute
+    lc_functions = get_lc_functions(logical_decision_file)
+    # list of nested functions
+    [all_functions.remove(lc_f) if lc_f in all_functions else None for lc_f in lc_functions]
+    nested_functions = all_functions
+    # print(nested_functions)
+    variables_execution_block = get_vars_exe_block(logical_decision_file)
+    logical_data_funciton = {}
+    for f in nested_functions:
+        function_access_var = {}
+        [function_access_var.update({v['varName'].split(".")[0]: "logicalData"} if "." in v['varName']
+                                    else {v['varName']: "variable"})
+         if f in v['funcitonList'] else None for k, v in variables_execution_block.items()]
+        print(f)
+        # function_access_var = remove_dups(function_access_var)
+        logical_data_funciton.update({f: function_access_var})
+    return render(request, 'logical_data_l2_funcitons.html', {'title_name': which_way,
+                                                              'logical_data_funciton': logical_data_funciton})
