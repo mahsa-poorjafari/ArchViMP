@@ -32,14 +32,15 @@
     <div id="tab02" class="tab-contents">
         <div class="col-md-12 text_container" style="display: none" id="logical_comp_textual">
             <ul class="list_level0">
-                {% for t, f in thread_function.items %}
+                {% for t, f_list in thread_function.items %}
                     <li class="li-list_level0">
                         <span>{{ t }}</span>
                         <ul class="list_level1">
-                            <li class="li-list_level1" >
-                                {{ f }}
-                            </li>
-
+                            {% for f in f_list %}
+                                <li class="li-list_level1" >
+                                    {{ f }}
+                                </li>
+                            {% endfor %}
                         </ul>
                     </li>
 

@@ -5,6 +5,20 @@ from logical_vis.logical_data_inputs import *
 import itertools
 
 
+def get_b_parameter(request):
+    file_name = None
+    b_parameter = request.GET.get('b', "ThreadFourFunction")
+    if b_parameter == "UPLOADED":
+        file_name = request.GET.get('FileName')
+        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
+        which_way = b_parameter + " File"
+    else:
+        trace_file = get_trace_file_path(b_parameter)
+        which_way = b_parameter + " Benchmark"
+
+    return [b_parameter, trace_file, which_way, file_name]
+
+
 def remove_dups(a_list):
     # Remove Duplicates
     var_thr_dict = dict.fromkeys(a_list)
@@ -21,42 +35,30 @@ def get_file_records(file_path):
 
 
 def get_first_function(t, trace_file):
-    with open(trace_file, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        if "Main_" in t:
-            # print("t=>  ", t)
-            b = t.split('_')
-            csv_file.seek(0, 0)
-            thread_functioncall_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and
-                                                row[1].lstrip() == b[1], csv_reader)
-            #                             and "CONSTANT;" in row[5].lstrip(), csv_reader)
+    csv_reader = get_file_records(trace_file)
+    thread_function_list = []
+    t_id = t.split("Main_")[1] if "Main_" in t else t
+    if "Main_" in t:
+        thread_functioncall_flist = list(filter(lambda r: "FUNCTIONCALL" in r[2] and
+                                          r[1] == t_id, csv_reader))
+        # print(thread_functioncall_flist)
+        thread_functioncall_list = thread_functioncall_flist[0] if len(thread_functioncall_flist) > 0 else None
+        thread_function_list.append(thread_functioncall_list[3])
+    else:
+        thread_functioncall_flist = list(filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and
+                                         row[1] == t_id and "CONSTANT;" in row[5], csv_reader))
 
-            thread_functioncall_flist = list(thread_functioncall_filter)
-            # print(thread_functioncall_flist)
+        # print("thread_functioncall_flist => \n", thread_functioncall_flist)
+        if "ROSACE" in trace_file:
+            thread_functioncall_list = thread_functioncall_flist[-1] \
+                if len(thread_functioncall_flist) > 0 else None
+        else:
             thread_functioncall_list = thread_functioncall_flist[0] \
                 if len(thread_functioncall_flist) > 0 else None
+        thread_function_list.append(thread_functioncall_list[3])
+    thread_function = {t: thread_function_list}
 
-            thread_function = {t: thread_functioncall_list[3] if thread_functioncall_list is not None else None}
-        else:
-            csv_file.seek(0, 0)
-            thread_functioncall_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and
-                                                row[1].lstrip() == str(t)
-                                                and row[5].lstrip() in ["LOCAL;CONSTANT;", "CONSTANT;LOCAL;",
-                                                "CONSTANT;CONSTANT;"],
-                                                csv_reader)
-
-            thread_functioncall_flist = list(thread_functioncall_filter)
-            # print("thread_functioncall_flist => \n", thread_functioncall_flist)
-            if "ROSACE" in trace_file:
-                thread_functioncall_list = thread_functioncall_flist[-1] \
-                    if len(thread_functioncall_flist) > 0 else None
-            else:
-                thread_functioncall_list = thread_functioncall_flist[0] \
-                    if len(thread_functioncall_flist) > 0 else None
-
-            thread_function = {t: thread_functioncall_list[3] if thread_functioncall_list is not None else None}
-    csv_file.close()
-    # print(t, "=>  ", thread_function)
+    print(t, "=>  ", thread_function)
     return thread_function
 
 
@@ -76,7 +78,7 @@ def get_thread_var_op(thr_func_dict, op, trace_file, shared_var_and_pointer):
         for tK, fV in thr_func_dict.items():
             thread_var_dict = {}
             # get the pure thread id
-            t_id = tK.strip("Main_") if "Main_" in tK else tK
+            t_id = tK.strip("Main_")[1] if "Main_" in tK else tK
             # get all records for this thead
             thread_records = filter(lambda row: row[1] == t_id and row[2] in op, csv_reader)
 
@@ -237,10 +239,8 @@ def group_over10_child(ld_lc):
 
 def get_time_stamp_list(trace_file):
     csv_reader_list = get_file_records(trace_file)
-
     time_stamps = map(lambda v: v[0], csv_reader_list)
     time_stamps_list = list(time_stamps)
-
     time_stamps_no_dups = remove_dups(time_stamps_list)
     time_stamps_no_dups.sort()
     return time_stamps_no_dups
@@ -429,7 +429,7 @@ def var_access_info(var_exe_block):
             var_id = r[3]
             var_name = r[2]
         elif r[1] == "Thread":
-            thr.append(r[2])
+            thr.append(r[3])
         elif r[1] == "Function":
             if r[2] not in func:
                 func.append(r[2])
@@ -446,4 +446,26 @@ def var_access_info(var_exe_block):
     # var.update({"funcitonList": func})
     # print(var)
     return var
+
+
+def get_thread_ids(report_file):
+    thread_ids = []
+    csv_reader_list = get_file_records(report_file)
+    thread_records = list(filter(lambda r: r[0] == "Thread", csv_reader_list))
+    [thread_ids.append("Main_" + r[2] if "main" in r[1] else r[2]) for r in thread_records]
+    thread_id_list = remove_dups(thread_ids)
+    print("thread_ids \n", thread_id_list)
+    return thread_ids
+
+
+def get_thread_function(t, report_file):
+    csv_reader_list = get_file_records(report_file)
+    t_id = t.strip("Main_") if "Main_" in t else t
+    parent_function = list(filter(lambda r: r[0] == "Thread", csv_reader_list))
+    thread_parent_function = []
+    [thread_parent_function.append(r[1]) if r[2] == t_id else None for r in parent_function]
+    thread_function_list = remove_dups(thread_parent_function)
+    print("\n", t_id, "    => ", thread_function_list)
+    return {t: thread_function_list}
+
 

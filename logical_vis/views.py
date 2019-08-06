@@ -122,15 +122,7 @@ def write_to_csv_file(data, data_name):
 
 
 def catastrophe(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File"
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
-
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     shared_variables_names = get_all_shared_var_names(b_parameter)
     # print(shared_variables_names)
     thread_ids = get_threads(trace_file)
@@ -145,15 +137,7 @@ def catastrophe(request):
 
 
 def logical_data_l0(request):
-    file_name = None
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File"
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
 
     shared_variables_names = get_all_shared_var_names(b_parameter)
 
@@ -171,22 +155,21 @@ def logical_data_l0(request):
 
 
 def logical_comp(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    file_name = None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File"
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
 
-    thread_list = get_threads(trace_file)
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
+    if b_parameter == "ThreadFourFunction":
+        logical_decision_file = get_logical_decision_file_path(b_parameter)
+        thread_list = get_thread_ids(logical_decision_file)
+    else:
+        thread_list = get_threads(trace_file)
     thr_func_dict = {}
     for t in thread_list:
-        thr_func = get_first_function(t, trace_file)
+        if b_parameter == "ThreadFourFunction":
+            thr_func = get_thread_function(t, logical_decision_file)
+        else:
+            thr_func = get_first_function(t, trace_file)
         thr_func_dict.update(thr_func)
-    # print("thr_func_list => ", thr_func_dict)
+    print("thr_func_list => ", thr_func_dict)
 
     return render(request, 'logical_component.html', {'threads': thread_list,
                                                       'thread_function': thr_func_dict,
@@ -197,17 +180,7 @@ def logical_comp(request):
 
 
 def logical_data_l1(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    file_name = None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File"
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
-
-    # print("trace_file=>  ", trace_file)
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     shared_variables_names = get_all_shared_var_names(b_parameter)
     struct_vars_groups = get_var_struct(shared_variables_names)
     struct_names = list(struct_vars_groups.keys())
@@ -240,17 +213,8 @@ def logical_data_l2_ungrouped(request):
 
 
 def logical_data_l3(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    file_name = None
     thr_func_dict = {}
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File"
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
-
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     ld_input_lc = []
     ld_output_lc = []
     ld_process_lc = []
@@ -297,14 +261,7 @@ def logical_data_l3(request):
 
 
 def ld_exe_path_l2(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File"
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
 
     shared_vars_names = get_all_shared_var_names(b_parameter)
     threads = get_threads(trace_file)
@@ -350,15 +307,7 @@ def ld_exe_path_l2(request):
 
 def time_line_view(request):
     thread_activity = {}
-    # file_name = None
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File=>   " + file_name
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
 
     threads = get_threads(trace_file)
     all_time_stamp = get_time_stamp_list(trace_file)
@@ -406,14 +355,7 @@ def time_line_view(request):
 
 
 def op_funcs_l2(request):
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File=>   " + file_name
-    else:
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
 
     threads = get_threads(trace_file)
     shared_vars_names = get_all_shared_var_names(b_parameter)
@@ -434,16 +376,10 @@ def op_funcs_l2(request):
 
 
 def functions_ld_l2(request):
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     logical_decision_file = None
-    b_parameter = request.GET.get('b') if (request.GET.get('b')) else None
-    if b_parameter == "UPLOADED":
-        file_name = request.GET.get('FileName')
-        trace_file = get_trace_file_path(b_parameter, file_name=file_name)
-        which_way = b_parameter + " File=>   " + file_name
-    else:
-        logical_decision_file = get_logical_decision_file_path(b_parameter)
-        trace_file = get_trace_file_path(b_parameter)
-        which_way = b_parameter + " Benchmark"
+    logical_decision_file = get_logical_decision_file_path(b_parameter)
+
     threads = get_threads(trace_file)
     # all funcitons that are exist
     all_functions = get_all_functions(logical_decision_file)

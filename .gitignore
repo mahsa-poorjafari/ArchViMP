@@ -5,3 +5,5 @@
 .env/
 .Uploaded_files/SharedVariablesFiles/*
 .Uploaded_files/TraceFiles/*
+.MultiThread_vis/__pycache__/*
+.logical_vis/__pycache__/*

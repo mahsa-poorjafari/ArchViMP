@@ -30,7 +30,7 @@ function main(container) {
             let threadList = document.getElementById("logical_comp_textual").getElementsByClassName("list_level0")[0].getElementsByClassName('li-list_level0');
             nodeStyle(graph, 'LogicalComp');
             configEdgeStyle(graph, "#000000");
-            let fW = 50;
+            let fW = 20;
             let fH = 100;
             let tW = 20;
             let tH = 300;
@@ -61,16 +61,22 @@ function main(container) {
                 }
                 // console.table([thrFunc, lcName, styleIdNode]);
                 nodeStyle(graph, styleIdNode);
-                let funcNode = graph.insertVertex(parent, funcId, thrFunc, fW, fH, 120, 80, styleIdNode);
-
+                let mxCells = graph.getChildVertices(graph.getDefaultParent());
+                let funcNode = null;
+                mxCells.forEach(function(node){
+                    console.log(node['style'].includes("LogicalComp") && node['value'] === thrFunc );
+                    if (node['style'].includes("LogicalComp") && node['value'] === thrFunc ){
+                        funcNode = node;
+                    }
+                });
+                if (funcNode === null)
+                    funcNode = graph.insertVertex(parent, funcId, thrFunc, fW, fH, 120, 80, styleIdNode);
                 fW += 150;
                 thrNode.target = funcNode;
                 graph.insertEdge(parent, null, null, thrNode, funcNode, 'dashed=0;' +
                             'endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=0;');
             }
-
-        }
-        finally {
+        }finally {
             //console.table( graph.getChildVertices(graph.getDefaultParent()));
             graph.getModel().endUpdate();
 
