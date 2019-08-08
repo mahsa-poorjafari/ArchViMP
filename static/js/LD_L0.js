@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     main(graphContainer);
 });
 
-
 function main(container){
     // Checks if the browser is supported
     if (!mxClient.isBrowserSupported())
@@ -61,7 +60,6 @@ function main(container){
 
                 nodeSize = setNodeSize(dtText, 'dataType' );
                 nodeStyle(graph, 'dataType');
-
                 let dtNode = graph.insertVertex(parent, dtId, dtText, dtX, dtY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // let dtStList = dataTypes[i].getElementsByClassName("list_level1")[0].getElementsByClassName('li-list_level1');
                 dtY += 800;
@@ -69,8 +67,6 @@ function main(container){
                 for(let j = 0; j < dtStList.length; j++){
                     let firstElement = dtStList[j].firstElementChild;
                     let stText = firstElement.innerHTML;
-
-
                     if (stText !== "variables" && stText !== "variables ") {
                         drawChildLD(graph, parent, dtNode, firstElement, 'open', '0', j, ulrParam);
                     }else{

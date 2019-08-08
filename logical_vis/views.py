@@ -138,13 +138,9 @@ def catastrophe(request):
 
 def logical_data_l0(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
-
     shared_variables_names = get_all_shared_var_names(b_parameter)
-
     data_types_vars = get_data_types(b_parameter)
     data_types_names = list(data_types_vars.keys())
-    print("\n data_types_vars=>  ", data_types_vars.keys())
-
     return render(request, 'logical_data_L0.html', {'data_types': data_types_vars,
                                                     'shared_variables': shared_variables_names,
                                                     'title_name': which_way,
@@ -155,7 +151,7 @@ def logical_data_l0(request):
 
 
 def logical_comp(request):
-
+    logical_decision_file = ""
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     if b_parameter == "ThreadFourFunction":
         logical_decision_file = get_logical_decision_file_path(b_parameter)
@@ -169,8 +165,6 @@ def logical_comp(request):
         else:
             thr_func = get_first_function(t, trace_file)
         thr_func_dict.update(thr_func)
-    print("thr_func_list => ", thr_func_dict)
-
     return render(request, 'logical_component.html', {'threads': thread_list,
                                                       'thread_function': thr_func_dict,
                                                       'title_name': which_way,
@@ -218,7 +212,7 @@ def logical_data_l3(request):
     ld_input_lc = []
     ld_output_lc = []
     ld_process_lc = []
-    threads = get_threads(trace_file)
+
     shared_vars_names = get_all_shared_var_names(b_parameter)
     struct_vars_groups = get_var_struct(shared_vars_names)
     # remove brackets for pointers in order to catch their records
@@ -226,30 +220,36 @@ def logical_data_l3(request):
     [shared_var_and_pointer.append(p.replace("{", "").replace("}", "")) if "{" in p and "}" in p else
      shared_var_and_pointer.append(p) for p in shared_vars_names]
 
-    for t in threads:
-        thr_func = get_first_function(t, trace_file)
-        thr_func_dict.update(thr_func)
+    if b_parameter == "ThreadFourFunction":
+        logical_decision_file = get_logical_decision_file_path(b_parameter)
+        thread_list = get_thread_ids(logical_decision_file)
+        for t in thread_list:
+            thr_func = get_thread_function(t, logical_decision_file)
+            thr_func_dict.update(thr_func)
+    else:
+        thread_list = get_threads(trace_file)
+        for t in thread_list:
+            thr_func = get_first_function(t, trace_file)
+            thr_func_dict.update(thr_func)
 
+
+    print("\n++++++++++++++++++++++++++++\n")
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(thr_func_dict, ["LOAD"], trace_file, shared_var_and_pointer)
-    print("\n thread_var_input =  ", thread_var_input)
+
     # Get the variables that are threads Output
     thread_var_output = get_thread_var_op(thr_func_dict, ["STORE"], trace_file, shared_var_and_pointer)
+
     # Get the variables that are threads Processed
     thread_var_process = get_thread_var_op(thr_func_dict, ["LOAD", "STORE"], trace_file, shared_var_and_pointer)
-    if len(struct_vars_groups) > 9:
+
+    if len(shared_vars_names) > 5:
         ld_input_lc = create_ld_thread_op(thread_var_input, "Input_")
+
         ld_output_lc = create_ld_thread_op(thread_var_output, "Output_")
         # ld_output_g = group_over10_child(ld_output_lc)
         ld_process_lc = create_ld_thread_op(thread_var_process, "Process_")
         # ld_process_g = group_over10_child(ld_process_lc)
-
-    thread_list = get_threads(trace_file)
-    thr_func_dict = {}
-    for t in thread_list:
-        thr_func = get_first_function(t, trace_file)
-        thr_func_dict.update(thr_func)
-
     return render(request, 'logical_data_L3.html', {'title_name': which_way, 'file_path': trace_file,
                                                     'raw_file_name': file_name, 'href_id': b_parameter,
                                                     'ld_input_lc': ld_input_lc, 'ld_output_lc': ld_output_lc,
@@ -384,11 +384,16 @@ def functions_ld_l2(request):
     # all funcitons that are exist
     all_functions = get_all_functions(logical_decision_file)
     # first functions that threads execute
+    print("\n all_functions...........\n")
+    print(all_functions)
     lc_functions = get_lc_functions(logical_decision_file)
+    print("\n lc_functions...........\n")
+    print(lc_functions)
     # list of nested functions
     [all_functions.remove(lc_f) if lc_f in all_functions else None for lc_f in lc_functions]
     nested_functions = all_functions
-    # print(nested_functions)
+    print("\n nested_functions...........\n")
+    print(nested_functions)
     variables_execution_block = get_vars_exe_block(logical_decision_file)
     logical_data_funciton = {}
     for f in nested_functions:
@@ -396,7 +401,7 @@ def functions_ld_l2(request):
         [function_access_var.update({v['varName'].split(".")[0]: "logicalData"} if "." in v['varName']
                                     else {v['varName']: "variable"})
          if f in v['funcitonList'] else None for k, v in variables_execution_block.items()]
-        print(f)
+        # print(f)
         # function_access_var = remove_dups(function_access_var)
         logical_data_funciton.update({f: function_access_var})
     return render(request, 'logical_data_l2_funcitons.html', {'title_name': which_way,

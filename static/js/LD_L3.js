@@ -83,11 +83,20 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
             let threadsList = [];
             for (let i=0; i< threadsListContainer.length; i++){
                 let lcId = 'LC_' + i;
-                let logicalComp = threadsListContainer[i].innerHTML;
+                let logicalComp = threadsListContainer[i].getElementsByTagName("li")[0].innerText;
                 threadsList.push(logicalComp);
                 nodeSize = setNodeSize(logicalComp, 'LogicalComp');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
-                let lcNode = graph.insertVertex(parent, lcId, logicalComp, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                let mxCells =  graph.getChildVertices(graph.getDefaultParent());
+                let nodeCounter = 0;
+                mxCells.forEach(function (node) {
+                    if (node['value'] === logicalComp)
+                        nodeCounter++;
+                });
+                if (nodeCounter === 0){
+                    graph.insertVertex(parent, lcId, logicalComp, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                    lcY += 300;
+                }
                 graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                     let cell = evt.getProperty('cell');
                     if (cell['style'].includes("LogicalComp")){
@@ -95,7 +104,6 @@ function allOperations(container, txt, InContainer, OutContainer, PContainer) {
                     }
                     evt.consume();
                 });
-                lcY += 300;
             }
             let listOfTechnicalData = [];
             let listOfShareVars = document.getElementById('shared_vars_holder').getElementsByClassName('shared_var_list')[0];
@@ -171,9 +179,7 @@ function mainGrouped(container, txt, op) {
         // Gets the default parent for inserting new cells. This
         // is normally the first child of the root (ie. layer 0).
         let parent = graph.getDefaultParent();
-
-
-
+        graph.keepEdgesInBackground = true;
         // Highlights the vertices when the mouse enters
         let highlight = new mxCellTracker(graph, '#337ab7');
 
@@ -404,13 +410,12 @@ function logicalDataLevel1(container, txt, op) {
         let parent = graph.getDefaultParent();
         // Highlights the vertices when the mouse enters
         let highlight = new mxCellTracker(graph, '#337ab7');
-
+        graph.keepEdgesInBackground = true;
         // Adds cells to the model in a single step
         graph.getModel().beginUpdate();
         try {
             let lcX = null;
             let lcY = null;
-
             configEdgeStyle(graph, "#000000");
 
             let ldL2 = txt.getElementsByClassName('list_level0')[0].getElementsByClassName('li-list_level0');
@@ -419,34 +424,35 @@ function logicalDataLevel1(container, txt, op) {
                 let lcId = 'LDL2_' + op + '_' + i;
                 let lcFirstElement = ldL2[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
+                console.log("ZZZZZZZZZZ   " + lcText);
                 nodeSize = setNodeSize(lcText, 'logicalData_' + op);
                 let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
                 let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
-                console.log(ldL2List.length);
+                // console.log(ldL2List.length);
                 nodeStyle(graph,  nodeSize['nodeIdText']);
                 // positioning the op_group logical data
                 if (i === 0 && lcText.length > 20){
-                    console.log("reached i===0 && >20");
-                    lcX = 500;
+                    // console.log("reached i===0 && >20");
+                    lcX = 400;
                     lcY = 400;
                 }else if (i === 0 ){
-                    console.log("reached i===0");
-                    lcX = 500;
-                    lcY = 300;
+                    // console.log("reached i===0");
+                    lcX = 300;
+                    lcY = 250;
                 }else if ( lcText.length > 20 && ldL2List.length > 20){
-                    console.log("(i+1)%2 === 0 and >20");
+                    // console.log("(i+1)%2 === 0 and >20");
                     lcY += 800;
                     lcX = 600;
                 }else if (lcText.length > 20 && ldL2List.length <= 20){
-                    console.log("(i+1)%2 === 0 ");
-                    lcX = 500;
-                    lcY += 500;
+                    // console.log("(i+1)%2 === 0 ");
+                    lcX = 300;
+                    lcY += 600;
                 }else {
-                    console.log("reached else");
-                    lcX = 500;
-                    lcY += 400;
+                    // console.log("reached else");
+                    lcX = 300;
+                    lcY += 600;
                 }
-                console.log(lcText +"   " + lcText.length + "  -  " + lcX +"--"+ lcY + "--i--" + i);
+                // console.log(lcText +"   " + lcText.length + "  -  " + lcX +"--"+ lcY + "--i--" + i);
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // lcY = (i === 0 && lcText.length > 20)? 400 : (lcText.length > 20) ? lcY + 700: 200;
 

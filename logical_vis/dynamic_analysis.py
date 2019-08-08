@@ -57,8 +57,6 @@ def get_first_function(t, trace_file):
                 if len(thread_functioncall_flist) > 0 else None
         thread_function_list.append(thread_functioncall_list[3])
     thread_function = {t: thread_function_list}
-
-    print(t, "=>  ", thread_function)
     return thread_function
 
 
@@ -70,50 +68,37 @@ def get_var_names(var_list, op):
 
 
 def get_thread_var_op(thr_func_dict, op, trace_file, shared_var_and_pointer):
+    print("\n __________________", op, "___________")
     thread_var_op = {}
+    # print("shared_var_and_pointer   ", shared_var_and_pointer)
     # What I need is?: To show the inputs-LD of each threads
     # For that, I built an dict: {'first function of each thread as the key': [list of variables or structs]}
-    with open(trace_file) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for tK, fV in thr_func_dict.items():
-            thread_var_dict = {}
-            # get the pure thread id
-            t_id = tK.strip("Main_")[1] if "Main_" in tK else tK
-            # get all records for this thead
-            thread_records = filter(lambda row: row[1] == t_id and row[2] in op, csv_reader)
+    csv_reader = get_file_records(trace_file)
+    for tK, fV in thr_func_dict.items():
+        thread_var_dict = {}
+        # get the pure thread id
+        t_id = tK.strip("Main_") if "Main_" in tK else tK
+        # get all records for this thead from Trace file and Filter the records based on operation
+        thread_records = filter(lambda row: row[1] == t_id and row[2] in op, csv_reader)
+        thread_pointers_list = list(filter(lambda row: row[4] in shared_var_and_pointer or
+                                    row[3] in shared_var_and_pointer, list(thread_records)))
+        # print("\n thread_pointers_list---  ", thread_pointers_list)
+        # Some of the Pointers don't have any names, So I assigned their memory address to specify them as well as/
+        # fill the gap.
+        thread_access_pointer_map = map(lambda row: ["{" + row[4] + "}" if row[3] is "" else row[3], row[0], row[1],
+                                        row[2], row[5]], thread_pointers_list)
+        thread_access_pointer_list = list(thread_access_pointer_map)
+        # print("thread_access_pointer_list====>   ", thread_access_pointer_list)
+        if len(shared_var_and_pointer) > 1:
+            # if it is struct, only show it as logicalData
+            # need to specify the type of elements
+            thread_vars_list = [[v[0].split(".")[0], v[1], v[2], v[3], "logicalData"] if "." in v[0]
+                                else [v[0], v[1], v[2], v[3], "variable"] for v in thread_access_pointer_list]
 
-            # Filter the records based on operation
-            thread_pointers_filter = filter(lambda row: row[4] in shared_var_and_pointer or
-                                            row[3] in shared_var_and_pointer, list(thread_records))
-            thread_pointers_list = list(thread_pointers_filter)
-            # Some of the Pointers don't have any names, So I assigned their memory address to specify them as well as/
-            # fill the gap.
-            thread_access_pointer_map = map(lambda row: ["{" + row[4] + "}" if row[3] is "" else row[3], row[0], row[1],
-                                            row[2], row[5]], thread_pointers_list)
-            thread_access_pointer_list = list(thread_access_pointer_map)
-            # print(thread_access_pointer_list)
-
-            csv_file.seek(0, 0)
-
-            # thread_vars_filter = filter(lambda row: row[3] in shared_var_and_pointer, list(thread_records))
-            # list_thread_vars = list(thread_vars_filter)
-            # thread_access_vars_map = map(lambda row: [row[3], row[0], row[1], row[2], row[5]], list_thread_vars)
-            # thread_access_vars_list = list(thread_access_vars_map)
-            # [thread_access_vars_list.append(a) for a in thread_access_pointer_list]
-            # print(thread_access_vars_list)
-            # csv_file.seek(0, 0)
-            if len(shared_var_and_pointer) > 1:
-                # if it is struct, only show it as logicalData
-                # need to specify the type of elements
-                thread_vars_list = [[v[0].split(".")[0], v[1], v[2], v[3], "logicalData"] if "." in v[0]
-                                    else [v[0], v[1], v[2], v[3], "variable"] for v in thread_access_pointer_list]
-
-                # remove duplicate rows
-                thread_var_dict.update({i[0]: i[4] for i in thread_vars_list})
-
-            thread_var_op.update({fV: thread_var_dict})
-
-    csv_file.close()
+            # remove duplicate rows
+            thread_var_dict.update({i[0]: i[4] for i in thread_vars_list})
+        # TO DO... fV[0]
+        thread_var_op.update({fV[0]: thread_var_dict})
     return thread_var_op
 
 
@@ -171,18 +156,20 @@ def get_variable_file_path(benchmark_name):
     switcher = {
         "ROSACE": "benchmark_traces/ROSACE/SharedVariablesRosace.txt",
         "ThreadFourFunction":
-            "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsLLVMWitFunctionsReturnSharedVariables.txt",
+            "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsSharedVariables.txt",
     }
     return switcher.get(benchmark_name, "Invalid Value")
 
 
 def get_all_shared_var_names(benchmark_name):
+    var_names_list = []
     var_file_path = get_variable_file_path(benchmark_name)
-    with open(var_file_path, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        var_names = map(lambda var: var[1] if var[0] is "" else var[0], csv_reader)
-        var_names_list = list(var_names)
-    csv_file.close()
+    # print("var_file_path \n", var_file_path)
+    csv_reader = get_file_records(var_file_path)
+    # print("Variables \n", csv_reader)
+    [var_names_list.append(r[1] if r[0] is "" else r[0]) if len(r) > 0 else None for r in csv_reader]
+    # var_names = map(lambda var: var[1] if var[0] is "" else var[0], csv_reader)
+    # var_names_list = list(var_names)
     return var_names_list
 
 
@@ -381,7 +368,7 @@ def get_all_functions(logical_decision_file):
     function_records = list(filter(lambda r: r[0] == "Function", csv_reader_list))
 
     all_function_list = {f[1] for f in function_records}
-    print(all_function_list)
+    # print(all_function_list)
     return all_function_list
 
 
@@ -389,8 +376,8 @@ def get_lc_functions(logical_decision_file):
     csv_reader_list = get_file_records(logical_decision_file)
     function_records = list(filter(lambda r: r[0] == "Thread", csv_reader_list))
 
-    lc_function_list = {f[2] for f in function_records}
-    print(lc_function_list)
+    lc_function_list = {f[1] for f in function_records}
+    # print(lc_function_list)
     return lc_function_list
 
 
@@ -411,7 +398,7 @@ def get_vars_exe_block(logical_decision_file):
         var_infos = var_access_info(var_exe_block)
         variable_access_infos.update(var_infos)
         # vars_info.update({var_record[3]: var_record[2], "exe_block": var_exe_block})
-    print(variable_access_infos)
+    # print(variable_access_infos)
     return variable_access_infos
 
 
@@ -454,18 +441,23 @@ def get_thread_ids(report_file):
     thread_records = list(filter(lambda r: r[0] == "Thread", csv_reader_list))
     [thread_ids.append("Main_" + r[2] if "main" in r[1] else r[2]) for r in thread_records]
     thread_id_list = remove_dups(thread_ids)
-    print("thread_ids \n", thread_id_list)
-    return thread_ids
+    # print("thread_ids \n", thread_id_list)
+    return thread_id_list
 
 
 def get_thread_function(t, report_file):
+    # print("Thread ID   ", t)
+    parent_function = []
     csv_reader_list = get_file_records(report_file)
     t_id = t.strip("Main_") if "Main_" in t else t
-    parent_function = list(filter(lambda r: r[0] == "Thread", csv_reader_list))
+    [parent_function.append(r[1]) if r[0] == "Thread" and r[2] == t_id else None for r in csv_reader_list]
+    # parent_function = list(filter(lambda r: r[0] == "Thread" and r[2] == t_id, csv_reader_list))
+
     thread_parent_function = []
-    [thread_parent_function.append(r[1]) if r[2] == t_id else None for r in parent_function]
-    thread_function_list = remove_dups(thread_parent_function)
-    print("\n", t_id, "    => ", thread_function_list)
+    # [thread_parent_function.append(r[1]) if r[2] == t_id else None for r in parent_function]
+    # thread_function_list = remove_dups(thread_parent_function)
+    thread_function_list = remove_dups(parent_function)
+    # print(t_id, "    => ", thread_function_list)
     return {t: thread_function_list}
 
 

@@ -62,7 +62,7 @@ function mainViewTimeLine(container, txt) {
                     lcNode = graph.insertVertex(parent, lcId, lcText, lcW, lcY, 100, 60, 'thread');
                     childW = lcW;
                 }
-                lcW += 300;
+                lcW += 150;
                 let sharedVarsAccess =  lcs[i].getElementsByClassName('list_level1')[0].getElementsByClassName('li-list_level1');
                 for (let accessList of sharedVarsAccess){
                     let accessTime = accessList.firstElementChild.innerHTML.replace(/_/g, "\n");

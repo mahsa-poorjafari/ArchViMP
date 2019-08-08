@@ -53,7 +53,6 @@ function setNodeSize(nodeText, nodeIdStyle){
     let nodeIdText = null;
     let Width = null;
     let Height = null;
-    console.log(nodeIdStyle);
     if (nodeText.length > 20){
         nodeIdText = nodeIdStyle + '_big';
         if(nodeIdStyle.search(/_R/)){
@@ -313,14 +312,15 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
     let Text = "";
     let nodeType = "";
     let gName = "";
+    let pNodeText = "";
     if (pNode !== null){
+        pNodeText = pNode['value'];
         pX = pNode['geometry']['x'];
         pY = pNode['geometry']['y'];
     }else{
         chX = pX;
         chY = pY;
     }
-    let pNodeText = pNode['value'];
     for (let j = 0; j < childList.length; j++) {
 
         let Text = childList[j].getElementsByClassName('key')[0].innerHTML;
@@ -349,10 +349,8 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
         let nodeId = 'var_'+ op +'_' + j;
         nodeStyle(graph,  nodeSize['nodeIdText']);
         let values = [];
-
         // set the right position based on the previous node
         mxCell =  graph.getChildVertices(graph.getDefaultParent());
-
         let graph_child_num = mxCell.length;
         if (graph_child_num === 1){
             // means it is the first child
@@ -360,27 +358,27 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
                 values[0] = pX;
                 values[1] = pY - 200;
             } else {
-                values[0] = pX + 50;
-                values[1] = pY - 300;
+                values[0] = pX;
+                values[1] = pY - 200;
             }
-
         }else{
-
-            let indx = graph_child_num-1;
-            let PreviousNodeVal = mxCell[indx]['value'];
-            bX = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['x'] + 50: mxCell[indx]['geometry']['x'];
-            bY = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['y'] + 100 : mxCell[indx]['geometry']['y'];
-
+            let indx = j;
+            pX = (pNodeText.length > 20 && j > 4) ? pX + 100 : pX;
+            // let indx = graph_child_num-1;
+            // let PreviousNodeVal = mxCell[indx]['value'];
+            // bX = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['x'] + 50: mxCell[indx]['geometry']['x'];
+            // bY = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['y'] + 100 : mxCell[indx]['geometry']['y'];
+            // console.log(indx, pX, pY);
             if (Text.length > 20) {
-                values = setPositionLDL2Big(bX, bY, indx);
+                values = setPositionLDL2Big(pX, pY, indx);
             }else {
-                values = setPositionLDL2(bX, bY, indx);
+                values = setPositionLDL2(pX, pY, indx);
             }
         }
         chX = values[0];
         chY = values[1];
 
-        // console.log(Text + " => " + chX +" - "+ chY + " " + j);
+        console.log(Text + " => " + chX +" - "+ chY + " " + j);
         if (Text !== ""){
             let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
             chNode.target = pNode;

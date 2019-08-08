@@ -348,25 +348,44 @@ function setPositionLDL2(pX, pY , indx) {
     let chY = pY;
     switch (indx) {
         case 0:
+            chX = pX;
+            chY = pY - 200;
+            break;
         case 1:
+            chX = pX - 200;
+            chY = pY - 200;
+            break;
         case 2:
-            chX = pX - 150;
-            chY = pY + 200;
+            chX = pX - 200;
+            chY = pY - 50;
             break;
         case 3:
-            chX = pX;
-            chY = pY + 200;
+            chX = pX - 200;
+            chY = pY + 100;
+            break;
         case 4:
+            chX = pX + 200;
+            chY = pY - 200;
+            break;
         case 5:
+            chX = pX + 250;
+            chY = pY - 100;
+            break;
         case 6:
+            chX = pX + 250;
+            chY = pY;
+            break;
         case 7:
-            chX = pX + indx * 30;
-            chY = pY + 150;
+            chX = pX + 200;
+            chY = pY + 100;
             break;
         case 8:
+            chX = pX;
+            chY = pY + 200;
+            break;
         case 9:
-            chX = pX + 100;
-            chY = pY + 100;
+            chX = pX + 150;
+            chY = pY;
             break;
         case 10:
             chX = pX + 200;
@@ -394,9 +413,10 @@ function setPositionLDL2(pX, pY , indx) {
         case 18:
         case 19:
         case 20:
-            chX = pX;
+            chX = pX + indx * 10 + 100;
             chY = pY - 100;
             break;
+
     }
 
     return [chX, chY];

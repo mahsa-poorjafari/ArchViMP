@@ -212,12 +212,17 @@
             {% for t, f in logical_comps.items %}
                 <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
                     <span>{{ t }}</span>
-                    <p class="thr_func">{{ f }}</p>
+                    <ul class="thr_func">
+                        {% for lc in f %}
+                            <li>{{ lc }}</li>
+                        {% endfor %}
+                    </ul>
                 </li>
             {% endfor %}
         </ul>
     </div>
-    <div class="col-md-12 text_container" style="display: block" id="thread_var_input">
+    <div class="col-md-12 text_container" style="display: none" id="thread_var_input">
+        <p>Input</p>
         <ul class="thread_list">
             {% for lc, td in thread_var_input.items %}
                 <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
@@ -230,7 +235,8 @@
         </ul>
     </div>
 
-    <div class="col-md-12 text_container" style="display: block" id="thread_var_process">
+    <div class="col-md-12 text_container" style="display: none" id="thread_var_process">
+        <p>Process</p>
         <ul class="thread_list">
             {% for lc, td in thread_var_process.items %}
                 <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">
@@ -242,7 +248,8 @@
             {% endfor %}
         </ul>
     </div>
-    <div class="col-md-12 text_container" style="display: block" id="thread_var_output">
+    <div class="col-md-12 text_container" style="display: none" id="thread_var_output">
+        <p>Output</p>
         <ul class="thread_list">
             {% for lc, td in thread_var_output.items %}
                 <li class="li_thread_id col-4" style="border-bottom: 1px solid #2e6da4;">

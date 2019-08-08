@@ -27,22 +27,22 @@ def get_var_struct(shared_vars):
 def get_data_types(benchmark_name):
     var_file_path = get_variable_file_path(benchmark_name)
     data_types_vars = {}
-    with open(var_file_path, "r") as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        vars_data_type = map(lambda i: i[2], csv_reader)
-        vars_data_type_list = list(vars_data_type)
-        vars_data_type = remove_dups(vars_data_type_list)
-
-        # print("data_types", data_types)
-        for dt in vars_data_type:
-            csv_file.seek(0, 0)
-            var_names = map(lambda var: var[1] if var[0] is " " else var[0] if var[2] == dt else None, csv_reader)
-            var_names_not_none = filter(partial(is_not, None), var_names)
-            var_names_not_none = filter(partial(is_not, ''), var_names_not_none)
-            var_names = remove_dups(list(var_names_not_none))
-            var_struct_list = get_var_struct(var_names)
-            data_types_vars.update({dt: var_struct_list})
-    csv_file.close()
+    vars_data_type_list = []
+    csv_reader = get_file_records(var_file_path)
+    [vars_data_type_list.append(r[2]) if len(r) > 0 else None for r in csv_reader]
+    vars_data_type = remove_dups(vars_data_type_list)
+    print("data_types", vars_data_type)
+    for dt in vars_data_type:
+        var_names = []
+        [var_names.append(var[1] if var[0] is "" else var[0]) if var[2] == dt and len(var) > 0 else None
+         for var in csv_reader]
+        # var_names = map(lambda var: var[1] if var[0] is " " else var[0] if var[2] == dt else None, csv_reader)
+        # var_names_not_none = filter(partial(is_not, None), var_names)
+        # var_names_not_none = filter(partial(is_not, ''), var_names_not_none)
+        # var_names = remove_dups(list(var_names_not_none))
+        print("var_names \n", var_names)
+        var_struct_list = get_var_struct(var_names)
+        data_types_vars.update({dt: var_struct_list})
     return data_types_vars
 
 

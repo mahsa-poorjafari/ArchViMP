@@ -67,10 +67,11 @@ function main(container) {
                         stY = 300;
                     }
                     else if (i !== 0 && structList.length <= 4){
-                        stX += 500;
-                    }
-                    else if (i !== 0 && structList.length > 4 && (i-1)%2 === 0){
                         stX += 700;
+                    }
+                    else if (i !== 0 && structList.length > 4 && i%2 === 0){
+                        stX = 300;
+                        stY += 500;
                     }else{
                         stY += 400;
                         stX = 200;
