@@ -3,6 +3,7 @@ from operator import is_not
 from functools import partial
 from logical_vis.logical_data_inputs import *
 import itertools
+from itertools import cycle
 
 
 def get_b_parameter(request):
@@ -32,6 +33,23 @@ def get_file_records(file_path):
         csv_reader_list = list(csv_reader)
     csv_file.close()
     return csv_reader_list
+
+
+def get_logical_components(logical_decision_file):
+    csv_reader = get_file_records(logical_decision_file)
+    thread_rows = []
+    logical_components = {}
+    logical_components_dic = {}
+
+    # Filter only rows that have Thread infos
+    [thread_rows.append(r) if r[0] == "Thread" else None for r in csv_reader]
+    [logical_components.update({t[1]: ''}) for t in thread_rows]
+    for lc in logical_components:
+        thread_ids = []
+        [thread_ids.append(t[2]) if t[1] == lc else None for t in thread_rows]
+        thread_ids = remove_dups(thread_ids)
+        logical_components_dic.update({lc: thread_ids})
+    return logical_components_dic
 
 
 def get_first_function(t, trace_file):
@@ -359,23 +377,103 @@ def retrieve_exe_path(exe_path_set):
         if len(var_exe_path) < 0 or item not in var_exe_path:
             var_exe_path.append(item)
     print("exe_path =>  ", var_exe_path)
-
     return exe_path
 
 
 def get_all_functions(logical_decision_file):
     csv_reader_list = get_file_records(logical_decision_file)
     function_records = list(filter(lambda r: r[0] == "Function", csv_reader_list))
-
     all_function_list = {f[1] for f in function_records}
     # print(all_function_list)
     return all_function_list
 
 
+def get_all_logical_decisions(logical_decision_file):
+    csv_reader_list = get_file_records(logical_decision_file)
+    [r.insert(0, indx) for indx, r in enumerate(csv_reader_list)]
+    logical_decision_dic = {}
+    log_dec_list = []
+    for indx, r in enumerate(csv_reader_list):
+        log_dec_names = {}
+        if r[1] == "Accesses" and r[2] == "within":
+            row_number = r[0]
+            logical_decision_rows = logical_decision_block(csv_reader_list[row_number:])
+            if logical_decision_rows != 1:
+                for ld_indx, ld in enumerate(logical_decision_rows):
+                    if ld[1] == "logicalDecision":
+                        var_list, thread_list, file_name = get_logical_decision_vars(logical_decision_rows[ld_indx+1:])
+                        log_dec_names.update({''.join(ld[1:]): {"START": ld[2],
+                                                                "END": ld[3],
+                                                                "var_list": var_list,
+                                                                "thread_list": thread_list,
+                                                                "file_name": file_name
+                                                                }
+                                              })
+                log_dec_list.append(log_dec_names)
+    # print("log_dec_list =>  ", log_dec_list)
+    Gnames = []
+    [Gnames.append(list(ld_item.keys())[0] if len(list(ld_item.keys())) == 1 else list(ld_item.keys())[0])
+     for ld_item in log_dec_list]
+    Gnames = remove_dups(Gnames)
+    # print(Gnames)
+    logical_decision_groups = {}
+    for ld_gname in Gnames:
+        ld_variable_list = []
+        ld_thread_list = []
+        ld_file_name_list = []
+        # print("\n ld_gname : ", ld_gname)
+        for ld in log_dec_list:
+            if list(ld.keys())[0] == ld_gname:
+                ld_variable_list.append(list(ld.values())[0]['var_list'][0]
+                                        if len(list(ld.values())[0]['var_list']) == 1
+                                        else list(ld.values())[0]['var_list'])
+                ld_thread_list.append(list(ld.values())[0]['thread_list'][0]
+                                      if len(list(ld.values())[0]['thread_list']) == 1
+                                      else list(ld.values())[0]['thread_list'])
+                ld_file_name_list.append(list(ld.values())[0]['file_name'][0]
+                                         if len(list(ld.values())[0]['file_name']) == 1
+                                         else list(ld.values())[0]['file_name'])
+        ld_variable_list = remove_dups(ld_variable_list)
+        ld_thread_list = remove_dups(ld_thread_list)
+        ld_file_name_list = remove_dups(ld_file_name_list)
+
+        ld_name = ld_gname + '_' + ld_file_name_list[0]
+        logical_decision_dic.update({ld_name: {
+            "variable_list": ld_variable_list,
+            "thread_list": ld_thread_list
+        }})
+    print(logical_decision_dic)
+    return logical_decision_dic
+
+
+def logical_decision_block(a_list):
+    block = []
+    for r in a_list:
+        if r[1] not in ["Thread", "Variable", "Function"]:
+            block.append(r)
+        else:
+            # print(block)
+            return block
+    return 1
+
+
+def get_logical_decision_vars(ld_list):
+    # print("ld_list   \n ", ld_list)
+    var_list = []
+    thread_list = []
+    file_name = []
+    [var_list.append(item[4]) if item[1] not in ["Conditional", "logicalDecision"] else None for item in ld_list]
+    [thread_list.append(item[2]) if item[1] not in ["Conditional", "logicalDecision"] else None for item in ld_list]
+    [file_name.append(item[8]) if item[1] not in ["Conditional", "logicalDecision"] else None for item in ld_list]
+    var_list = remove_dups(var_list)
+    thread_list = remove_dups(thread_list)
+    file_name = remove_dups(file_name)
+    return var_list, thread_list, file_name
+
+
 def get_lc_functions(logical_decision_file):
     csv_reader_list = get_file_records(logical_decision_file)
     function_records = list(filter(lambda r: r[0] == "Thread", csv_reader_list))
-
     lc_function_list = {f[1] for f in function_records}
     # print(lc_function_list)
     return lc_function_list
@@ -386,7 +484,6 @@ def get_vars_exe_block(logical_decision_file):
     [r.insert(0, indx) for indx, r in enumerate(csv_reader_list)]
     variable_records = list(filter(lambda r: r[1] == "Variable", csv_reader_list))
     # print(variable_records)
-
     variable_access_infos = {}
     block_begin = None
     block_end = None

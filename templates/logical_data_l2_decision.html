@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <h2>{{ title_name }} </h2>
+            <h2> Logical Data - Level 2 </h2>
+            <h4> Accessed within Logical Decision</h4>
+        </div>
+    </nav>
+    {% if not logical_data_decision %}
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-times"></i>
+            No group for this level of Logical Data has been created.</br>
+            The list of logical decision is Empty.
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
+            There are <strong class="see_it" style="text-decoration: underline;">{{ logical_data_decision|length }}</strong> Logical Data which are logical decisions:
+            <ul>
+                {% for dt in logical_data_decision %}
+                    <li><strong> {{ forloop.counter }}- {{ dt }}</strong></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <div class="tabs">
+        <div class="tab-button-outer">
+            <ul id="tab-button">
+                <li><a href="#tab01" class="btn-info" style="display: none">Diagram</a></li>
+                <li><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
+            </ul>
+            </div>
+            <div class="tab-select-outer">
+                <select id="tab-select">
+                    <option value="#tab01">Diagram</option>
+                    <option value="#tab02">Textual</option>
+                </select>
+            </div>
+    </div>
+    <div id="tab01" class="tab-contents">
+        <div class="col-md-12 well diagram_container" id="logical_data_l2_decision_diagram"></div>
+    </div>
+    <div id="tab02" class="tab-contents" style="display: none">
+        <div class="col-md-12 well textual_container" id="logical_data_l2_decision_textual">
+            <ul class="list_level0">
+                {% for k,v in logical_data_decision.items %}
+                    <li class="li-list_level0 col-4" style="border-left: 1px solid #2e6da4;">
+                    <span>{{ k }}</span>
+                        <ul class="list_level1">
+                            {% for var, varList in v.items %}
+                                <li class="li-list_level1 {{ var }}">
+                                    <span class="key">{{ var }}</span>
+                                    {% for v in varList %}
+                                        <span class="value">{{ v }}</span>
+                                    {% endfor %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+            <ul class="logical_components">
+                {% for lc, thr in logical_components.items %}
+                    <li class="lc_li">
+                        <span class="lc_name">{{ lc }}</span>
+                        {% for t in thr %}
+                            <span class="threads">{{ t }}</span>
+                        {% endfor %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <script src="{% static 'js/LD_L2_decision.js' %}" type="text/javascript"></script>
+{% endblock %}

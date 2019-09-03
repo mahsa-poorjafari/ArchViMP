@@ -231,8 +231,6 @@ def logical_data_l3(request):
         for t in thread_list:
             thr_func = get_first_function(t, trace_file)
             thr_func_dict.update(thr_func)
-
-
     print("\n++++++++++++++++++++++++++++\n")
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(thr_func_dict, ["LOAD"], trace_file, shared_var_and_pointer)
@@ -377,7 +375,6 @@ def op_funcs_l2(request):
 
 def functions_ld_l2(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
-    logical_decision_file = None
     logical_decision_file = get_logical_decision_file_path(b_parameter)
 
     threads = get_threads(trace_file)
@@ -406,3 +403,15 @@ def functions_ld_l2(request):
         logical_data_funciton.update({f: function_access_var})
     return render(request, 'logical_data_l2_funcitons.html', {'title_name': which_way,
                                                               'logical_data_funciton': logical_data_funciton})
+
+
+def logical_decision_ld_l2(request):
+    b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
+    logical_decision_file = get_logical_decision_file_path(b_parameter)
+    logical_components = get_logical_components(logical_decision_file)
+    # all logical_decision that are exist
+    all_logical_decisions = get_all_logical_decisions(logical_decision_file)
+    return render(request, 'logical_data_l2_decision.html', {'title_name': which_way,
+                                                             'logical_data_decision': all_logical_decisions,
+                                                             'logical_components': logical_components
+                                                             })

@@ -126,7 +126,7 @@ function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrPara
         nodeStyle(graph, 'LogicalComp');
         // console.log("============== " + Text+ " - " + chY + "   j= ", j);
         let lcNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-        lcNode.source = ldNode;
+        // lcNode.source = ldNode;
         // console.table(lcNode);
         graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
             let cell = evt.getProperty('cell');
@@ -135,7 +135,24 @@ function drawLcForLd(graph, parent, ldNode, childList, logicalCompY, op, ulrPara
             }
             evt.consume();
         });
-        graph.insertEdge(parent, null, null, ldNode, lcNode , 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+        switch (op) {
+           case "R":
+               if (ldNode.target === null || ldNode.target['value'] !== lcNode['value']) {
+                   graph.insertEdge(parent, null, null, ldNode, lcNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+                   ldNode.target = lcNode;
+               }
+               break;
+           case "P":
+               graph.insertEdge(parent, null, null, lcNode, ldNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;');
+               ldNode.target = lcNode;
+               ldNode.source = lcNode;
+               break;
+           case "W":
+               graph.insertEdge(parent, null, null, lcNode, ldNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+               lcNode.source = ldNode;
+               break;
+        }
+        // graph.insertEdge(parent, null, null, ldNode, lcNode , 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
         chY += 200;
     }
 }
@@ -378,14 +395,16 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
         chX = values[0];
         chY = values[1];
 
-        console.log(Text + " => " + chX +" - "+ chY + " " + j);
+        // console.log(Text + " => " + chX +" - "+ chY + " " + j);
         if (Text !== ""){
             let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
             chNode.target = pNode;
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                 let cell = evt.getProperty('cell');
-                if (cell['style'].includes("logicalData")){
-                    window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+                console.table(cell['target']);
+                if (cell['style'].includes("logicalData") && cell['target'] !== null){
+                    let nodeValue = cell['value'].replace(/ /g,'');
+                    window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+nodeValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
                 }
                 evt.consume();
             });
@@ -511,7 +530,6 @@ function connect_TD_to_related_LC(graph, parent, listGroup, op) {
                if (lcNode !== null){
                    switch (op) {
                        case "R":
-
                            if (tdCell.target === null || tdCell.target['value'] !== lcNode['value']) {
                                graph.insertEdge(parent, null, null, tdCell, lcNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
                                tdCell.target = lcNode;

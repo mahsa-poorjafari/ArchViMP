@@ -63,7 +63,7 @@ function logicalDataL2Function(container) {
                     stX = 200;
                 }
                 let stNode = graph.insertVertex(parent, stId, ldtext, stX, stY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                console.log("___________  " + ldtext);
+                // console.log("___________  " + ldtext);
                 drawTdForLd(graph, parent, stNode, varList, null, ulrParam);
                 // drawChild(graph, parent, stNode, varList, 'diamondThin', '1', 0, 'variable');
             }

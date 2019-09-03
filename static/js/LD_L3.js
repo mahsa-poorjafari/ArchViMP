@@ -369,8 +369,8 @@ function showAllL3GroupContainer(container, InContainer, OutContainer, PContaine
             configEdgeStyle(graph, "#000000");
 
             showLdL3(InContainer, "R",graph, parent, 50, 50);
-            showLdL3(PContainer, "R",graph, parent, 500, 50);
-            showLdL3(OutContainer, "R",graph, parent, 900, 50);
+            showLdL3(PContainer, "P",graph, parent, 500, 50);
+            showLdL3(OutContainer, "W",graph, parent, 900, 50);
 
         }finally {
             graph.getModel().endUpdate();
@@ -424,7 +424,7 @@ function logicalDataLevel1(container, txt, op) {
                 let lcId = 'LDL2_' + op + '_' + i;
                 let lcFirstElement = ldL2[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
-                console.log("ZZZZZZZZZZ   " + lcText);
+                // console.log("ZZZZZZZZZZ   " + lcText);
                 nodeSize = setNodeSize(lcText, 'logicalData_' + op);
                 let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
                 let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
