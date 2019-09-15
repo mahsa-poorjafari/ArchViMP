@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <h2 class="title_name"></h2>
+            <h4>Timeline View - Access the Shared Variables through time</h4>
+        </div>
+    </nav>
+
+    <div id="tab01" class="tab-contents">
+        <div class="col-md-10 well diagram_container" id="time_line_ld_l2_diagram"></div>
+    </div>
+
+    <script src="{% static 'js/TimeLine_ld_l2.js' %}" type="text/javascript"></script>
+
+{% endblock %}

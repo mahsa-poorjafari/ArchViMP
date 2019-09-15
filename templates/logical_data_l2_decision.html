@@ -29,7 +29,7 @@
         <div class="tab-button-outer">
             <ul id="tab-button">
                 <li><a href="#tab01" class="btn-info" style="display: none">Diagram</a></li>
-                <li><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
+                <li><a href="#tab02" class="btn-info" style="display: block">Textual</a></li>
             </ul>
             </div>
             <div class="tab-select-outer">
@@ -42,7 +42,7 @@
     <div id="tab01" class="tab-contents">
         <div class="col-md-12 well diagram_container" id="logical_data_l2_decision_diagram"></div>
     </div>
-    <div id="tab02" class="tab-contents" style="display: none">
+    <div id="tab02" class="tab-contents" style="display: block">
         <div class="col-md-12 well textual_container" id="logical_data_l2_decision_textual">
             <ul class="list_level0">
                 {% for k,v in logical_data_decision.items %}

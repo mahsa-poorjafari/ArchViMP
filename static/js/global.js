@@ -635,6 +635,10 @@ function showLdL3(container, op, graph, parent, X, Y) {
 function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
     let nodeSize = {};
     let nodePosition = [];
+    let benchmarkName = get_url_benchmark();
+    let fileName = get_url_fileName();
+    let ulrParam = [benchmarkName];
+    ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
     let time_stamp_list = document.getElementById('time_stamp_list').getElementsByTagName('p');
     for (let ts of time_stamp_list){
         if (ts.innerHTML.replace(/_/g, "\n") === timeStamp){
@@ -670,6 +674,13 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
         nodeSize = setNodeSize(childText, nodeType);
         nodeStyle(graph,  nodeSize['nodeIdText']);
         graph.insertVertex(parent, null, childText, childX, childY, 150, 70, nodeSize['nodeIdText']);
+        graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+            let cell = evt.getProperty('cell');
+            if (cell['style'].includes('logicalData')){
+                window.location = "http://127.0.0.1:8000/timeLineLDL2?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+            }
+            evt.consume();
+        });
         childX += 80;
 
     }

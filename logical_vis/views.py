@@ -314,7 +314,7 @@ def time_line_view(request):
     for t in threads:
         time_activity = {}
         t_id = t if "Main_" not in t else t.split("_")[1]
-        print(t_id)
+        # print(t_id)
         with open(trace_file, 'r') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
@@ -346,6 +346,7 @@ def time_line_view(request):
 
         od = collections.OrderedDict(sorted(time_activity.items()))
         thread_activity.update({t: od})
+    print(thread_activity)
     return render(request, 'time_line_view.html', {'title_name': which_way,
                                                    "threads": threads,
                                                    "thread_activity": thread_activity,
@@ -415,3 +416,8 @@ def logical_decision_ld_l2(request):
                                                              'logical_data_decision': all_logical_decisions,
                                                              'logical_components': logical_components
                                                              })
+
+
+def timeline_ld_l2(request):
+    return render(request, 'timeLine_ld_l2.html')
+

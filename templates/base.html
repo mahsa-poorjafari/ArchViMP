@@ -52,28 +52,6 @@
                 let emptyList = document.getElementById("empty-list");
                 let wrongFile = document.getElementsByClassName("wrong-format")[0];
                 let emptyFile = document.getElementsByClassName("empty-file")[0];
-                {#traceFileForm.addEventListener("submit", function(e) {#}
-                {#    e.preventDefault();#}
-                {#    wrongFile.style.display = "none";#}
-                {#    emptyFile.style.display = "none";#}
-                {#    uploadedTraceFile = traceFileForm.getElementsByClassName("select_tag_file")[0].value;#}
-                {##}
-                {#    if(uploadedTraceFile === "" || uploadedTraceFile === null){#}
-                {#        document.getElementById("select_tag_file").classList.add("invalid_field");#}
-                {#        emptyList.style.display = "block";#}
-                {#    }else{#}
-                {#        emptyList.style.display = "none";#}
-                {#        let msg = {#}
-                {#            type: "message",#}
-                {#            text: {#}
-                {#                "existingTraceFile": uploadedTraceFile#}
-                {#            },#}
-                {#            date: Date.now()#}
-                {#        };#}
-                {#        socket.send(JSON.stringify(msg));#}
-                {#    }#}
-                {##}
-                {# });#}
             });
 
             socket.onmessage = function message(event) {
@@ -83,8 +61,6 @@
                 console.log(data);
             };
             if (socket.readyState === WebSocket.OPEN) {
-
-                socket.onopen();
             }
 
             socket.onclose = function(e) {

@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'time_line_view', views.time_line_view, name='time_line_view'),
     url(r'operation_functions_L2', views.functions_ld_l2, name='logical_data_l2_funcitons'),
     url(r'logical_decision_L2', views.logical_decision_ld_l2, name='logical_data_l2_decision'),
+    url(r'timeLineLDL2', views.timeline_ld_l2, name='timeLineLDL2')
 ]
 # handler404 = error_handling.error_404_view
 
