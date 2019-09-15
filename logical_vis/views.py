@@ -412,9 +412,15 @@ def logical_decision_ld_l2(request):
     logical_components = get_logical_components(logical_decision_file)
     # all logical_decision that are exist
     all_logical_decisions = get_all_logical_decisions(logical_decision_file)
+    all_shared_resources = get_all_shared_var_names(b_parameter)
+    shared_variables_list = []
+    [shared_variables_list.append(s.split(".")[0]+".") if "." in s else shared_variables_list.append(s) for s in all_shared_resources]
+    shared_variables_list = remove_dups(shared_variables_list)
+    print(shared_variables_list)
     return render(request, 'logical_data_l2_decision.html', {'title_name': which_way,
                                                              'logical_data_decision': all_logical_decisions,
-                                                             'logical_components': logical_components
+                                                             'logical_components': logical_components,
+                                                             'shared_variables_list': shared_variables_list
                                                              })
 
 

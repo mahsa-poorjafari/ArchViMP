@@ -28,7 +28,8 @@
     <div class="tabs">
         <div class="tab-button-outer">
             <ul id="tab-button">
-                <li><a href="#tab01" class="btn-info" style="display: none">Diagram</a></li>
+                <li><a href="#tab01" class="btn-info" style="display: block">Diagram L2</a></li>
+                <li><a href="#tab03" class="btn-info" style="display: block">Diagram L1</a></li>
                 <li><a href="#tab02" class="btn-info" style="display: block">Textual</a></li>
             </ul>
             </div>
@@ -42,9 +43,12 @@
     <div id="tab01" class="tab-contents">
         <div class="col-md-12 well diagram_container" id="logical_data_l2_decision_diagram"></div>
     </div>
+    <div id="tab03" class="tab-contents">
+        <div class="col-md-12 well diagram_container" id="logical_data_l1_decision_diagram"></div>
+    </div>
     <div id="tab02" class="tab-contents" style="display: block">
         <div class="col-md-12 well textual_container" id="logical_data_l2_decision_textual">
-            <ul class="list_level0">
+            <ul class="col-md-12 list_level0">
                 {% for k,v in logical_data_decision.items %}
                     <li class="li-list_level0 col-4" style="border-left: 1px solid #2e6da4;">
                     <span>{{ k }}</span>
@@ -61,13 +65,20 @@
                     </li>
                 {% endfor %}
             </ul>
-            <ul class="logical_components">
+            <ul class="col-md-12 logical_components">
                 {% for lc, thr in logical_components.items %}
                     <li class="lc_li">
                         <span class="lc_name">{{ lc }}</span>
                         {% for t in thr %}
                             <span class="threads">{{ t }}</span>
                         {% endfor %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <ul class="col-md-12 shared_variables_list">
+                {% for v in shared_variables_list %}
+                    <li class="lc_li">
+                        <span class="lc_name">{{ v }}</span>
                     </li>
                 {% endfor %}
             </ul>

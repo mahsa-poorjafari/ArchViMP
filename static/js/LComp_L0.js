@@ -14,10 +14,7 @@ function main(container) {
         // Creates the graph inside the given container
         var graph = new mxGraph(container);
         //graph.setEnabled(false);
-
-
         // graph.getStylesheet().getDefaultEdgeStyle();
-
         // Enables rubberband selection
         new mxRubberband(graph);
         var parent = graph.getDefaultParent();
@@ -30,10 +27,10 @@ function main(container) {
             let threadList = document.getElementById("logical_comp_textual").getElementsByClassName("list_level0")[0].getElementsByClassName('li-list_level0');
             nodeStyle(graph, 'LogicalComp');
             configEdgeStyle(graph, "#000000");
-            let fW = 20;
-            let fH = 100;
-            let tW = 20;
-            let tH = 300;
+            let fX = 20;
+            let fY = 70;
+            let tX = 500;
+            let tY = 50;
             let thrNode = null;
             let styleIdNode = "LogicalComp";
             let lcName = get_node_name();
@@ -45,14 +42,14 @@ function main(container) {
                 if (thrText.includes("_")){
                     thrText = thrText.replace(/_/g, "\n");
                     styleIdNode = "mainThread";
-                    tW += 150;
+                    tY += 150;
                 }else {
                     styleIdNode = "thread";
 
                 }
                 nodeStyle(graph, styleIdNode);
-                thrNode = graph.insertVertex(parent, thrId, thrText, tW, tH, 120, 80, styleIdNode);
-                tW += 150;
+                thrNode = graph.insertVertex(parent, thrId, thrText, tX, tY, 120, 80, styleIdNode);
+                tY += 150;
                 let funcId = "func_" + i;
                 if (lcName !== null && lcName !== thrFunc){
                     styleIdNode = "LogicalCompInactive";
@@ -70,8 +67,8 @@ function main(container) {
                     }
                 });
                 if (funcNode === null)
-                    funcNode = graph.insertVertex(parent, funcId, thrFunc, fW, fH, 120, 80, styleIdNode);
-                fW += 150;
+                    funcNode = graph.insertVertex(parent, funcId, thrFunc, fX, fY, 120, 80, styleIdNode);
+                fY += 150;
                 thrNode.target = funcNode;
                 graph.insertEdge(parent, null, null, thrNode, funcNode, 'dashed=0;' +
                             'endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=0;');
