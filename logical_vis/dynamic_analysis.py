@@ -393,6 +393,9 @@ def get_all_logical_decisions(logical_decision_file):
     [r.insert(0, indx) for indx, r in enumerate(csv_reader_list)]
     logical_decision_dic = {}
     log_dec_list = []
+    logical_components = get_logical_components(logical_decision_file)
+    print('------logComp_list------------\n')
+
     for indx, r in enumerate(csv_reader_list):
         log_dec_names = {}
         if r[1] == "Accesses" and r[2] == "within":
@@ -400,6 +403,7 @@ def get_all_logical_decisions(logical_decision_file):
             logical_decision_rows = logical_decision_block(csv_reader_list[row_number:])
             if logical_decision_rows != 1:
                 for ld_indx, ld in enumerate(logical_decision_rows):
+
                     if ld[1] == "logicalDecision":
                         var_list, thread_list, file_name = get_logical_decision_vars(logical_decision_rows[ld_indx+1:])
                         log_dec_names.update({''.join(ld[1:]): {"START": ld[2],
@@ -414,8 +418,8 @@ def get_all_logical_decisions(logical_decision_file):
     Gnames = []
     [Gnames.append(list(ld_item.keys())[0] if len(list(ld_item.keys())) == 1 else list(ld_item.keys())[0])
      for ld_item in log_dec_list]
-    Gnames = remove_dups(Gnames)
     # print(Gnames)
+    Gnames = remove_dups(Gnames)
     logical_decision_groups = {}
     for ld_gname in Gnames:
         ld_variable_list = []
@@ -434,13 +438,20 @@ def get_all_logical_decisions(logical_decision_file):
                                          if len(list(ld.values())[0]['file_name']) == 1
                                          else list(ld.values())[0]['file_name'])
         ld_variable_list = remove_dups(ld_variable_list)
+
         ld_thread_list = remove_dups(ld_thread_list)
         ld_file_name_list = remove_dups(ld_file_name_list)
-
         ld_name = ld_gname + '_' + ld_file_name_list[0]
+        lc_list = []
+        for thr_id in ld_thread_list:
+            [lc_list.append(k) if thr_id in v else None for k, v in logical_components.items()]
+        print(ld_name)
+        print(lc_list)
+        lc_list = remove_dups(lc_list)
         logical_decision_dic.update({ld_name: {
             "variable_list": ld_variable_list,
-            "thread_list": ld_thread_list
+            "thread_list": ld_thread_list,
+            "Logical_component_list": lc_list,
         }})
     print(logical_decision_dic)
     return logical_decision_dic
