@@ -414,12 +414,24 @@ def logical_decision_ld_l2(request):
     all_logical_decisions = get_all_logical_decisions(logical_decision_file)
     all_shared_resources = get_all_shared_var_names(b_parameter)
     shared_variables_list = []
-    [shared_variables_list.append(s.split(".")[0]+".") if "." in s else shared_variables_list.append(s) for s in all_shared_resources]
+    [shared_variables_list.append(s.split(".")[0]+".") if "." in s else shared_variables_list.append(s)
+     for s in all_shared_resources]
     shared_variables_list = remove_dups(shared_variables_list)
-    print(shared_variables_list)
+    var_list_log_des = []
+    [var_list_log_des.append(x.split('.')[0] + ".") if '.' in x else var_list_log_des.append(x) if k == 'variable_list'
+     else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() for x in v]
+    var_list_log_des = remove_dups(var_list_log_des)
+    print(var_list_log_des)
+    lc_list_log_des = []
+    [lc_list_log_des.append(x) if k == 'Logical_component_list' else None for des_k, des_v in all_logical_decisions.items()
+     for k, v in des_v.items() for x in v]
+    lc_list_log_des = remove_dups(lc_list_log_des)
+    # print(lc_list_log_des)
     return render(request, 'logical_data_l2_decision.html', {'title_name': which_way,
                                                              'logical_data_decision': all_logical_decisions,
                                                              'logical_components': logical_components,
+                                                             'lc_list_log_des': lc_list_log_des,
+                                                             'var_list_log_des': var_list_log_des,
                                                              'shared_variables_list': shared_variables_list
                                                              })
 

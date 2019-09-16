@@ -75,6 +75,20 @@
                     </li>
                 {% endfor %}
             </ul>
+            <ul class="col-md-12 lc_list_log_des">
+                {% for lc in lc_list_log_des %}
+                    <li class="lc_li">
+                        <span class="lc_name">{{ lc }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <ul class="col-md-12 var_list_log_des">
+                {% for v in var_list_log_des %}
+                    <li class="var_li">
+                        <span class="lc_name">{{ v }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
             <ul class="col-md-12 shared_variables_list">
                 {% for v in shared_variables_list %}
                     <li class="lc_li">
