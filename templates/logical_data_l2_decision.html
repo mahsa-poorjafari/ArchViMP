@@ -28,9 +28,15 @@
     <div class="tabs">
         <div class="tab-button-outer">
             <ul id="tab-button">
-                <li><a href="#tab01" class="btn-info" style="display: block">Diagram L2</a></li>
-                <li><a href="#tab03" class="btn-info" style="display: block">Diagram L1</a></li>
-                <li><a href="#tab02" class="btn-info" style="display: block">Textual</a></li>
+                <li id="for_tab01" class="col-md-3" style="padding-right:0 "><a href="#tab01" class="btn-info"
+                                                                 style="display: block;
+                                                                    border-radius:3px 0 0 3px; ">
+                    Diagram L2</a></li>
+                <li id="for_tab03" class="col-md-3" style="padding-left: 0"><a href="#tab03" class="btn-info"
+                                                                style="display: block;
+                                                                    border-radius:0 3px 3px 0;">
+                    Diagram L1</a></li>
+                <li id="for_tab02" class="col-md-3"><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
             </ul>
             </div>
             <div class="tab-select-outer">
@@ -46,7 +52,7 @@
     <div id="tab03" class="tab-contents">
         <div class="col-md-12 well diagram_container" id="logical_data_l1_decision_diagram"></div>
     </div>
-    <div id="tab02" class="tab-contents" style="display: block">
+    <div id="tab02" class="tab-contents" style="display: none">
         <div class="col-md-12 well textual_container" id="logical_data_l2_decision_textual">
             <ul class="col-md-12 list_level0">
                 {% for k,v in logical_data_decision.items %}

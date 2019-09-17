@@ -48,6 +48,8 @@ function main(container) {
 
                 }
                 nodeStyle(graph, styleIdNode);
+                console.log(thrText);
+                console.log(thrFunc);
                 thrNode = graph.insertVertex(parent, thrId, thrText, tX, tY, 120, 80, styleIdNode);
                 tY += 150;
                 let funcId = "func_" + i;
@@ -61,7 +63,7 @@ function main(container) {
                 let mxCells = graph.getChildVertices(graph.getDefaultParent());
                 let funcNode = null;
                 mxCells.forEach(function(node){
-                    console.log(node['style'].includes("LogicalComp") && node['value'] === thrFunc );
+                    //console.log(node['style'].includes("LogicalComp") && node['value'] === thrFunc );
                     if (node['style'].includes("LogicalComp") && node['value'] === thrFunc ){
                         funcNode = node;
                     }

@@ -30,6 +30,7 @@ function logicalDataL2Decision(container, ldL2List) {
             let lcX = 900;
             let lcY = 200;
             let styleIdNode = null;
+            let strokeColor = null;
             let nodeSize = {};
             let ldName = get_node_name();
             let benchmarkName = get_url_benchmark();
@@ -69,8 +70,10 @@ function logicalDataL2Decision(container, ldL2List) {
                 let lDecId = 'ldL2_Dec' + i;
                 if (ldName !== null && ldName !== lDecText) {
                     styleIdNode = "LogicalDataInactive";
+                    strokeColor = "strokeColor=#ccc;";
                 } else {
                     styleIdNode = "logicalData";
+                    strokeColor = "strokeColor=#000000;";
                 }
                 nodeSize = setNodeSize(lDecText, styleIdNode);
                 nodeStyle(graph, nodeSize['nodeIdText']);
@@ -81,7 +84,7 @@ function logicalDataL2Decision(container, ldL2List) {
                     mxCells.forEach(function (logComp){
                         if (logComp['value'] === lcForLd.innerHTML){
                             logCompNode = logComp;
-                            graph.insertEdge(parent, null, null, logComp, stNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize=10;');
+                            graph.insertEdge(parent, null, null, logComp, stNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize=10;' + strokeColor);
                             logComp.source = stNode;
                             stNode.source = logComp;
                         }
@@ -103,43 +106,20 @@ function logicalDataL2Decision(container, ldL2List) {
                         }
                     });
                 }
-                //console.log(lcText);
-                // lcText.forEach(function (lc) {
-                //     nodeSize = setNodeSize(lc, 'LogicalComp');
-                //     nodeStyle(graph, nodeSize['nodeIdText']);
-                //     //console.log(lc + ' --- ' +lcX + '  ---  ' + lcY);
-                //     let lcNode = graph.insertVertex(parent, null, lc, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                //     lcY += 100;
-                //     graph.insertEdge(parent, null, null, lcNode, stNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize=10;');
-                //     lcNode.source = stNode;
-                //     stNode.source = lcNode;
-                // });
-
-                // Draw Variables that have been accessed within this Logical Decision
-                // let variableList = [];
-                // for (let v of varList){
-                //     variableList.push(v.innerHTML);
-                // }
-                // variableList.forEach(function (vVal) {
-                //     let varText = vVal.includes('.') ? vVal.split(".")[0] : vVal;
-                //     let nodeStyleVar = vVal.includes('.') ? 'logicalData' : 'variable';
-                //     nodeSize = setNodeSize(varText, nodeStyleVar);
-                //     nodeStyle(graph, nodeSize['nodeIdText']);
-                //     // let varNode = graph.insertVertex(parent, null, varText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                //     varY += 100;
-                //
-                //     //graph.insertEdge(parent, null, null, varNode, stNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;endFill=1;');
-                //     //varNode.target = stNode;
-                //     //stNode.source = varNode;
-                // })
             }
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                 let cell = evt.getProperty('cell');
-                if (cell['style'].includes("logicalData")){
+                if (cell['style'].includes("logicalData") || cell['style'].includes("LogicalDataInactive") || cell['value'].includes('logicalDecision')){
                     let cellValue = cell['value'].replace(/ /g,'');
+                    //let currentUrl = document.location;
+                    //document.location = currentUrl + '&node=' + cellValue;
+                    document.location = "http://127.0.0.1:8000/logical_decision_L2?b=" +benchmarkName + "&node=" + cellValue;
                     //window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-                    document.getElementsByClassName('diagram_container').style.display = 'none';
-                    document.getElementById('logical_data_l1_decision_diagram').style.display = 'block';
+                    //document.getElementById('tab01').style.display = 'none';
+                    //document.getElementById('tab03').style.display = 'block';
+                    //document.getElementById('for_tab01').classList.remove("is-active");
+                    //document.getElementById('for_tab03').classList.add("is-active");
+
                 }
                 else if (cell['style'].includes("LogicalComp")){
                     let cellValue = cell['value'].replace(/ /g,'');
@@ -176,12 +156,15 @@ function logicalDataL1Decision(container, ldL2List) {
         let lDecX = 700;
         let lDefY = 50;
         let varText = null;
-        let lcText = [];
         let nodeSize = null;
         let styleOfNode = null;
         let sharedVar = null;
         let allSharedVars = document.getElementById("logical_data_l2_decision_textual").getElementsByClassName("var_list_log_des")[0].getElementsByClassName("var_li");
-        let mxCells = null;
+        let ldName = get_node_name();
+        let benchmarkName = get_url_benchmark();
+        let fileName = get_url_fileName();
+        let ulrParam = [benchmarkName];
+        ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
 
         for (let varElement of allSharedVars){
             sharedVar = varElement.getElementsByClassName('lc_name')[0];
@@ -195,8 +178,9 @@ function logicalDataL1Decision(container, ldL2List) {
 
         }
         //console.log(thread_list);
-        mxCells = graph.getChildVertices(graph.getDefaultParent());
-
+        let mxCells = graph.getChildVertices(graph.getDefaultParent());
+        let styleIdNode = null;
+        let strokeColor = null;
         for (let i=0; i < ldL2List.length; i++) {
             let logDesVarList = [];
             let lDecText = ldL2List[i].firstElementChild.innerHTML.replace(/ /g, '');
@@ -208,17 +192,23 @@ function logicalDataL1Decision(container, ldL2List) {
                     logDesVarList.push(varName);
                 }
             };
-            console.log(lDecText);
-            console.log(logDesVarList);
+            //console.log(lDecText);
+            //console.log(logDesVarList);
             let lDecId = 'ldL2_Dec' + i;
-
-            nodeSize = setNodeSize(lDecText, 'logicalData');
+            if (ldName !== null && ldName !== lDecText) {
+                styleIdNode = "LogicalDataInactive";
+                strokeColor = "strokeColor=#ccc;";
+            } else {
+                styleIdNode = "logicalData";
+                strokeColor = "strokeColor=#000000;";
+            }
+            nodeSize = setNodeSize(lDecText, styleIdNode);
             nodeStyle(graph, nodeSize['nodeIdText']);
             let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+50, nodeSize['Height']+50, nodeSize['nodeIdText']);
             lDefY += 200;
             mxCells.forEach(function (node) {
                 if ( logDesVarList.includes(node['value']) ){
-                    graph.insertEdge(parent, null, null, node, stNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;endFill=1;');
+                    graph.insertEdge(parent, null, null, node, stNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;endFill=1;'+ strokeColor);
                     node.source = stNode;
                     stNode.source = node;
                 }
@@ -226,12 +216,13 @@ function logicalDataL1Decision(container, ldL2List) {
         }
         graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
             let cell = evt.getProperty('cell');
-            if (cell['style'].includes("logicalData")){
-                let cellValue = cell['value'].replace(/ /g,'');
+            let cellValue = cell['value'].replace(/ /g,'');
+            if (cell['style'].includes("logicalData") && !cellValue.includes('logicalDecision')){
                 window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+            }else if (cellValue.includes('logicalDecision')){
+                document.location = "http://127.0.0.1:8000/logical_decision_L2?b=" +benchmarkName + "&node=" + cellValue;
             }
             else if (cell['style'].includes("LogicalComp")){
-                let cellValue = cell['value'].replace(/ /g,'');
                 window.location = "http://127.0.0.1:8000/logical_comp?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
             }
             evt.consume();

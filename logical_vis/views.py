@@ -382,17 +382,18 @@ def functions_ld_l2(request):
     # all funcitons that are exist
     all_functions = get_all_functions(logical_decision_file)
     # first functions that threads execute
-    print("\n all_functions...........\n")
-    print(all_functions)
+    # print("\n all_functions...........\n")
+    # print(all_functions)
     lc_functions = get_lc_functions(logical_decision_file)
-    print("\n lc_functions...........\n")
-    print(lc_functions)
+    # print("\n lc_functions...........\n")
+    # print(lc_functions)
     # list of nested functions
     [all_functions.remove(lc_f) if lc_f in all_functions else None for lc_f in lc_functions]
     nested_functions = all_functions
-    print("\n nested_functions...........\n")
-    print(nested_functions)
+    # print("\n nested_functions...........\n")
+    # print(nested_functions)
     variables_execution_block = get_vars_exe_block(logical_decision_file)
+
     logical_data_funciton = {}
     for f in nested_functions:
         function_access_var = {}
@@ -402,6 +403,7 @@ def functions_ld_l2(request):
         # print(f)
         # function_access_var = remove_dups(function_access_var)
         logical_data_funciton.update({f: function_access_var})
+    print(logical_data_funciton)
     return render(request, 'logical_data_l2_funcitons.html', {'title_name': which_way,
                                                               'logical_data_funciton': logical_data_funciton})
 
@@ -421,7 +423,7 @@ def logical_decision_ld_l2(request):
     [var_list_log_des.append(x.split('.')[0] + ".") if '.' in x else var_list_log_des.append(x) if k == 'variable_list'
      else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() for x in v]
     var_list_log_des = remove_dups(var_list_log_des)
-    print(var_list_log_des)
+    # print(var_list_log_des)
     lc_list_log_des = []
     [lc_list_log_des.append(x) if k == 'Logical_component_list' else None for des_k, des_v in all_logical_decisions.items()
      for k, v in des_v.items() for x in v]

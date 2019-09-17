@@ -445,8 +445,8 @@ def get_all_logical_decisions(logical_decision_file):
         lc_list = []
         for thr_id in ld_thread_list:
             [lc_list.append(k) if thr_id in v else None for k, v in logical_components.items()]
-        print(ld_name)
-        print(lc_list)
+        # print(ld_name)
+        # print(lc_list)
         lc_list = remove_dups(lc_list)
         logical_decision_dic.update({ld_name: {
             "variable_list": ld_variable_list,

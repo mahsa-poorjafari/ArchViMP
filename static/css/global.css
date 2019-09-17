@@ -158,7 +158,7 @@ div{line-height: 2em;}
 }
 .tab-contents {
     margin: 10px 20px;
-
+    /* display: none; */
 }
 .tab-contents .textual_container {
     width: 1570px;}

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let graphContainer = document.getElementById('logical_data_l2_function_diagram');
+    let graphContainer = document.getElementById('function_circular_diagram');
     logicalDataL2Function(graphContainer);
 });
 
@@ -36,7 +36,7 @@ function logicalDataL2Function(container) {
             let fileName = get_url_fileName();
             let ulrParam = [benchmarkName];
             ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
-            let ldL2List = document.getElementById("logical_data_l2_function_textual").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
+            let ldL2List = document.getElementById("function_circular_textual").getElementsByClassName("li-list_level0");
             for (let i=0; i < ldL2List.length; i++){
                 let ldtext = ldL2List[i].firstElementChild.innerHTML.replace(/ /g,'');
                 let varList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("li-list_level1");

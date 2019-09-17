@@ -28,8 +28,20 @@
     <div class="tabs">
         <div class="tab-button-outer">
             <ul id="tab-button">
-                <li><a href="#tab01" class="btn-info" style="display: none">Diagram</a></li>
-                <li><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
+                <li id="for_tab03" class="col-md-3" style="padding-right:0 "><a href="#tab03" class="btn-info"
+                                                                                style="display: block;
+                                                                                border-radius:3px 0 0 3px; ">
+                    Diagram L2</a></li>
+                <li id="for_tab04" class="col-md-3" style="padding-right:0; padding-left: 0 ">
+                    <a href="#tab04" class="btn-info"
+                       style="display: block; border-radius:0 0 0 0;
+                       border-right: 1px solid #337ab7; border-left: 1px solid #337ab7;">
+                        Diagram L1</a></li>
+                <li id="for_tab01" class="col-md-3" style="padding-left:0 "><a href="#tab01" class="btn-info"
+                                                                               style="display: block;
+                                                                               border-radius:0 3px 3px 0;">
+                    Circular Diagram</a></li>
+                <li id="for_tab02" class="col-md-3"><a href="#tab02" class="btn-info" style="display: block">Textual</a></li>
             </ul>
             </div>
             <div class="tab-select-outer">
@@ -39,12 +51,18 @@
                 </select>
             </div>
     </div>
-    <div id="tab01" class="tab-contents">
+    <div id="tab01" class="tab-contents" style="display: none">
+        <div class="col-md-12 well diagram_container" id="function_circular_diagram"></div>
+    </div>
+    <div id="tab03" class="tab-contents" style="display: none">
         <div class="col-md-12 well diagram_container" id="logical_data_l2_function_diagram"></div>
     </div>
+    <div id="tab04" class="tab-contents" style="display: none">
+        <div class="col-md-12 well diagram_container" id="logical_data_l1_function_diagram"></div>
+    </div>
     <div id="tab02" class="tab-contents" style="display: none">
-        <div class="col-md-12 well textual_container" id="logical_data_l2_function_textual">
-            <ul class="list_level0">
+        <div class="col-md-12 well textual_container" id="function_textual">
+            <ul class="list_level0" id="function_circular_textual">
                 {% for k,v in logical_data_funciton.items %}
                     <li class="li-list_level0 col-3" style="border-left: 1px solid #2e6da4;">
                     <span>{{ k }}</span>
