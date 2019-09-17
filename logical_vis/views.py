@@ -378,7 +378,6 @@ def functions_ld_l2(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     logical_decision_file = get_logical_decision_file_path(b_parameter)
 
-    threads = get_threads(trace_file)
     # all funcitons that are exist
     all_functions = get_all_functions(logical_decision_file)
     # first functions that threads execute
@@ -395,17 +394,24 @@ def functions_ld_l2(request):
     variables_execution_block = get_vars_exe_block(logical_decision_file)
 
     logical_data_funciton = {}
+    all_var_accessed = []
     for f in nested_functions:
-        function_access_var = {}
-        [function_access_var.update({v['varName'].split(".")[0]: "logicalData"} if "." in v['varName']
-                                    else {v['varName']: "variable"})
+        function_access_var = []
+        [function_access_var.append(v['varName'].split(".")[0]+".") if "." in v['varName']
+                                    else function_access_var.append(v['varName'])
          if f in v['funcitonList'] else None for k, v in variables_execution_block.items()]
+        all_var_accessed.extend(function_access_var)
         # print(f)
         # function_access_var = remove_dups(function_access_var)
+        function_access_var = remove_dups(function_access_var)
         logical_data_funciton.update({f: function_access_var})
+    all_var_accessed = remove_dups(all_var_accessed)
+    print(all_var_accessed)
     print(logical_data_funciton)
     return render(request, 'logical_data_l2_funcitons.html', {'title_name': which_way,
-                                                              'logical_data_funciton': logical_data_funciton})
+                                                              'logical_data_funciton': logical_data_funciton,
+                                                              'all_var_accessed': all_var_accessed
+                                                              })
 
 
 def logical_decision_ld_l2(request):

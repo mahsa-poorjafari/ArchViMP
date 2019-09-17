@@ -55,14 +55,14 @@ function setNodeSize(nodeText, nodeIdStyle){
     let Height = null;
     if (nodeText.length > 20){
         nodeIdText = nodeIdStyle + '_big';
-        if(nodeIdStyle.search(/_R/)){
+        if(nodeIdStyle.includes("_R")){
             Width = 300 ;
             Height = 150;
         }else{
             Width = 235 ;
             Height = 125;
         }
-    }else if (nodeIdStyle === 'LogicalComp' || nodeIdStyle.search(/_R/)){
+    }else if (nodeIdStyle === 'LogicalComp' || nodeIdStyle.includes("_R")){
         nodeIdText = nodeIdStyle;
         Width = 150 ;
         Height = 100;
@@ -317,7 +317,7 @@ function get_node_name() {
     return nodeName
 }
 
-function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
+function drawTdForLd(graph, parent, pNode, childList, op, ulrParam, strokeColor) {
     let nodeSize = {};
     let pX = 50;
     let pY = 2000;
@@ -330,6 +330,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
     let nodeType = "";
     let gName = "";
     let pNodeText = "";
+    let nodeText = null;
     if (pNode !== null){
         pNodeText = pNode['value'];
         pX = pNode['geometry']['x'];
@@ -340,28 +341,12 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
     }
     for (let j = 0; j < childList.length; j++) {
 
-        let Text = childList[j].getElementsByClassName('key')[0].innerHTML;
-
-        // grouping the child if their are more than 10
-        //let eText = childList[j].getElementsByClassName('key')[0].innerHTML;
-        // if (eText === "group_over10_var" || eText === "group_over10_ld"){
-        //     // let valJson = JSON.parse(childList[j].getElementsByClassName('value')[0].innerHTML);
-        //     let elemtVal = String(childList[j].getElementsByClassName('value')[0].innerHTML);
-        //     let toJson = elemtVal.replace(/'/g, '"');
-        //     let valJson = JSON.parse(toJson);
-        //     let keys = Object.keys(valJson);
-        //     keys.forEach(function (k) {
-        //         if (k !== "child_list") gName = k;
-        //     });
-        //     Text = gName;
-        //     nodeType = valJson[String(gName)];
-        // }else{
-            //Text = eText;
-            // nodeType = childList[j].getElementsByClassName('value')[0].innerHTML;
-        //}
-        nodeType = childList[j].getElementsByClassName('value')[0].innerHTML;
-        let nodeIdStyle = nodeType.replace(/ /g,'');
-        nodeSize = setNodeSize(Text, nodeIdStyle);
+        let Text = childList[j].getElementsByClassName('value')[0].innerHTML;
+        nodeType = Text.includes(".")? "logicalData" : "variable";
+        nodeText = Text.includes(".")? Text.split(".")[0]: Text;
+        //console.log(nodeText);
+        //console.log(nodeType);
+        nodeSize = setNodeSize(Text, nodeType);
 
         let nodeId = 'var_'+ op +'_' + j;
         nodeStyle(graph,  nodeSize['nodeIdText']);
@@ -371,7 +356,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
         let graph_child_num = mxCell.length;
         if (graph_child_num === 1){
             // means it is the first child
-            if (Text.length > 20) {
+            if (nodeText.length > 20) {
                 values[0] = pX;
                 values[1] = pY - 200;
             } else {
@@ -386,7 +371,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
             // bX = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['x'] + 50: mxCell[indx]['geometry']['x'];
             // bY = (PreviousNodeVal.length > 20) ? mxCell[indx]['geometry']['y'] + 100 : mxCell[indx]['geometry']['y'];
             // console.log(indx, pX, pY);
-            if (Text.length > 20) {
+            if (nodeText.length > 20) {
                 values = setPositionLDL2Big(pX, pY, indx);
             }else {
                 values = setPositionLDL2(pX, pY, indx);
@@ -397,7 +382,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
 
         // console.log(Text + " => " + chX +" - "+ chY + " " + j);
         if (Text !== ""){
-            let chNode = graph.insertVertex(parent, nodeId, Text, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
+            let chNode = graph.insertVertex(parent, nodeId, nodeText, chX, chY, nodeSize['Width'], nodeSize['Height'],  nodeSize['nodeIdText']);
             chNode.target = pNode;
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                 let cell = evt.getProperty('cell');
@@ -408,7 +393,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam) {
                 }
                 evt.consume();
             });
-            graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
+            graph.insertEdge(parent, null, null, chNode, pNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=1;' + strokeColor);
         }
 
     }
@@ -489,22 +474,7 @@ function connect_LD_to_related_LC(graph, parent, inputGroup, X, Y, op) {
 
 function connect_TD_to_related_LC(graph, parent, listGroup, op) {
     let tdRelatedLc = listGroup.getElementsByClassName('thread_list')[0].getElementsByClassName('li_thread_id');
-    // let logicalComponents = [];
-    // let technicaData = [];
-    // for (let inG of listGroup){
-    //     let lcList = inG.getElementsByClassName('list_level1')[0].getElementsByClassName('logical_components')[0].getElementsByClassName('list_level2');
-    //     for (let lc of lcList){
-    //         logicalComponents.push(lc.firstElementChild.innerHTML.replace(/ /g,''));
-    //     }
-    // }
-    // for (let inG of listGroup){
-    //     let lcList = inG.getElementsByClassName('list_level1')[0].getElementsByClassName('group_members')[0].getElementsByClassName('list_level2');
-    //     for (let lc of lcList){
-    //         technicaData.push(lc.getElementsByClassName('key')[0].innerHTML.replace(/ /g,''));
-    //     }
-    // }
-    // console.log(logicalComponents);
-    // console.log(technicaData);
+
     let lcNode = null;
     let tdNode = null;
     let mxCells = graph.getChildVertices(graph.getDefaultParent());

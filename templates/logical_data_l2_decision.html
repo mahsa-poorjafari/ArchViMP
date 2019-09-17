@@ -57,7 +57,7 @@
             <ul class="col-md-12 list_level0">
                 {% for k,v in logical_data_decision.items %}
                     <li class="li-list_level0 col-4" style="border-left: 1px solid #2e6da4;">
-                    <span>{{ k }}</span>
+                    <span style="font-weight: bold ">{{ k }}</span>
                         <ul class="list_level1">
                             {% for var, varList in v.items %}
                                 <li class="li-list_level1 {{ var }}">
