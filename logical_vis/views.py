@@ -377,40 +377,55 @@ def op_funcs_l2(request):
 def functions_ld_l2(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     logical_decision_file = get_logical_decision_file_path(b_parameter)
+    trace_exe_file = get_trace_file_path(b_parameter)
 
     # all funcitons that are exist
     all_functions = get_all_functions(logical_decision_file)
+
     # first functions that threads execute
-    # print("\n all_functions...........\n")
-    # print(all_functions)
     lc_functions = get_lc_functions(logical_decision_file)
-    # print("\n lc_functions...........\n")
-    # print(lc_functions)
+    lc_for_threads = get_logical_components(logical_decision_file)
+    # print(lc_for_threads)
+
     # list of nested functions
     [all_functions.remove(lc_f) if lc_f in all_functions else None for lc_f in lc_functions]
     nested_functions = all_functions
-    # print("\n nested_functions...........\n")
-    # print(nested_functions)
+
     variables_execution_block = get_vars_exe_block(logical_decision_file)
 
-    logical_data_funciton = {}
+    logical_data_function = {}
     all_var_accessed = []
+    all_lc_accessed_nested_function = []
     for f in nested_functions:
         function_access_var = []
+        lc_of_nested_function = []
         [function_access_var.append(v['varName'].split(".")[0]+".") if "." in v['varName']
                                     else function_access_var.append(v['varName'])
          if f in v['funcitonList'] else None for k, v in variables_execution_block.items()]
         all_var_accessed.extend(function_access_var)
-        # print(f)
-        # function_access_var = remove_dups(function_access_var)
         function_access_var = remove_dups(function_access_var)
-        logical_data_funciton.update({f: function_access_var})
+
+        # Get threads that accessed this nested function
+        thread_access_function = get_thread_access_function(trace_exe_file, f)
+        # retrieve logical components that access this nested function
+        [lc_of_nested_function.append(lc) if thr in thrIds else None
+         for lc, thrIds in lc_for_threads.items() for thr in thread_access_function]
+        lc_of_nested_function = remove_dups(lc_of_nested_function)
+        all_lc_accessed_nested_function.extend(lc_of_nested_function)
+
+        logical_data_function.update({f: {
+            "VarList": function_access_var,
+            "LogicalComponets": lc_of_nested_function
+        }})
     all_var_accessed = remove_dups(all_var_accessed)
-    print(all_var_accessed)
-    print(logical_data_funciton)
-    return render(request, 'logical_data_l2_funcitons.html', {'title_name': which_way,
-                                                              'logical_data_funciton': logical_data_funciton,
-                                                              'all_var_accessed': all_var_accessed
+    all_lc_accessed_nested_function = remove_dups(all_lc_accessed_nested_function)
+    # print(all_var_accessed)
+    # print(logical_data_funciton)
+    return render(request, 'logical_data_l2_functions.html', {'title_name': which_way,
+                                                              'logical_data_function': logical_data_function,
+                                                              'all_var_accessed': all_var_accessed,
+                                                              'all_lc_accessed_nested_function':
+                                                                  all_lc_accessed_nested_function
                                                               })
 
 
@@ -425,11 +440,13 @@ def logical_decision_ld_l2(request):
     [shared_variables_list.append(s.split(".")[0]+".") if "." in s else shared_variables_list.append(s)
      for s in all_shared_resources]
     shared_variables_list = remove_dups(shared_variables_list)
+    # all variables that accessed within logical decision
     var_list_log_des = []
     [var_list_log_des.append(x.split('.')[0] + ".") if '.' in x else var_list_log_des.append(x) if k == 'variable_list'
      else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() for x in v]
     var_list_log_des = remove_dups(var_list_log_des)
     # print(var_list_log_des)
+    # Logical component that access logical decision
     lc_list_log_des = []
     [lc_list_log_des.append(x) if k == 'Logical_component_list' else None for des_k, des_v in all_logical_decisions.items()
      for k, v in des_v.items() for x in v]

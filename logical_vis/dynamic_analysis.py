@@ -511,7 +511,7 @@ def get_vars_exe_block(logical_decision_file):
 
 
 def var_access_info(var_exe_block):
-    print("\n _______________________")
+    # print("\n _______________________")
     # print(var_exe_block)
     thr = []
     func = []
@@ -528,8 +528,8 @@ def var_access_info(var_exe_block):
         elif r[1] == "Function":
             if r[2] not in func:
                 func.append(r[2])
-            if var_exe_block[indx+1][1] == "Accesses":
-                print(var_exe_block[indx+1])
+            # if var_exe_block[indx+1][1] == "Accesses":
+            #     print(var_exe_block[indx+1])
 
     if var_id is not None:
         var = {var_id: {
@@ -537,9 +537,7 @@ def var_access_info(var_exe_block):
                    "threadList": thr,
                    "funcitonList": func
                }}
-    # var.update({"threadList": thr})
-    # var.update({"funcitonList": func})
-    # print(var)
+
     return var
 
 
@@ -554,18 +552,24 @@ def get_thread_ids(report_file):
 
 
 def get_thread_function(t, report_file):
-    # print("Thread ID   ", t)
+
     parent_function = []
     csv_reader_list = get_file_records(report_file)
     t_id = t.strip("Main_") if "Main_" in t else t
     [parent_function.append(r[1]) if r[0] == "Thread" and r[2] == t_id else None for r in csv_reader_list]
-    # parent_function = list(filter(lambda r: r[0] == "Thread" and r[2] == t_id, csv_reader_list))
 
-    thread_parent_function = []
-    # [thread_parent_function.append(r[1]) if r[2] == t_id else None for r in parent_function]
-    # thread_function_list = remove_dups(thread_parent_function)
     thread_function_list = remove_dups(parent_function)
-    # print(t_id, "    => ", thread_function_list)
     return {t: thread_function_list}
+
+
+def get_thread_access_function(trace_file, nested_function_name):
+    print("\n -----------", nested_function_name, "-----------")
+    csv_reader_list = get_file_records(trace_file)
+    thread_list = []
+    records_list = list(filter(lambda r: r[3] == nested_function_name, csv_reader_list))
+    [thread_list.append(r[1]) for r in records_list]
+    thread_list = remove_dups(thread_list)
+    print(thread_list)
+    return thread_list
 
 

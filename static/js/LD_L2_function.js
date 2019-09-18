@@ -33,13 +33,21 @@ function logicalDataL2Function(container, ulrParam, ldName) {
     configEdgeStyle(graph, "#000000");
     try {
         let lcX = 700;
-        let lcY = 200;
+        let lcY = 100;
         let funX = 50;
         let funY = 100;
         let styleIdNode = null;
         let strokeColor = null;
         let nodeSize = {};
         let functionContainer = document.getElementById('function_circular_textual').getElementsByClassName('li-list_level0');
+        let lcContainer = document.getElementById('all_lc_accessed_nested_function').getElementsByClassName('li-list_level1');
+        for (let lc of lcContainer){
+            let lcName = lc.innerHTML.replace(/ /g, '');
+            nodeStyle(graph, 'LogicalComp');
+            nodeSize = setNodeSize(lcName, 'LogicalComp' );
+            graph.insertVertex(parent, null, lcName, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+            lcY += 200;
+        }
         for (let elm of functionContainer) {
             let fun_name = elm.getElementsByClassName('func_name')[0].innerHTML;
             if (ldName !== null && ldName !== fun_name) {
@@ -53,6 +61,11 @@ function logicalDataL2Function(container, ulrParam, ldName) {
             nodeSize = setNodeSize(fun_name, styleIdNode );
             let funNode = graph.insertVertex(parent, null, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
             funY += 200;
+
+            // draw logical components
+
+            // console.log(fun_name);
+            // console.log(lcContainer);
         }
     }finally{
         // Updates the display
@@ -100,10 +113,10 @@ function logicalDataL1Function(container, ulrParam, ldName) {
         let fun_name = null;
         for (let elm of functionContainer){
             fun_name = elm.getElementsByClassName('func_name')[0].innerHTML;
-            let funVarElements = elm.getElementsByClassName('list_level1')[0].getElementsByClassName('li-list_level1');
+            let funVarElements = elm.getElementsByClassName('list_level1')[0].getElementsByClassName('VarList')[0].getElementsByClassName('value');
             let funVarList = [];
             for (let varName of funVarElements){
-                let varNameTyped = varName.firstElementChild.innerHTML.replace(/ /g,'');
+                let varNameTyped = varName.innerHTML.replace(/ /g,'');
                 funVarList.push(varNameTyped.includes('.')? varNameTyped.split(".")[0]: varNameTyped);
             }
             if (ldName !== null && ldName !== fun_name) {
@@ -159,7 +172,7 @@ function circularLogicalDataFunction(container, ulrParam, ldName) {
             let ldL2List = document.getElementById("function_circular_textual").getElementsByClassName("li-list_level0");
             for (let i=0; i < ldL2List.length; i++){
                 let ldtext = ldL2List[i].firstElementChild.innerHTML.replace(/ /g,'');
-                let varList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("li-list_level1");
+                let varList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("VarList")[0].getElementsByClassName('value');
                 let stId = 'ldL2_' + i;
                 if (ldName !== null && ldName !== ldtext){
                     styleIdNode = "LogicalDataInactive";

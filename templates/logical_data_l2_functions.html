@@ -8,7 +8,7 @@
             <h4> Operation of Functions</h4>
         </div>
     </nav>
-    {% if not logical_data_funciton %}
+    {% if not logical_data_function %}
         <div class="alert alert-danger" role="alert">
             <i class="fas fa-times"></i>
             No group for this level of Logical Data has been created.</br>
@@ -17,9 +17,9 @@
     {% else %}
         <div class="alert alert-info" role="alert">
             <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
-            There are <strong class="see_it" style="text-decoration: underline;">{{ logical_data_funciton|length }}</strong> Logical Data which are nested function:
+            There are <strong class="see_it" style="text-decoration: underline;">{{ logical_data_function|length }}</strong> Logical Data which are nested function:
             <ul>
-                {% for dt in logical_data_funciton %}
+                {% for dt in logical_data_function %}
                     <li><strong> {{ forloop.counter }}- {{ dt }}</strong></li>
                 {% endfor %}
             </ul>
@@ -63,13 +63,15 @@
     <div id="tab02" class="tab-contents" style="display: none">
         <div class="col-md-12 well textual_container" id="function_textual">
             <ul class="list_level0 col-md-12" id="function_circular_textual">
-                {% for k,v in logical_data_funciton.items %}
+                {% for k,v in logical_data_function.items %}
                     <li class="li-list_level0 col-3" style="border-left: 1px solid #2e6da4;">
                     <span class="func_name" style="font-weight: bold ">{{ k }}</span>
-                        <ul class="list_level1">
-                            {% for var in v %}
-                                <li class="li-list_level1" id="{{ var }}">
-                                    <span class="value">{{ var }}</span>
+                        <ul class="list_level1 {{ k }}">
+                            {% for key, val in v.items %}
+                                <li class="li-list_level1 {{ key }}" >
+                                    {% for v in val %}
+                                        <span class="value">{{ v }}</span>
+                                    {% endfor %}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -79,6 +81,11 @@
             <ul class="list_level0 col-md-12" id="all_var_accessed">
                 {% for var in all_var_accessed %}
                     <li class="li-list_level1" id="{{ var }}_id">{{ var }}</li>
+                {% endfor %}
+            </ul>
+            <ul class="list_level0 col-md-12" id="all_lc_accessed_nested_function">
+                {% for var in all_lc_accessed_nested_function %}
+                    <li class="li-list_level1">{{ var }}</li>
                 {% endfor %}
             </ul>
         </div>

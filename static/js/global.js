@@ -340,8 +340,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam, strokeColor)
         chY = pY;
     }
     for (let j = 0; j < childList.length; j++) {
-
-        let Text = childList[j].getElementsByClassName('value')[0].innerHTML;
+        let Text = childList[j].innerHTML;
         nodeType = Text.includes(".")? "logicalData" : "variable";
         nodeText = Text.includes(".")? Text.split(".")[0]: Text;
         //console.log(nodeText);

@@ -15,6 +15,49 @@
                 <div class="alert alert-danger" role="alert">{{ trace_error }}</div>
             {% endif %}
         </div>
+        <div class="col-md-12 select_file_form shadow-sm">
+            <h2>You can <strong class="see_it">SELECT</strong> a program from the below list:</h2>
+            <form method="post" enctype="multipart/form-data" class="form-inline select_trace_file" id="select_trace_file">
+                {% csrf_token %}
+                <div class="invalid-feedback" id="empty-t-list">Please select a Trace Tile from the list.</div>
+                <div class="invalid-feedback" id="empty-shv-list">Please select a Shared Variable File from the list.</div>
+                <div class="col-md-3"></div>
+                <div class="col-md-6" >
+                    <div class="form-group">
+                        <select class="browser-default custom-select form-group select_tag_file" id="selected_trace_file" name="selected_trace_file">
+                          <option value="" selected>Chose a program name</option>
+<!--                            {% for f in existing_trace_files %}-->
+<!--                                <option value="{{ f }}">{{ f }}</option>-->
+<!--                            {% endfor %}-->
+                        </select>
+                    </div>
+<!--                    <div class="form-group">-->
+<!--                        <select class="browser-default custom-select form-group select_tag_file" id="selected_shared_var_file" name="selected_shared_var_file">-->
+<!--                          <option value="" selected>Chose between uploaded Shared Variables Files</option>-->
+<!--                            {% for f in existing_shvar_files %}-->
+<!--                                <option value="{{ f }}">{{ f }}</option>-->
+<!--                            {% endfor %}-->
+<!--                        </select>-->
+<!--                    </div>-->
+                </div>
+                <div class="form-group col-md-3">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+<!--        <div class="col-md-12 trace_file_form shadow-sm">-->
+<!--            <div class="col-md-12">-->
+<!--                {% if shvar_error != "" %}-->
+<!--                    <div class="alert alert-danger" role="alert">{{ shvar_error }}</div>-->
+<!--                {% endif %}-->
+<!--            </div>-->
+<!--        </div>-->
+        <div class="col-md-12" style="font-size: 2em;">
+            <h2>OR</h2>
+        </div>
         <div class="col-md-12 trace_file_form shadow-sm">
             <h2>You can <strong  class="see_it">UPLOAD</strong> your files here:</h2>
             <form method="post" enctype="multipart/form-data" class="form-inline needs-validation trace_file_upload" id="trace_file_upload" novalidate>
@@ -25,7 +68,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <div class="input-group " id="custom-file">
+                    <div class="input-group " id="trace-file">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroupFileAddon01">
                                 <i class="fa fa-upload" aria-hidden="true"></i>
@@ -38,9 +81,9 @@
                         </div>
 
                     </div>
-                    <div class="input-group" id="custom-file">
+                    <div class="input-group" id="shared-var-file">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroupFileAddon01">
+                            <span class="input-group-text" id="inputGroupFileAddon02">
                                 <i class="fa fa-upload" aria-hidden="true"></i>
                             </span>
                         </div>
@@ -50,7 +93,7 @@
 
                         </div>
                     </div>
-                    <div class="input-group" id="custom-file">
+                    <div class="input-group" id="exe-path-file">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroupFileAddon03">
                                 <i class="fa fa-upload" aria-hidden="true"></i>
@@ -69,47 +112,9 @@
             </form>
 
         </div>
-        <div class="col-md-12" style="font-size: 2em;">
-            <h2>OR</h2>
-        </div>
-        <div class="col-md-12">
-            {% if shvar_error != "" %}
-                <div class="alert alert-danger" role="alert">{{ shvar_error }}</div>
-            {% endif %}
-        </div>
-        <div class="col-md-12 select_file_form shadow-sm">
-            <h2>You can <strong class="see_it">SELECT</strong> from the files which uploaded before:</h2>
-            <form method="post" enctype="multipart/form-data" class="form-inline select_trace_file" id="select_trace_file">
-                {% csrf_token %}
-                <div class="invalid-feedback" id="empty-t-list">Please select a Trace Tile from the list.</div>
-                <div class="invalid-feedback" id="empty-shv-list">Please select a Shared Variable File from the list.</div>
-                <div class="col-md-3"></div>
-                <div class="col-md-6" >
-                    <div class="form-group">
-                        <select class="browser-default custom-select form-group select_tag_file" id="selected_trace_file" name="selected_trace_file">
-                          <option value="" selected>Chose between uploaded Trace Files</option>
-                            {% for f in existing_trace_files %}
-                                <option value="{{ f }}">{{ f }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <select class="browser-default custom-select form-group select_tag_file" id="selected_shared_var_file" name="selected_shared_var_file">
-                          <option value="" selected>Chose between uploaded Shared Variables Files</option>
-                            {% for f in existing_shvar_files %}
-                                <option value="{{ f }}">{{ f }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group col-md-3">
-                    <button type="submit" class="btn btn-primary">Load</button>
-                </div>
 
-            </form>
-        </div>
 
-    </div>
+
 
     {% if trace_url and shvar_url %}
         <div class="col-md-12 file_uploaded">
