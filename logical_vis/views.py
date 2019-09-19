@@ -315,7 +315,7 @@ def ld_exe_path_l2(request):
 def time_line_view(request):
     thread_activity = {}
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
-
+    csv_reader_list = get_file_records(trace_file)
     threads = get_threads(trace_file)
     all_time_stamp = get_time_stamp_list(trace_file)
     if "." in all_time_stamp[-1]:
@@ -324,38 +324,53 @@ def time_line_view(request):
         time_activity = {}
         t_id = t if "Main_" not in t else t.split("_")[1]
         # print(t_id)
-        with open(trace_file, 'r') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
+        thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
+                               row[3] is not "" and "CONSTANT;" in row[5], csv_reader_list)
+        thread_list = list(thread_filter)
 
-            thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
-                                   row[3] is not "" and "CONSTANT;" in row[5], csv_reader)
-            thread_list = list(thread_filter)
-            # print(thread_list)
-            # csv_file.seek(0, 0)
-        csv_file.close()
-        # write_to_csv_file(thread_list, "timeline_" + t_id)
         time_stamp_dict = {k[0] for k in thread_list}
         time_stamp_list = list(time_stamp_dict)
         time_stamp_list.sort()
 
         for ts in time_stamp_list:
             activity_list = []
-            thread_filter = map(lambda r: {r[3].split(".")[0] if "." in r[3] else r[3]: r[2],
-                                "node_type": "logicalData" if "." in r[3] else "variable"} if r[0] == ts and
-                                r[1] == t_id else None, thread_list)
+            thread_filter = map(lambda r: {r[3].split(".")[0]+"." if "." in r[3] else r[3]: r[2]}
+                                if r[0] == ts and r[1] == t_id else None, thread_list)
             time_stamp_act = list(filter(partial(is_not, None), thread_filter))
             for indx, item in enumerate(time_stamp_act):
                 if indx is 0 or item != time_stamp_act[indx-1]:
                     activity_list.append(item)
+            # print(activity_list)
             if len(activity_list) > 1:
                 t_ld_name = t_id + "-" + ts
-                time_activity.update({ts: {t_ld_name: activity_list}})
+                # print("---------------", t_ld_name, "---------------")
+                # print(activity_list)
+                activity_var_list = []
+                [activity_var_list.extend(a.keys()) for a in activity_list]
+                activity_var_list = remove_dups(activity_var_list)
+                thr_ts_activity_list = {}
+                for v in activity_var_list:
+                    ts_op_var = []
+                    # print("---------------", v, "---------------")
+                    for a in activity_list:
+                        # print("---------------", a, "---------------")
+                        if v in list(a.keys()):
+                            ts_op_var.append(a[v])
+                        # [ts_op_var.append(a[v]) for a in activity_list]
+                    ts_op_var = remove_dups(ts_op_var)
+                    if len(ts_op_var) > 1:
+                        thr_ts_activity_list.update({v: 'PROCESS'})
+                    else:
+                        thr_ts_activity_list.update({v: ts_op_var[0]})
+                # print(thr_ts_activity_list)
+                time_activity.update({ts: {t_ld_name: thr_ts_activity_list}})
+
             else:
-                time_activity.update({ts: {"noGroup": activity_list}})
+                time_activity.update({ts: {"noGroup": activity_list[0]}})
 
         od = collections.OrderedDict(sorted(time_activity.items()))
         thread_activity.update({t: od})
-
+    print(thread_activity)
     return render(request, 'time_line_view.html', {'title_name': which_way,
                                                    "threads": threads,
                                                    "thread_activity": thread_activity,

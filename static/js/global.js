@@ -610,7 +610,7 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
     ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
     let time_stamp_list = document.getElementById('time_stamp_list').getElementsByTagName('p');
     for (let ts of time_stamp_list){
-        if (ts.innerHTML.replace(/_/g, "\n") === timeStamp){
+        if (ts.innerHTML.replace(/ /g,'') === timeStamp){
             nodePosition[0] = ts.offsetLeft;
             nodePosition[1] = ts.offsetTop;
             // console.log(nodePosition);
@@ -624,17 +624,22 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
     let nodeType = "logicalData";
     let op = null;
     for (let i=0; i < childList.length; i++){
-        let childText = childList[i].firstElementChild.innerHTML.replace(/_/g, "\n");
+        let childText = childList[i].getElementsByClassName('g_name')[0].innerHTML.replace(/ /g,'');
+        // console.log(childText);
         if (childText === "noGroup"){
-            childText = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('key')[0].innerHTML.replace(/_/g, "\n");
-            childOp = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('val')[0].innerHTML.replace(/_/g, "\n");
-            childType = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('node_type')[0].innerHTML.replace(/_/g, "\n");
+            childText = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('key')[0].innerHTML.replace(/ /g,'');
+            childType = childText.includes(".")? "logicalData" : "variable";
+            childText = childText.includes(".")? childText.split(".")[0] : childText;
+            childOp = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('val')[0].innerHTML.replace(/ /g,'');
             switch (childOp) {
                 case "LOAD":
                     op = "R";
                     break;
                 case "STORE":
                     op = "W";
+                    break;
+                case "PROCESS":
+                    op = "P";
                     break;
             }
             nodeType = childType + "_" + op;
@@ -643,13 +648,7 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
         nodeSize = setNodeSize(childText, nodeType);
         nodeStyle(graph,  nodeSize['nodeIdText']);
         graph.insertVertex(parent, null, childText, childX, childY, 150, 70, nodeSize['nodeIdText']);
-        graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
-            let cell = evt.getProperty('cell');
-            if (cell['style'].includes('logicalData')){
-                window.location = "http://127.0.0.1:8000/timeLineLDL2?b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-            }
-            evt.consume();
-        });
+
         childX += 80;
 
     }

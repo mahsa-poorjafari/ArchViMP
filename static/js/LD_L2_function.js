@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     //let clientWidth = document.documentElement.clientWidth;
     let clientWidth = document.getElementById('content').clientWidth;
     let ldName = get_node_name();
-
+    if (ldName !== null){
+        document.getElementById('tab04').style.display = 'block';
+        document.getElementById('tab03').style.display = 'none';
+        document.getElementById('for_tab03').classList.remove("is-active");
+        document.getElementById('for_tab04').classList.add("is-active");
+    }
     logicalDataL2Function(ldL2GraphContainer, clientWidth, ldName);
     logicalDataL1Function(ldL1GraphContainer, clientWidth, ldName);
     circularLogicalDataFunction(circularGraphContainer, ldName);

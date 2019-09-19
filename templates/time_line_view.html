@@ -10,9 +10,9 @@
     <div class="tabs">
         <div class="tab-button-outer">
             <ul id="tab-button">
-              <li><a href="#tab01" class="btn-info" style="display:block">Diagram L3</a></li>
-              <li><a href="#tab03" class="btn-info" style="display:block">Diagram L2</a></li>
-              <li><a href="#tab02" class="btn-info" style="display:block">Textual</a></li>
+              <li id="for_tab01"><a href="#tab01" class="btn-info" style="display:block">Diagram L3</a></li>
+              <li id="for_tab03"><a href="#tab03" class="btn-info" style="display:block">Diagram L2</a></li>
+              <li id="for_tab02"><a href="#tab02" class="btn-info" style="display:block">Textual</a></li>
             </ul>
         </div>
         <div class="tab-select-outer">
@@ -33,7 +33,9 @@
         <div class="col-md-10 well diagram_container" id="time_line_diagram"></div>
     </div>
     <div id="tab03" class="tab-contents">
-        <div class="col-md-12 diagram_container" id="time_line_ldl2_diagram"></div>
+        <div class="col-md-12 diagram_container" id="time_line_ldl2_diagram">
+            Heeeeeeeeeeey
+        </div>
     </div>
     <div id="tab02" class="tab-contents time_stamp_text">
         <div class="col-md-12 text_container" style="display: block" id="time_line_text">
@@ -49,14 +51,13 @@
                                         {% for g_name, g_members in tv.items %}
                                             <li class="li-list_level2 activity">
                                                 <span class="g_name">{{ g_name }}</span>
-                                                <p class="g_members">
-                                                    {% for members in g_members %}
-                                                        {% for kkey, kval in members.items %}
-                                                            <span class="key">{{ kkey }}</span>
-                                                            <span class="val {{ kkey }}">{{ kval }}</span>
-                                                        {% endfor %}
-                                                    {% endfor %}
-                                                </p>
+                                                {% for membersName, memberOp in g_members.items %}
+                                                    <p class="g_members">
+                                                        <span class="key">{{ membersName }}</span>
+                                                        <span class="val {{ kkey }}">{{ memberOp }}</span>
+                                                    </p>
+                                                {% endfor %}
+
                                             </li>
                                         {% endfor %}
                                     </ul>

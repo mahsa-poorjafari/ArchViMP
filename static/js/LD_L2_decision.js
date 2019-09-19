@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let ldL2List = document.getElementById("logical_data_l2_decision_textual").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
     let clientWidth = document.getElementById('content').clientWidth;
     let ldName = get_node_name();
+    if (ldName !== null){
+        document.getElementById('tab03').style.display = 'block';
+        document.getElementById('tab01').style.display = 'none';
+        document.getElementById('for_tab01').classList.remove("is-active");
+        document.getElementById('for_tab03').classList.add("is-active");
+    }
     logicalDataL2Decision(graphContainerL2, ldL2List, clientWidth, ldName);
     logicalDataL1Decision(graphContainerL1, ldL2List, clientWidth, ldName);
 });
