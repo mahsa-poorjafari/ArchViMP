@@ -7,17 +7,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let ldL2GraphContainer = document.getElementById('logical_data_l2_function_diagram');
     let ldL1GraphContainer = document.getElementById('logical_data_l1_function_diagram');
     let circularGraphContainer = document.getElementById('function_circular_diagram');
-
+    //let clientWidth = document.documentElement.clientWidth;
+    let clientWidth = document.getElementById('content').clientWidth;
     let ldName = get_node_name();
-    let benchmarkName = get_url_benchmark();
-    let fileName = get_url_fileName();
-    let ulrParam = [benchmarkName];
-    ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
-    logicalDataL2Function(ldL2GraphContainer, ulrParam, ldName);
-    logicalDataL1Function(ldL1GraphContainer, ulrParam, ldName);
-    circularLogicalDataFunction(circularGraphContainer, ulrParam, ldName);
+
+    logicalDataL2Function(ldL2GraphContainer, clientWidth, ldName);
+    logicalDataL1Function(ldL1GraphContainer, clientWidth, ldName);
+    circularLogicalDataFunction(circularGraphContainer, ldName);
 });
-function logicalDataL2Function(container, ulrParam, ldName) {
+function logicalDataL2Function(container, clientWidth, ldName) {
+
     // Disables the built-in context menu
     mxEvent.disableContextMenu(container);
     // Creates the graph inside the given container
@@ -32,7 +31,8 @@ function logicalDataL2Function(container, ulrParam, ldName) {
     graph.getModel().beginUpdate();
     configEdgeStyle(graph, "#000000");
     try {
-        let lcX = 700;
+        let lcX = clientWidth/2-150;
+        let funX2 = clientWidth-250;
         let lcY = 100;
         let funX = 50;
         let funY = 100;
@@ -41,15 +41,28 @@ function logicalDataL2Function(container, ulrParam, ldName) {
         let nodeSize = {};
         let functionContainer = document.getElementById('function_circular_textual').getElementsByClassName('li-list_level0');
         let lcContainer = document.getElementById('all_lc_accessed_nested_function').getElementsByClassName('li-list_level1');
+        // draw logical components
         for (let lc of lcContainer){
             let lcName = lc.innerHTML.replace(/ /g, '');
             nodeStyle(graph, 'LogicalComp');
             nodeSize = setNodeSize(lcName, 'LogicalComp' );
             graph.insertVertex(parent, null, lcName, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-            lcY += 200;
+            lcY += 100;
         }
-        for (let elm of functionContainer) {
+        let mxCells = graph.getChildVertices(graph.getDefaultParent());
+        let lcName = null;
+        //for (const [i, elm] of functionContainer.entries()) {
+        for (let i = 0; i < functionContainer.length; i++) {
+            let elm = functionContainer[i];
+            let funLcList = [];
             let fun_name = elm.getElementsByClassName('func_name')[0].innerHTML;
+            let funLcTags = elm.getElementsByClassName('list_level1')[0].getElementsByClassName('LogicalComponets')[0].getElementsByClassName('value');
+            // console.log(fun_name);
+            // console.log(funLcTags);
+            for (let lc of funLcTags){
+                lcName = lc.innerHTML.replace(/ /g, '');
+                funLcList.push(lcName);
+            }
             if (ldName !== null && ldName !== fun_name) {
                 styleIdNode = "LogicalDataInactive";
                 strokeColor = "strokeColor=#ccc;";
@@ -59,20 +72,30 @@ function logicalDataL2Function(container, ulrParam, ldName) {
             }
             nodeStyle(graph, styleIdNode);
             nodeSize = setNodeSize(fun_name, styleIdNode );
+            funX = (i+1)%2 === 0 ? funX2 : 50;
+            funY = (i+1)%2 === 0 ? funY : funY += 100;
             let funNode = graph.insertVertex(parent, null, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-            funY += 200;
+            // funY += 200;
+            // Connecting each function node to its logical components
 
-            // draw logical components
-
-            // console.log(fun_name);
-            // console.log(lcContainer);
+            // console.log(funLcList);
+            mxCells.forEach(function (node) {
+                if(node['style'] === 'LogicalComp' && funLcList.includes(node['value'])){
+                    graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize=10;' + strokeColor);
+                    node.source = funNode;
+                    funNode.source = node;
+                }
+            });
+            let ldUlrPath = "http://127.0.0.1:8000/operation_functions_L2";
+            let lcUlrPath = "http://127.0.0.1:8000/logical_comp";
+            ldLcGraphDoubleClickEvent(graph, ldUlrPath, lcUlrPath);
         }
     }finally{
         // Updates the display
         graph.getModel().endUpdate();
     }
 }
-function logicalDataL1Function(container, ulrParam, ldName) {
+function logicalDataL1Function(container, clientWidth, ldName) {
     // Disables the built-in context menu
     mxEvent.disableContextMenu(container);
     // Creates the graph inside the given container
@@ -87,16 +110,19 @@ function logicalDataL1Function(container, ulrParam, ldName) {
     graph.getModel().beginUpdate();
     configEdgeStyle(graph, "#000000");
     try {
+        let funX = clientWidth/2-150;
+        let varX2 = clientWidth-250;
         let varX = 50;
         let varY = 100;
-        let funX = 700;
         let funY = 100;
         let styleIdNode = null;
         let strokeColor = null;
         let nodeSize = {};
         let variableContainer = document.getElementById('all_var_accessed');
         let variableList = variableContainer.getElementsByClassName("li-list_level1");
-        for (let vElement of variableList){
+
+        for (let i = 0; i < variableList.length; i++){
+            let vElement = variableList[i];
             let elementText = vElement.innerHTML;
             let varText = elementText.includes(".")? elementText.split(".")[0] : elementText;
             let varType = elementText.includes(".")? "logicalData" : "variable";
@@ -104,14 +130,15 @@ function logicalDataL1Function(container, ulrParam, ldName) {
             // console.log(varText);
             nodeSize = setNodeSize(varText, varType );
             // console.table(nodeSize);
+            varX = (i+1)%2 === 0 ? varX2 : 50;
+            varY = (i+1)%2 === 0 ? varY : varY += 150;
             graph.insertVertex(parent, null, varText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-            varY += 200;
         }
         let mxCells = graph.getChildVertices(graph.getDefaultParent());
         let functionContainer = document.getElementById('function_circular_textual').getElementsByClassName('li-list_level0');
 
         let fun_name = null;
-        for (let elm of functionContainer){
+        for (let elm of functionContainer) {
             fun_name = elm.getElementsByClassName('func_name')[0].innerHTML;
             let funVarElements = elm.getElementsByClassName('list_level1')[0].getElementsByClassName('VarList')[0].getElementsByClassName('value');
             let funVarList = [];
@@ -128,7 +155,7 @@ function logicalDataL1Function(container, ulrParam, ldName) {
             }
             nodeStyle(graph, styleIdNode);
             nodeSize = setNodeSize(fun_name, styleIdNode );
-            let funNode = graph.insertVertex(parent, null, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+            let funNode = graph.insertVertex(parent, 'function_ld_'+fun_name, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
             funY += 200;
             mxCells.forEach(function (node){
                 if(funVarList.includes(node['value'])){
@@ -137,6 +164,9 @@ function logicalDataL1Function(container, ulrParam, ldName) {
                     funNode.source = node;
                 }
             });
+            let tdUlrPath = "http://127.0.0.1:8000/Logical_Data_L1";
+            let ldUrlPath = "http://127.0.0.1:8000/operation_functions_L2";
+            ldTdGraphDoubleClickEvent(graph, tdUlrPath, ldUrlPath);
         }
     }finally{
         // Updates the display
@@ -144,7 +174,7 @@ function logicalDataL1Function(container, ulrParam, ldName) {
     }
 }
 
-function circularLogicalDataFunction(container, ulrParam, ldName) {
+function circularLogicalDataFunction(container, ldName) {
     if (!mxClient.isBrowserSupported()) {
         // Displays an error message if the browser is not supported.
         mxUtils.error('Browser is not supported!', 200, false);
@@ -198,7 +228,7 @@ function circularLogicalDataFunction(container, ulrParam, ldName) {
                 }
                 let stNode = graph.insertVertex(parent, stId, ldtext, stX, stY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // console.log("___________  " + ldtext);
-                drawTdForLd(graph, parent, stNode, varList, null, ulrParam, strokeColor);
+                //drawTdForLd(graph, parent, stNode, varList, null, ulrParam, strokeColor);
                 // drawChild(graph, parent, stNode, varList, 'diamondThin', '1', 0, 'variable');
             }
 

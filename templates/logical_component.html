@@ -29,23 +29,26 @@
     <div id="tab01" class="tab-contents">
         <div class="col-md-12 well diagram_container" id="logical_comp_diagram"></div>
     </div>
-    <div id="tab02" class="tab-contents">
-        <div class="col-md-12 text_container" style="display: none" id="logical_comp_textual">
-            <ul class="list_level0">
-                {% for t, f_list in thread_function.items %}
-                    <li class="li-list_level0">
-                        <span>{{ t }}</span>
-                        <ul class="list_level1">
-                            {% for f in f_list %}
-                                <li class="li-list_level1" >
-                                    {{ f }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
+    <div id="tab02" class="tab-contents" style="display: none">
+        <div class="col-md-12 text_container" id="logical_comp_textual">
 
+            <ul class="lc_for_threads" style="margin-top: 2em">
+                {% for t, f_list in lc_for_threads.items %}
+                    <li class="li-list_level0">
+                        <span class="log_comp_name">{{ t }}</span>
+                        {% for f in f_list %}
+                            <span class="thread_id">{{ f }}</span>
+                        {% endfor %}
+
+                    </li>
                 {% endfor %}
             </ul>
+            <ul class="thread_id_list" style="margin-top: 2em">
+                {% for t in thread_id_list %}
+                    <span class="thread_id">{{ t }}</span>
+                {% endfor %}
+            </ul>
+
         </div>
     </div>
 

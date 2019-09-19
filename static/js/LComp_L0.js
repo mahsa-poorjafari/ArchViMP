@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     let graphContainer = document.getElementById('logical_comp_diagram');
-    main(graphContainer);
+    let clientWidth = document.getElementById('content').clientWidth;
+    let lcName = get_node_name();
+    main(graphContainer, clientWidth, lcName);
 });
-function main(container) {
+function main(container, clientWidth, lcName) {
     // Checks if the browser is supported
     if (!mxClient.isBrowserSupported()) {
         // Displays an error message if the browser is not supported.
@@ -24,57 +26,67 @@ function main(container) {
         graph.getModel().beginUpdate();
 
         try {
-            let threadList = document.getElementById("logical_comp_textual").getElementsByClassName("list_level0")[0].getElementsByClassName('li-list_level0');
             nodeStyle(graph, 'LogicalComp');
             configEdgeStyle(graph, "#000000");
             let fX = 20;
+            let fX2 = clientWidth-450;
             let fY = 70;
-            let tX = 500;
-            let tY = 50;
-            let thrNode = null;
+            // let tX = 500;
+            let tX = clientWidth/2-200;
+            let tY = 0;
             let styleIdNode = "LogicalComp";
-            let lcName = get_node_name();
-            for (let i=0; i<threadList.length; i++){
-                let thrId = 'thr' + i;
-                let thrText = threadList[i].getElementsByTagName("span")[0].innerHTML;
-                let thrFunc = threadList[i].getElementsByClassName('li-list_level1')[0].innerHTML.replace(/[\n\r ]/g, "");
-
-                if (thrText.includes("_")){
+            let logCompList = [];
+            // let thrFunc = threadList[i].getElementsByClassName('li-list_level1')[0].innerHTML.replace(/[\n\r ]/g, "");
+            let threads = document.getElementsByClassName('thread_id_list')[0].getElementsByClassName('thread_id');
+            let logicalComponentList = document.getElementById("logical_comp_textual").getElementsByClassName("lc_for_threads")[0].getElementsByClassName('li-list_level0');
+            for (let thr of threads){
+                let thrText = thr.innerHTML.replace(/ /g, '');
+                if (thrText.includes("_")) {
                     thrText = thrText.replace(/_/g, "\n");
                     styleIdNode = "mainThread";
-                    tY += 150;
-                }else {
+                } else {
                     styleIdNode = "thread";
-
                 }
                 nodeStyle(graph, styleIdNode);
-                console.log(thrText);
-                console.log(thrFunc);
-                thrNode = graph.insertVertex(parent, thrId, thrText, tX, tY, 120, 80, styleIdNode);
+                graph.insertVertex(parent, null, thrText, tX, tY, 120, 80, styleIdNode);
                 tY += 150;
-                let funcId = "func_" + i;
-                if (lcName !== null && lcName !== thrFunc){
+            }
+            let mxCells = graph.getChildVertices(graph.getDefaultParent());
+            for (let i=0; i<logicalComponentList.length; i++) {
+                let logComp = logicalComponentList[i];
+                let lcId = 'LC' + i;
+                let lcText = logComp.getElementsByClassName("log_comp_name")[0].innerHTML.replace(/[\n\r ]/g, "");
+                let lcThrElements = logComp.getElementsByClassName('thread_id');
+                let lcThrList = [];
+                for (let thr of lcThrElements){
+                    lcThrList.push(thr.innerHTML.replace(/ /g, ''));
+                }
+                if (lcName !== null && lcName !== lcText) {
                     styleIdNode = "LogicalCompInactive";
-                }else{
+                } else {
                     styleIdNode = "LogicalComp";
                 }
-                // console.table([thrFunc, lcName, styleIdNode]);
                 nodeStyle(graph, styleIdNode);
-                let mxCells = graph.getChildVertices(graph.getDefaultParent());
-                let funcNode = null;
-                mxCells.forEach(function(node){
-                    //console.log(node['style'].includes("LogicalComp") && node['value'] === thrFunc );
-                    if (node['style'].includes("LogicalComp") && node['value'] === thrFunc ){
-                        funcNode = node;
+                fX = (i+1)%2 === 0 ? fX2 : 50;
+                fY = (i+1)%2 === 0 ? fY : fY += 150;
+                //console.log(lcText);
+                //console.log(lcThrList);
+
+                let lcNode = graph.insertVertex(parent, lcId, lcText, fX, fY, 120, 80, styleIdNode);
+                // fY += 150;
+                mxCells.forEach(function (node) {
+                    let nodeValue = node['value'].includes("\n")? node['value'].split("\n")[1] : node['value'];
+                    console.log(nodeValue);
+                    if ((node['style'] === 'thread' || node['style'] === 'mainThread') && lcThrList.includes(nodeValue)){
+                        graph.insertEdge(parent, null, null, node, lcNode, 'dashed=0;' +
+                            'endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=0;');
+                        node.target = lcNode;
+                        lcNode.source = node;
                     }
                 });
-                if (funcNode === null)
-                    funcNode = graph.insertVertex(parent, funcId, thrFunc, fX, fY, 120, 80, styleIdNode);
-                fY += 150;
-                thrNode.target = funcNode;
-                graph.insertEdge(parent, null, null, thrNode, funcNode, 'dashed=0;' +
-                            'endArrow=diamondThin;sourcePerimeterSpacing=0;startFill=0;endFill=0;');
+
             }
+
         }finally {
             //console.table( graph.getChildVertices(graph.getDefaultParent()));
             graph.getModel().endUpdate();

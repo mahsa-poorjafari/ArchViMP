@@ -1,11 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
+
     let graphContainerL2 = document.getElementById('logical_data_l2_decision_diagram');
     let graphContainerL1 = document.getElementById('logical_data_l1_decision_diagram');
     let ldL2List = document.getElementById("logical_data_l2_decision_textual").getElementsByClassName("list_level0")[0].getElementsByClassName("li-list_level0");
-    logicalDataL2Decision(graphContainerL2, ldL2List);
-    logicalDataL1Decision(graphContainerL1, ldL2List);
+    let clientWidth = document.getElementById('content').clientWidth;
+    let ldName = get_node_name();
+    logicalDataL2Decision(graphContainerL2, ldL2List, clientWidth, ldName);
+    logicalDataL1Decision(graphContainerL1, ldL2List, clientWidth, ldName);
 });
-function logicalDataL2Decision(container, ldL2List) {
+function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
     if (!mxClient.isBrowserSupported()) {
         // Displays an error message if the browser is not supported.
         mxUtils.error('Browser is not supported!', 200, false);
@@ -25,18 +28,14 @@ function logicalDataL2Decision(container, ldL2List) {
         graph.getModel().beginUpdate();
         configEdgeStyle(graph, "#000000");
         try {
-            let lDecX = 50;
-            let lDefY = 50;
-            let lcX = 900;
+            let lDecX = 0;
+            let lDefY = 0;
+            let lcX = clientWidth/2-150;
+            let lDecX2 = clientWidth-450;
             let lcY = 200;
             let styleIdNode = null;
             let strokeColor = null;
             let nodeSize = {};
-            let ldName = get_node_name();
-            let benchmarkName = get_url_benchmark();
-            let fileName = get_url_fileName();
-            let ulrParam = [benchmarkName];
-            ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
 
             let lcList = document.getElementById("logical_data_l2_decision_textual").getElementsByClassName("lc_list_log_des")[0].getElementsByClassName("lc_li");
             let lcDict = {};
@@ -62,7 +61,6 @@ function logicalDataL2Decision(container, ldL2List) {
             let mxCells = graph.getChildVertices(graph.getDefaultParent());
             for (let i=0; i < ldL2List.length; i++) {
                 let lDecText = ldL2List[i].firstElementChild.innerHTML.replace(/ /g, '');
-
                 let thread_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("thread_list")[0].getElementsByClassName('value');
                 let Logical_component_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("Logical_component_list")[0].getElementsByClassName('value');
                 // console.log(lDecText);
@@ -78,6 +76,8 @@ function logicalDataL2Decision(container, ldL2List) {
                 nodeSize = setNodeSize(lDecText, styleIdNode);
                 nodeStyle(graph, nodeSize['nodeIdText']);
                 //console.table(lDecText + ' === ' + lDecX + ' === ===' + lDefY);
+                lDecX = (i+1)%2 === 0 ? lDecX2 : 10;
+                lDefY = (i+1)%2 === 0 ? lDefY : lDefY += 200;
                 let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+50, nodeSize['Height']+50, nodeSize['nodeIdText']);
                 let logCompNode = null;
                 for (let lcForLd of Logical_component_list){
@@ -92,7 +92,7 @@ function logicalDataL2Decision(container, ldL2List) {
                 }
                 // Draw threads that run this Logical Decision
 
-                lDefY += 200;
+
                 let lcText = [];
                 //console.log(thread_list);
                 for (let element of thread_list){
@@ -107,36 +107,17 @@ function logicalDataL2Decision(container, ldL2List) {
                     });
                 }
             }
-            graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
-                let cell = evt.getProperty('cell');
-                if (cell['style'].includes("logicalData") || cell['style'].includes("LogicalDataInactive") || cell['value'].includes('logicalDecision')){
-                    let cellValue = cell['value'].replace(/ /g,'');
-                    //let currentUrl = document.location;
-                    //document.location = currentUrl + '&node=' + cellValue;
-                    document.location = "http://127.0.0.1:8000/logical_decision_L2?b=" +benchmarkName + "&node=" + cellValue;
-                    //window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-                    //document.getElementById('tab01').style.display = 'none';
-                    //document.getElementById('tab03').style.display = 'block';
-                    //document.getElementById('for_tab01').classList.remove("is-active");
-                    //document.getElementById('for_tab03').classList.add("is-active");
-
-                }
-                else if (cell['style'].includes("LogicalComp")){
-                    let cellValue = cell['value'].replace(/ /g,'');
-                    window.location = "http://127.0.0.1:8000/logical_comp?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-                }
-                evt.consume();
-            });
+            let ldUlrPath = "http://127.0.0.1:8000/logical_decision_L2";
+            let lcUlrPath = "http://127.0.0.1:8000/logical_comp";
+            ldLcGraphDoubleClickEvent(graph, ldUlrPath, lcUlrPath);
         }finally{
             // Updates the display
             graph.getModel().endUpdate();
         }
     }
 }
-function LogDesGroupMembers(memberName) {
 
-}
-function logicalDataL1Decision(container, ldL2List) {
+function logicalDataL1Decision(container, ldL2List, clientWidth, ldName) {
     // Disables the built-in context menu
     mxEvent.disableContextMenu(container);
     // Creates the graph inside the given container
@@ -152,29 +133,29 @@ function logicalDataL1Decision(container, ldL2List) {
     configEdgeStyle(graph, "#000000");
     try {
         let varX = 20;
-        let varY = 70;
-        let lDecX = 700;
+        let varY = 0;
+        // let lDecX = 700;
         let lDefY = 50;
+        let lDecX = clientWidth/2-200;
+        let varX2 = clientWidth-300;
         let varText = null;
         let nodeSize = null;
         let styleOfNode = null;
         let sharedVar = null;
         let allSharedVars = document.getElementById("logical_data_l2_decision_textual").getElementsByClassName("var_list_log_des")[0].getElementsByClassName("var_li");
-        let ldName = get_node_name();
-        let benchmarkName = get_url_benchmark();
-        let fileName = get_url_fileName();
-        let ulrParam = [benchmarkName];
-        ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
 
-        for (let varElement of allSharedVars){
+        for (let i=0; i < allSharedVars.length; i++){
+            let varElement = allSharedVars[i];
             sharedVar = varElement.getElementsByClassName('lc_name')[0];
             varText = sharedVar.innerHTML.includes(".")? sharedVar.innerHTML.split(".")[0] : sharedVar.innerHTML ;
             styleOfNode = sharedVar.innerHTML.includes(".")? "logicalData" : "variable" ;
             nodeSize = setNodeSize(varText, styleOfNode);
             nodeStyle(graph, nodeSize['nodeIdText']);
             // to Draw Variable element
+            varX = (i+1)%2 === 0 ? varX2 : 50;
+            varY = (i+1)%2 === 0 ? varY : varY += 150;
             graph.insertVertex(parent, varText, varText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-            varY += 200;
+
 
         }
         //console.log(thread_list);
@@ -214,19 +195,9 @@ function logicalDataL1Decision(container, ldL2List) {
                 }
             });
         }
-        graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
-            let cell = evt.getProperty('cell');
-            let cellValue = cell['value'].replace(/ /g,'');
-            if (cell['style'].includes("logicalData") && !cellValue.includes('logicalDecision')){
-                window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-            }else if (cellValue.includes('logicalDecision')){
-                document.location = "http://127.0.0.1:8000/logical_decision_L2?b=" +benchmarkName + "&node=" + cellValue;
-            }
-            else if (cell['style'].includes("LogicalComp")){
-                window.location = "http://127.0.0.1:8000/logical_comp?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-            }
-            evt.consume();
-        });
+        let tdUlrPath = "http://127.0.0.1:8000/Logical_Data_L1";
+        let ldUlrPath = "http://127.0.0.1:8000/logical_decision_L2";
+        ldTdGraphDoubleClickEvent(graph, tdUlrPath, ldUlrPath);
 
     }finally{
         // Updates the display

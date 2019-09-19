@@ -1,11 +1,11 @@
 
 function createLine(x1,y1,x2,y2,lineId) {
     let distance = Math.sqrt(((x1-x2)*(x1-x2))+((y1-y2)*(y1-y2)));
-    console.log(distance);
+    //console.log(distance);
     let xMid = (x1+x2)/2;
-    console.log('left'+xMid);
+    //console.log('left'+xMid);
     let yMid = (y1+y2)/2;
-    console.log('top'+yMid);
+    //console.log('top'+yMid);
     let radian = Math.atan2(y1-y2, x1-x2);
     let degree = (radian*180)/Math.PI;
     let line = document.getElementById(lineId);
@@ -243,7 +243,7 @@ function drawChild(graph, parent, pNode, childList, endArrowShape, endArrowFill,
         let values = [];
         if (pNode !== null){
             if (Text.length > 20){
-                console.table([Text, j]);
+                //console.table([Text, j]);
                 values = setPositionBig(pX, pY, j);
             }else{
                 values = setPosition(pX, pY, j);
@@ -385,7 +385,7 @@ function drawTdForLd(graph, parent, pNode, childList, op, ulrParam, strokeColor)
             chNode.target = pNode;
             graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
                 let cell = evt.getProperty('cell');
-                console.table(cell['target']);
+                //console.table(cell['target']);
                 if (cell['style'].includes("logicalData") && cell['target'] !== null){
                     let nodeValue = cell['value'].replace(/ /g,'');
                     window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+nodeValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
@@ -485,7 +485,7 @@ function connect_TD_to_related_LC(graph, parent, listGroup, op) {
         for (let td of tdList){
             tdNames.push(td.innerHTML.replace(/ /g,''));
         }
-        console.log(lcName +" -- " + tdNames);
+        //console.log(lcName +" -- " + tdNames);
         for (let node of mxCells){
             if(node['style'].includes("LogicalComp") && lcName === node['value']){
                 lcNode = node;
@@ -518,7 +518,7 @@ function connect_TD_to_related_LC(graph, parent, listGroup, op) {
             });
 
         }
-        console.table(mxCells);
+        //console.table(mxCells);
     }
 }
 
@@ -653,4 +653,40 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
         childX += 80;
 
     }
+}
+
+function ldLcGraphDoubleClickEvent(graph, ldUlrParam, lcUrlPath) {
+    let benchmarkName = get_url_benchmark();
+    let fileName = get_url_fileName();
+    let ulrParam = [benchmarkName];
+    ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
+    graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+        let cell = evt.getProperty('cell');
+        if (cell['style'].includes("logicalData") || cell['style'].includes("LogicalDataInactive") || cell['value'].includes('logicalDecision')){
+            let cellValue = cell['value'].replace(/ /g,'');
+            document.location = ldUlrParam+"?b=" +ulrParam[0] + "&node=" + cellValue;
+        }
+        else if (cell['style'].includes("LogicalComp")){
+            let cellValue = cell['value'].replace(/ /g,'');
+            window.location = lcUrlPath+"?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+        }
+        evt.consume();
+    });
+}
+
+function ldTdGraphDoubleClickEvent(graph, tdUlrPath, ldUrlPath) {
+    let benchmarkName = get_url_benchmark();
+    let fileName = get_url_fileName();
+    let ulrParam = [benchmarkName];
+    ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
+    graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
+        let cell = evt.getProperty('cell');
+        let cellValue = cell['value'].replace(/ /g,'');
+        if (cell['style'].includes("logicalData") && !cellValue.includes('logicalDecision')){
+            window.location = tdUlrPath+"?node="+cellValue+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
+        }else if (cellValue.includes('logicalDecision') || cell['id'].includes('function_ld_')){
+            document.location = ldUrlPath+"?b=" +ulrParam[0] + "&node=" + cellValue;
+        }
+        evt.consume();
+    });
 }

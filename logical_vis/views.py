@@ -151,26 +151,35 @@ def logical_data_l0(request):
 
 
 def logical_comp(request):
-    logical_decision_file = ""
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
-    if b_parameter == "ThreadFourFunction":
-        logical_decision_file = get_logical_decision_file_path(b_parameter)
-        thread_list = get_thread_ids(logical_decision_file)
-    else:
-        thread_list = get_threads(trace_file)
-    thr_func_dict = {}
-    for t in thread_list:
-        if b_parameter == "ThreadFourFunction":
-            thr_func = get_thread_function(t, logical_decision_file)
-        else:
-            thr_func = get_first_function(t, trace_file)
-        thr_func_dict.update(thr_func)
-    return render(request, 'logical_component.html', {'threads': thread_list,
-                                                      'thread_function': thr_func_dict,
+    logical_decision_file = get_logical_decision_file_path(b_parameter)
+    lc_for_threads = get_logical_components(logical_decision_file)
+    thread_id_list = []
+    [thread_id_list.append("Main_"+thrList[0]) if "main" in lc else thread_id_list.extend(thrList)
+     for lc, thrList in lc_for_threads.items()]
+    thread_id_list = remove_dups(thread_id_list)
+
+    # logical_decision_file = ""
+    # # b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
+    # if b_parameter == "ThreadFourFunction":
+    #     logical_decision_file = get_logical_decision_file_path(b_parameter)
+    #     thread_list = get_thread_ids(logical_decision_file)
+    # else:
+    #     thread_list = get_threads(trace_file)
+    # thr_func_dict = {}
+    # for t in thread_list:
+    #     if b_parameter == "ThreadFourFunction":
+    #         thr_func = get_thread_function(t, logical_decision_file)
+    #     else:
+    #         thr_func = get_first_function(t, trace_file)
+    #     thr_func_dict.update(thr_func)
+    return render(request, 'logical_component.html', {
+                                                      'thread_id_list': thread_id_list,
                                                       'title_name': which_way,
                                                       'file_path': trace_file,
                                                       'raw_file_name': file_name,
-                                                      'href_id': b_parameter})
+                                                      'href_id': b_parameter,
+                                                      'lc_for_threads': lc_for_threads})
 
 
 def logical_data_l1(request):
@@ -319,7 +328,7 @@ def time_line_view(request):
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
-                                               row[3] is not "" and "CONSTANT;" in row[5], csv_reader)
+                                   row[3] is not "" and "CONSTANT;" in row[5], csv_reader)
             thread_list = list(thread_filter)
             # print(thread_list)
             # csv_file.seek(0, 0)
@@ -346,7 +355,7 @@ def time_line_view(request):
 
         od = collections.OrderedDict(sorted(time_activity.items()))
         thread_activity.update({t: od})
-    print(thread_activity)
+
     return render(request, 'time_line_view.html', {'title_name': which_way,
                                                    "threads": threads,
                                                    "thread_activity": thread_activity,
@@ -461,6 +470,5 @@ def logical_decision_ld_l2(request):
                                                              })
 
 
-def timeline_ld_l2(request):
-    return render(request, 'timeLine_ld_l2.html')
+
 
