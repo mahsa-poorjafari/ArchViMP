@@ -34,14 +34,21 @@
     </div>
     <div id="tab03" class="tab-contents">
         <div class="col-md-12 diagram_container" id="time_line_ldl2_diagram">
-            Heeeeeeeeeeey
+            <div class="alert alert-danger" id="tsGroupEmpty" role="alert">
+                <i class="fas fa-times"></i>
+                No timestamp group has been selected.
+            </div>
         </div>
     </div>
     <div id="tab02" class="tab-contents time_stamp_text">
         <div class="col-md-12 text_container" style="display: block" id="time_line_text">
             <ul class="list_level0">
                 {% for k, v in thread_activity.items %}
-                    <li class="li-list_level0 col-md-6">
+                    {% if "Main" in k %}
+                        <li class="li-list_level0 col-md-6" id="{{ main_tread_id }}">
+                    {% else %}
+                        <li class="li-list_level0 col-md-6" id="{{ k }}">
+                    {% endif %}
                         <span>{{ k }}</span>
                         <ul class="list_level1">
                             {% for ts, tv in v.items %}

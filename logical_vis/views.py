@@ -314,15 +314,20 @@ def ld_exe_path_l2(request):
 
 def time_line_view(request):
     thread_activity = {}
+
+    main_thread_list = []
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     csv_reader_list = get_file_records(trace_file)
     threads = get_threads(trace_file)
     all_time_stamp = get_time_stamp_list(trace_file)
     if "." in all_time_stamp[-1]:
         del all_time_stamp[-1]
+    [main_thread_list.append(thr) if "Main_" in thr else None for thr in threads]
+    main_tread_id = main_thread_list[0].split("_")[1]
     for t in threads:
         time_activity = {}
         t_id = t if "Main_" not in t else t.split("_")[1]
+
         # print(t_id)
         thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
                                row[3] is not "" and "CONSTANT;" in row[5], csv_reader_list)
@@ -370,10 +375,11 @@ def time_line_view(request):
 
         od = collections.OrderedDict(sorted(time_activity.items()))
         thread_activity.update({t: od})
-    print(thread_activity)
+    # print(thread_activity)
     return render(request, 'time_line_view.html', {'title_name': which_way,
                                                    "threads": threads,
                                                    "thread_activity": thread_activity,
+                                                   "main_tread_id": main_tread_id,
                                                    "time_stamp_list": all_time_stamp})
 
 

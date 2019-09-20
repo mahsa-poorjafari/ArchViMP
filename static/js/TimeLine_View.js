@@ -125,8 +125,38 @@ function timeLineL2(container, txt, ldName) {
     // Adds cells to the model in a single step
     graph.getModel().beginUpdate();
     try {
-        for (let tsGroup of txt){
-            
+        let tsGroup = [];
+        let tsVarElements = [];
+        let GroupThreadId = null;
+        if (ldName !== null){
+            GroupThreadId = ldName.split("-")[0];
+            if (GroupThreadId !== null ){
+                let tsElemnts = txt.getElementById(GroupThreadId);
+                let groupName = tsElemnts.firstElementChild.innerHTML.replace(/ /g,'');
+                let nodeTS = ldName.split("-")[1];
+                console.log(GroupThreadId);
+                console.log(nodeTS);
+                let tsList = groupLi.getElementsByClassName('list_level1')[0].getElementsByClassName('li-list_level1');
+                for (let tsLi of tsList){
+                    let ts = tsLi.firstElementChild.innerHTML.replace(/ /g,'');
+                    if( ts === nodeTS){
+                        tsVarElements = tsLi.getElementsByClassName('list_level2')[0].getElementsByClassName('li-list_level2');
+                    }
+                }
+            }
+
+            if (tsVarElements.length > 0){
+                console.log(tsVarElements);
+                for (let elm of tsVarElements){
+                    let elmGroup = elm.firstElementChild.innerHTML;
+                    if (elmGroup === ldName){
+                        let gMembers = elm.getElementsByClassName('g_members');
+
+                    }
+                }
+            }
+        }else{
+            document.getElementById('tsGroupEmpty').style.display = 'block';
         }
 
     }finally{
