@@ -58,7 +58,7 @@ function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
                 // console.log(lcName);
                 nodeSize = setNodeSize(lcName, 'LogicalComp');
                 nodeStyle(graph, nodeSize['nodeIdText']);
-                let lcNode = graph.insertVertex(parent, lcName, lcName, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                graph.insertVertex(parent, lcName, lcName, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 lcY += 250;
                 // END
             }
@@ -84,7 +84,7 @@ function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
                 //console.table(lDecText + ' === ' + lDecX + ' === ===' + lDefY);
                 lDecX = (i+1)%2 === 0 ? lDecX2 : 10;
                 lDefY = (i+1)%2 === 0 ? lDefY : lDefY += 200;
-                let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+50, nodeSize['Height']+50, nodeSize['nodeIdText']);
+                let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+80, nodeSize['Height']+80, nodeSize['nodeIdText']);
                 let logCompNode = null;
                 for (let lcForLd of Logical_component_list){
                     mxCells.forEach(function (logComp){
@@ -191,7 +191,7 @@ function logicalDataL1Decision(container, ldL2List, clientWidth, ldName) {
             }
             nodeSize = setNodeSize(lDecText, styleIdNode);
             nodeStyle(graph, nodeSize['nodeIdText']);
-            let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+50, nodeSize['Height']+50, nodeSize['nodeIdText']);
+            let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+80, nodeSize['Height']+80, nodeSize['nodeIdText']);
             lDefY += 200;
             mxCells.forEach(function (node) {
                 if ( logDesVarList.includes(node['value']) ){

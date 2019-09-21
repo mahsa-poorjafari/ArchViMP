@@ -49,8 +49,8 @@ function logicalDataL2Function(container, clientWidth, ldName) {
         // draw logical components
         for (let lc of lcContainer){
             let lcName = lc.innerHTML.replace(/ /g, '');
-            nodeStyle(graph, 'LogicalComp');
             nodeSize = setNodeSize(lcName, 'LogicalComp' );
+            nodeStyle(graph, 'LogicalComp');
             graph.insertVertex(parent, null, lcName, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
             lcY += 100;
         }
@@ -75,8 +75,8 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 styleIdNode = "logicalData";
                 strokeColor = "strokeColor=#000000;";
             }
-            nodeStyle(graph, styleIdNode);
             nodeSize = setNodeSize(fun_name, styleIdNode );
+            nodeStyle(graph, nodeSize['nodeIdText']);
             funX = (i+1)%2 === 0 ? funX2 : 50;
             funY = (i+1)%2 === 0 ? funY : funY += 100;
             let funNode = graph.insertVertex(parent, null, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
@@ -131,9 +131,9 @@ function logicalDataL1Function(container, clientWidth, ldName) {
             let elementText = vElement.innerHTML;
             let varText = elementText.includes(".")? elementText.split(".")[0] : elementText;
             let varType = elementText.includes(".")? "logicalData" : "variable";
-            nodeStyle(graph, varType);
             // console.log(varText);
             nodeSize = setNodeSize(varText, varType );
+            nodeStyle(graph, nodeSize['nodeIdText']);
             // console.table(nodeSize);
             varX = (i+1)%2 === 0 ? varX2 : 50;
             varY = (i+1)%2 === 0 ? varY : varY += 150;
@@ -158,8 +158,8 @@ function logicalDataL1Function(container, clientWidth, ldName) {
                 styleIdNode = "logicalData";
                 strokeColor = "strokeColor=#000000;";
             }
-            nodeStyle(graph, styleIdNode);
             nodeSize = setNodeSize(fun_name, styleIdNode );
+            nodeStyle(graph, nodeSize['nodeIdText']);
             let funNode = graph.insertVertex(parent, 'function_ld_'+fun_name, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
             funY += 200;
             mxCells.forEach(function (node){

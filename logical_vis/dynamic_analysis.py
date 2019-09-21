@@ -403,16 +403,19 @@ def get_all_logical_decisions(logical_decision_file):
             logical_decision_rows = logical_decision_block(csv_reader_list[row_number:])
             if logical_decision_rows != 1:
                 for ld_indx, ld in enumerate(logical_decision_rows):
-
+                    print(ld)
                     if ld[1] == "logicalDecision":
+                        ld[1] = "LogicalDecision\n"
                         var_list, thread_list, file_name = get_logical_decision_vars(logical_decision_rows[ld_indx+1:])
                         log_dec_names.update({''.join(ld[1:]): {"START": ld[2],
-                                                                "END": ld[3],
-                                                                "var_list": var_list,
-                                                                "thread_list": thread_list,
-                                                                "file_name": file_name
-                                                                }
+                                                                    "END": ld[3],
+                                                                    "var_list": var_list,
+                                                                    "thread_list": thread_list,
+                                                                    "file_name": file_name
+                                                                  }
                                               })
+
+                #print(log_dec_names)
                 log_dec_list.append(log_dec_names)
     # print("log_dec_list =>  ", log_dec_list)
     Gnames = []

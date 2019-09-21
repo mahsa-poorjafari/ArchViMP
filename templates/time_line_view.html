@@ -10,9 +10,12 @@
     <div class="tabs">
         <div class="tab-button-outer">
             <ul id="tab-button">
-              <li id="for_tab01"><a href="#tab01" class="btn-info" style="display:block">Diagram L3</a></li>
-              <li id="for_tab03"><a href="#tab03" class="btn-info" style="display:block">Diagram L2</a></li>
-              <li id="for_tab02"><a href="#tab02" class="btn-info" style="display:block">Textual</a></li>
+              <li id="for_tab01"><a href="#tab01" class="btn-info" style="display:block"
+                                    onclick="document.getElementById('time_line_diagram').style.display='block';">
+                  Timeline L3</a></li>
+              <li id="for_tab03"><a href="#tab03" class="btn-info" onclick="checkTsGroup();" style="display:block">
+                  Timeline L2</a></li>
+              <li id="for_tab02"><a href="#tab02" class="btn-info" style="display:none">Textual</a></li>
             </ul>
         </div>
         <div class="tab-select-outer">
@@ -34,14 +37,14 @@
     </div>
     <div id="tab03" class="tab-contents">
         <div class="col-md-12 diagram_container" id="time_line_ldl2_diagram">
-            <div class="alert alert-danger" id="tsGroupEmpty" role="alert">
+            <div class="alert alert-danger" id="tsGroupEmpty" role="alert" style="display: none">
                 <i class="fas fa-times"></i>
                 No timestamp group has been selected.
             </div>
         </div>
     </div>
     <div id="tab02" class="tab-contents time_stamp_text">
-        <div class="col-md-12 text_container" style="display: block" id="time_line_text">
+        <div class="col-md-12 text_container" style="display: none" id="time_line_text">
             <ul class="list_level0">
                 {% for k, v in thread_activity.items %}
                     {% if "Main" in k %}
@@ -56,7 +59,7 @@
                                     <span class="time_stamp">{{ ts }}</span>
                                     <ul class="list_level2">
                                         {% for g_name, g_members in tv.items %}
-                                            <li class="li-list_level2 activity">
+                                            <li class="li-list_level2 activity" id="{{ g_name }}">
                                                 <span class="g_name">{{ g_name }}</span>
                                                 {% for membersName, memberOp in g_members.items %}
                                                     <p class="g_members">

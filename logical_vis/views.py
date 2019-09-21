@@ -314,7 +314,6 @@ def ld_exe_path_l2(request):
 
 def time_line_view(request):
     thread_activity = {}
-
     main_thread_list = []
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     csv_reader_list = get_file_records(trace_file)
@@ -327,16 +326,13 @@ def time_line_view(request):
     for t in threads:
         time_activity = {}
         t_id = t if "Main_" not in t else t.split("_")[1]
-
         # print(t_id)
         thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
                                row[3] is not "" and "CONSTANT;" in row[5], csv_reader_list)
         thread_list = list(thread_filter)
-
         time_stamp_dict = {k[0] for k in thread_list}
         time_stamp_list = list(time_stamp_dict)
         time_stamp_list.sort()
-
         for ts in time_stamp_list:
             activity_list = []
             thread_filter = map(lambda r: {r[3].split(".")[0]+"." if "." in r[3] else r[3]: r[2]}
@@ -408,10 +404,8 @@ def functions_ld_l2(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     logical_decision_file = get_logical_decision_file_path(b_parameter)
     trace_exe_file = get_trace_file_path(b_parameter)
-
     # all funcitons that are exist
     all_functions = get_all_functions(logical_decision_file)
-
     # first functions that threads execute
     lc_functions = get_lc_functions(logical_decision_file)
     lc_for_threads = get_logical_components(logical_decision_file)
@@ -420,7 +414,6 @@ def functions_ld_l2(request):
     # list of nested functions
     [all_functions.remove(lc_f) if lc_f in all_functions else None for lc_f in lc_functions]
     nested_functions = all_functions
-
     variables_execution_block = get_vars_exe_block(logical_decision_file)
 
     logical_data_function = {}
@@ -430,7 +423,7 @@ def functions_ld_l2(request):
         function_access_var = []
         lc_of_nested_function = []
         [function_access_var.append(v['varName'].split(".")[0]+".") if "." in v['varName']
-                                    else function_access_var.append(v['varName'])
+                                      else function_access_var.append(v['varName'])
          if f in v['funcitonList'] else None for k, v in variables_execution_block.items()]
         all_var_accessed.extend(function_access_var)
         function_access_var = remove_dups(function_access_var)

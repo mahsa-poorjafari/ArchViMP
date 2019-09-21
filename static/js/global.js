@@ -620,16 +620,24 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
     // let childX = nodePosition[0];
     let childY = nodePosition[1] + 70;
     let childOp = null;
-    let childType = "logicalData";
+    let childType = null;
     let nodeType = "logicalData";
     let op = null;
+    let childId = null;
     for (let i=0; i < childList.length; i++){
         let childText = childList[i].getElementsByClassName('g_name')[0].innerHTML.replace(/ /g,'');
         // console.log(childText);
         if (childText === "noGroup"){
             childText = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('key')[0].innerHTML.replace(/ /g,'');
-            childType = childText.includes(".")? "logicalData" : "variable";
-            childText = childText.includes(".")? childText.split(".")[0] : childText;
+            if (childText.includes(".")){
+                childType = "logicalData";
+                childId = "dataStrcut" + i;
+                childText = childText.split(".")[0];
+            }else{
+                childType = "variable";
+                childId = "variable" + i;
+            }
+
             childOp = childList[i].getElementsByClassName('g_members')[0].getElementsByClassName('val')[0].innerHTML.replace(/ /g,'');
             switch (childOp) {
                 case "LOAD":
@@ -647,7 +655,7 @@ function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
         // console.log(childText +"__" + childX + "--" + childY + "__" + childType);
         nodeSize = setNodeSize(childText, nodeType);
         nodeStyle(graph,  nodeSize['nodeIdText']);
-        graph.insertVertex(parent, null, childText, childX, childY, 150, 70, nodeSize['nodeIdText']);
+        graph.insertVertex(parent, childId, childText, childX, childY, 150, 70, nodeSize['nodeIdText']);
 
         childX += 80;
 
@@ -688,4 +696,12 @@ function ldTdGraphDoubleClickEvent(graph, tdUlrPath, ldUrlPath) {
         }
         evt.consume();
     });
+}
+function checkTsGroup() {
+    let ldName = get_node_name();
+    if (ldName === null){
+        document.getElementById('tsGroupEmpty').style.display = 'block';
+    }else{
+        document.getElementById('tsGroupEmpty').style.display = 'none';
+    }
 }
