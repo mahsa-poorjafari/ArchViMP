@@ -121,19 +121,33 @@ def write_to_csv_file(data, data_name):
     csv_file.close()
 
 
-def catastrophe(request):
+def raw_tech_vis(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     shared_variables_names = get_all_shared_var_names(b_parameter)
-    # print(shared_variables_names)
     thread_ids = get_threads(trace_file)
     pure_thread_ids = []
     [pure_thread_ids.append(tid.split("_")[1]) if "Main_" in tid else pure_thread_ids.append(tid) for tid in thread_ids]
-    t_v_op = thread_per_vars(shared_variables_names, thread_ids)
-    return render(request, 'catastrophe.html', {"t_v_op": t_v_op,
-                                                'title_name': which_way,
-                                                "t_v_op_list": list(t_v_op),
-                                                "shared_variables": shared_variables_names,
-                                                "thread_ids": pure_thread_ids})
+    csv_reader_list = get_file_records(trace_file)
+
+    total_elements = len(shared_variables_names) + len(pure_thread_ids)
+    total_relations = len(pure_thread_ids)
+    t_v_op = {}
+    for thr_id in pure_thread_ids:
+        thread_var_list = []
+        [thread_var_list.append(r[3]) if r[1] == thr_id and r[3] in shared_variables_names
+         else None for r in csv_reader_list]
+        thread_var_list = remove_dups(thread_var_list)
+
+        # t_v_op = thread_per_vars(shared_variables_names, thread_ids)
+        total_relations += len(thread_var_list)
+        t_v_op.update({thr_id: thread_var_list})
+
+    return render(request, 'RawVis.html', {"t_v_op": t_v_op,
+                                           "total_elements": total_elements,
+                                           "total_relations": total_relations,
+                                           "title_name": which_way,
+                                           "shared_variables": shared_variables_names,
+                                           "thread_ids": pure_thread_ids})
 
 
 def logical_data_l0(request):
@@ -159,20 +173,6 @@ def logical_comp(request):
      for lc, thrList in lc_for_threads.items()]
     thread_id_list = remove_dups(thread_id_list)
 
-    # logical_decision_file = ""
-    # # b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
-    # if b_parameter == "ThreadFourFunction":
-    #     logical_decision_file = get_logical_decision_file_path(b_parameter)
-    #     thread_list = get_thread_ids(logical_decision_file)
-    # else:
-    #     thread_list = get_threads(trace_file)
-    # thr_func_dict = {}
-    # for t in thread_list:
-    #     if b_parameter == "ThreadFourFunction":
-    #         thr_func = get_thread_function(t, logical_decision_file)
-    #     else:
-    #         thr_func = get_first_function(t, trace_file)
-    #     thr_func_dict.update(thr_func)
     return render(request, 'logical_component.html', {
                                                       'thread_id_list': thread_id_list,
                                                       'title_name': which_way,
@@ -214,7 +214,7 @@ def logical_data_l2_ungrouped(request):
     return render(request, 'logical_data_L2_Ungrouped.html', {'thread_var_op': thread_var_op,
                                                               'benchmark_name': b_parameter})
 
-
+# Future Work
 def logical_data_l3(request):
     thr_func_dict = {}
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
@@ -471,16 +471,21 @@ def logical_decision_ld_l2(request):
     # print(var_list_log_des)
     # Logical component that access logical decision
     lc_list_log_des = []
+    total_relations = len(lc_list_log_des)
     [lc_list_log_des.append(x) if k == 'Logical_component_list' else None for des_k, des_v in all_logical_decisions.items()
      for k, v in des_v.items() for x in v]
     lc_list_log_des = remove_dups(lc_list_log_des)
     # print(lc_list_log_des)
+    total_elements = len(lc_list_log_des) + len(all_logical_decisions.keys())
+
     return render(request, 'logical_data_l2_decision.html', {'title_name': which_way,
                                                              'logical_data_decision': all_logical_decisions,
                                                              'logical_components': logical_components,
                                                              'lc_list_log_des': lc_list_log_des,
                                                              'var_list_log_des': var_list_log_des,
-                                                             'shared_variables_list': shared_variables_list
+                                                             'shared_variables_list': shared_variables_list,
+                                                             'total_elements': total_elements,
+                                                             'total_relations': total_relations
                                                              })
 
 

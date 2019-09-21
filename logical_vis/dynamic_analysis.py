@@ -293,7 +293,7 @@ def thread_per_vars(shared_variables, thread_ids):
     # print("\n => ", thread_vars)
     return thread_vars_op
 
-
+# Not needed, check first then remove this function
 def get_functions_with_body(trace_file, thread_list):
     thread_funciton_list = {}
     thread_funcitons = {}
@@ -356,6 +356,7 @@ def get_functions_with_body(trace_file, thread_list):
     return thread_funcitons
 
 
+# Not needed, check first then remove this function
 def get_first_function_body(function_name, trace_file):
     csv_reader_list = get_file_records(trace_file)
     [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
@@ -367,6 +368,7 @@ def get_first_function_body(function_name, trace_file):
     return function_body
 
 
+# Future work
 def retrieve_exe_path(exe_path_set):
     # print(exe_path_set)
     exe_path = list(map(lambda r: [r[3], r[4]], exe_path_set['function_body']))
@@ -403,7 +405,6 @@ def get_all_logical_decisions(logical_decision_file):
             logical_decision_rows = logical_decision_block(csv_reader_list[row_number:])
             if logical_decision_rows != 1:
                 for ld_indx, ld in enumerate(logical_decision_rows):
-                    print(ld)
                     if ld[1] == "logicalDecision":
                         ld[1] = "LogicalDecision\n"
                         var_list, thread_list, file_name = get_logical_decision_vars(logical_decision_rows[ld_indx+1:])

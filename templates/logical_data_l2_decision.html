@@ -15,14 +15,18 @@
             The list of logical decision is Empty.
         </div>
     {% else %}
-        <div class="alert alert-info" role="alert">
-            <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
-            There are <strong class="see_it" style="text-decoration: underline;">{{ logical_data_decision|length }}</strong> Logical Data which are logical decisions:
-            <ul>
-                {% for dt in logical_data_decision %}
-                    <li><strong> {{ forloop.counter }}- {{ dt }}</strong></li>
-                {% endfor %}
-            </ul>
+        <div class="alert alert-info col-md-12" role="alert" style="display: none">
+            <div class="col-md-1" style="text-align: center"><i class="fas fa-info-circle"
+                                                                style="color: #17a2b8; font-size:30px" aria-hidden="true"></i></div>
+            <div class="col-md-5" >
+                There are <strong class="see_it" style="text-decoration: underline;">{{ logical_data_decision|length }}</strong> Logical Data which are logical decisions:
+                <ul>
+                    {% for dt in logical_data_decision %}
+                        <li><strong> {{ forloop.counter }}- {{ dt }}</strong></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
         </div>
     {% endif %}
     <div class="tabs">
@@ -47,6 +51,22 @@
             </div>
     </div>
     <div id="tab01" class="tab-contents">
+        <div class="alert alert-info col-md-12" role="alert">
+            <div class="col-md-1" style="text-align: center">
+                <i class="fas fa-info-circle" style="color: #17a2b8; font-size:30px" aria-hidden="true"></i>
+            </div>
+            <div class="col-md-5">
+                <h4>
+                    Total Number of Elements:
+                    <strong style="font-weight: bold">{{ total_elements }}</strong>
+                </h4>
+                <h4>
+                    Total Number of Relation:
+                    <strong style="font-weight: bold">{{ total_relations }}</strong>
+                </h4>
+            </div>
+        </div>
+
         <div class="col-md-12 well diagram_container" id="logical_data_l2_decision_diagram"></div>
     </div>
     <div id="tab03" class="tab-contents">

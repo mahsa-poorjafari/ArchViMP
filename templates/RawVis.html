@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <nav class="navbar navbar-default">
+        <div  class="container-fluid">
+            <div class="col-md-12">
+                <h2>{{ title_name }} Overall view</h2>
+            </div>
+            <div class="col-md-12">
+                <p>In this view we see the interaction between technical parts of the {{ title_name }} Program </p><p> without applying our approach
+                </p>
+            </div>
+        </div>
+    </nav>
+
+    <div class="col-md-12">
+        <div class="alert alert-info col-md-12" role="alert">
+            <div class="col-md-1" style="text-align: center"><i class="fas fa-info-circle"
+                                                                style="color: #17a2b8; font-size:30px" aria-hidden="true"></i></div>
+            <div class="col-md-10">
+                <h4>
+                    Total Number of Elements:
+                    <strong style="font-weight: bold">{{ total_elements }}</strong>
+                </h4>
+                <h4>
+                    Total Number of Relation:
+                    <strong style="font-weight: bold">{{ total_relations }}</strong>
+                </h4>
+            </div>
+
+        </div>
+        <div class="tabs" >
+          <div class="tab-button-outer" style="display: none">
+            <ul id="tab-button" >
+              <li><a href="#tab01" class="btn-info" style="display: block">Diagram</a></li>
+              <li><a href="#tab02" class="btn-info" style="display: block">Textual</a></li>
+            </ul>
+          </div>
+            <div class="tab-select-outer">
+                <select id="tab-select">
+                    <option value="#tab01" class="shadow-sm rounded">Diagram</option>
+                    <option value="#tab02" class="shadow-sm rounded" style="display: none">Textual</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div id="tab01" class="tab-contents">
+            <div class="col-md-12 well" id="catastrophe_diagram"></div>
+        </div>
+        <div id="tab02" class="tab-contents">
+            <div class="col-md-12 text_container"  id="thread_ids_textual">
+                <ul class="threads_ids_tech">
+                    {% for t in thread_ids %}
+                        <li class="thread_id">{{ t }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+            <div class="col-md-12 text_container" id="shared_variables">
+                <ul class="shared_variables_tech">
+                    {% for v in shared_variables %}
+                        <li class="var_name">{{ v }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+            <div class="col-md-12 well" id="catastrophe_textual">
+                <ul id="var_list" >
+                    {% for tK, vV in t_v_op.items %}
+                        <li class="col-md-3 set_var_id" id="{{ tK }}"
+                            style="border-right: solid 1px #337ab7;
+                            border-top: solid 1px #337ab7; word-wrap: break-word">
+                            <strong style="font-weight: bold">{{ tK }}</strong>
+                            {% for tV in vV %}
+                                <span class="var_child">{{ tV }}</span>
+                            {% endfor %}
+
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{% static 'js/RawVis_dig.js' %}" type="text/javascript"></script>
+{% endblock %}
