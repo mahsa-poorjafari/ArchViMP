@@ -315,20 +315,26 @@ def time_line_view(request):
     thread_activity = {}
     main_thread_list = []
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
+    shared_vars_names = get_all_shared_var_names(b_parameter)
     csv_reader_list = get_file_records(trace_file)
     threads = get_threads(trace_file)
     all_time_stamp = get_time_stamp_list(trace_file)
     if "." in all_time_stamp[-1]:
         del all_time_stamp[-1]
     [main_thread_list.append(thr) if "Main_" in thr else None for thr in threads]
-    main_tread_id = main_thread_list[0].split("_")[1]
+
+    main_tread_id = main_thread_list[0].split("_")[1] if len(main_thread_list)>0 and \
+        "Main" in main_thread_list[0] else None
     for t in threads:
+        thread_list = []
         time_activity = {}
         t_id = t if "Main_" not in t else t.split("_")[1]
         # print(t_id)
-        thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
-                               row[3] is not "" and "CONSTANT;" in row[5], csv_reader_list)
-        thread_list = list(thread_filter)
+        # thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
+                               #row[3] is not "" and "CONSTANT;" in row[5], csv_reader_list)
+        # thread_list = list(thread_filter)
+        [thread_list.append(r) if r[1] == t_id and r[3] in shared_vars_names else None for r in csv_reader_list]
+
         time_stamp_dict = {k[0] for k in thread_list}
         time_stamp_list = list(time_stamp_dict)
         time_stamp_list.sort()

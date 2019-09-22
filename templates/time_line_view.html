@@ -15,7 +15,7 @@
                   Timeline L3</a></li>
               <li id="for_tab03"><a href="#tab03" class="btn-info" onclick="checkTsGroup();" style="display:block">
                   Timeline L2</a></li>
-              <li id="for_tab02"><a href="#tab02" class="btn-info" style="display:none">Textual</a></li>
+              <li id="for_tab02"><a href="#tab02" class="btn-info" style="display:block">Textual</a></li>
             </ul>
         </div>
         <div class="tab-select-outer">
@@ -44,7 +44,7 @@
         </div>
     </div>
     <div id="tab02" class="tab-contents time_stamp_text">
-        <div class="col-md-12 text_container" style="display: none" id="time_line_text">
+        <div class="col-md-12 text_container" style="display: block" id="time_line_text">
             <ul class="list_level0">
                 {% for k, v in thread_activity.items %}
                     {% if "Main" in k %}

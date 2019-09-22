@@ -64,7 +64,7 @@ function mainViewTimeLine(container, txt, ldName, ulrParam) {
                 let lcFirstElement = lcs[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
                 let childW = null;
-                if (lcText.includes("_")){
+                if (lcText.includes("Main_")){
                     lcText = lcText.replace(/_/g, "\n");
                     nodeStyle(graph, "mainThread");
                     lcNode = graph.insertVertex(parent, lcId, lcText, lcW, lcY, 100, 60, 'mainThread');

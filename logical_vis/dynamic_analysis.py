@@ -58,7 +58,7 @@ def get_first_function(t, trace_file):
     t_id = t.split("Main_")[1] if "Main_" in t else t
     if "Main_" in t:
         thread_functioncall_flist = list(filter(lambda r: "FUNCTIONCALL" in r[2] and
-                                          r[1] == t_id, csv_reader))
+                                         r[1] == t_id, csv_reader))
         # print(thread_functioncall_flist)
         thread_functioncall_list = thread_functioncall_flist[0] if len(thread_functioncall_flist) > 0 else None
         thread_function_list.append(thread_functioncall_list[3])
@@ -198,22 +198,22 @@ def get_all_shared_var_names(benchmark_name):
 def get_threads(file_path):
     trace_file_path = str(file_path)
     # print("trace_file_path", trace_file_path)
-    with open(trace_file_path, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        main_thread_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and row[3].lstrip() == "main", csv_reader)
-        main_thread_list = list(main_thread_filter)
-        # print("\n main_thread_list", main_thread_list)
-        main_thread_id = main_thread_list[0][1]
-        # print("main_thread_id =>  ", main_thread_id)
+    csv_reader = get_file_records(trace_file_path)
+    # main_thread_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and row[3].lstrip() == "main", csv_reader)
+    # main_thread_list = list(main_thread_filter)
+    main_thread_list = csv_reader[0]
+    print(main_thread_list)
+    # print("\n main_thread_list", main_thread_list)
+    main_thread_id = main_thread_list[0][1]
+    # print("main_thread_id =>  ", main_thread_id)
 
-        csv_file.seek(0, 0)
-        thread_ids = map(lambda var: var[1], csv_reader)
-        thr_dict = dict.fromkeys(list(thread_ids))
-        thread_list = list(thr_dict)
-        threads = ['Main_' + item if item == main_thread_id else item for item in thread_list]
-        # threads = {"threads": thread_list, "Main": main_thread_id}
-        # print(threads)
-    csv_file.close()
+    thread_ids = map(lambda var: var[1], csv_reader)
+    thr_dict = dict.fromkeys(list(thread_ids))
+    thread_list = list(thr_dict)
+    threads = ['Main_' + item if item == main_thread_id else item for item in thread_list]
+    # threads = {"threads": thread_list, "Main": main_thread_id}
+    # print(threads)
+
     return threads
 
 
