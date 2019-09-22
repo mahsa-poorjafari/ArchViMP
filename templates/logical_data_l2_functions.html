@@ -15,7 +15,7 @@
             The list of functions is Empty
         </div>
     {% else %}
-        <div class="alert alert-info" role="alert">
+        <div class="alert alert-info" role="alert"  style="display: none">
             <i class="fas fa-info-circle" style="color: #17a2b8" aria-hidden="true"></i>
             There are <strong class="see_it" style="text-decoration: underline;">{{ logical_data_function|length }}</strong> Logical Data which are nested function:
             <ul>
@@ -55,6 +55,21 @@
         <div class="col-md-12 well diagram_container" id="function_circular_diagram"></div>
     </div>
     <div id="tab03" class="tab-contents">
+        <div class="alert alert-info col-md-12" role="alert">
+            <div class="col-md-1" style="text-align: center">
+                <i class="fas fa-info-circle" style="color: #17a2b8; font-size:30px" aria-hidden="true"></i>
+            </div>
+            <div class="col-md-5">
+                <h4>
+                    Total Number of Elements:
+                    <strong style="font-weight: bold">{{ total_elements }}</strong>
+                </h4>
+                <h4>
+                    Total Number of Relation:
+                    <strong style="font-weight: bold">{{ total_relations }}</strong>
+                </h4>
+            </div>
+        </div>
         <div class="col-md-12 well diagram_container" id="logical_data_l2_function_diagram"></div>
     </div>
     <div id="tab04" class="tab-contents" style="display: none">

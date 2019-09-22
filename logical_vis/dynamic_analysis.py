@@ -154,8 +154,9 @@ def create_ld_thread_op(thread_var_op, op):
 def get_trace_file_path(benchmark_name, *args, **kwargs):
     file_name = kwargs.get('file_name') if kwargs.get('file_name') is not None else ""
     switcher = {
-        "ROSACE": "benchmark_traces/ROSACE/TraceDataRosace.txt",
+        "ROSACE": "benchmark_traces/ROSACE/ROSACE_trace.txt",
         "OCEAN": "benchmark_traces/OCEAN/Splash2ocean_contiguous_partitions.txt",
+        "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_trace.txt",
         "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsLLVMWitFunctionsReturn.txt",
         "UPLOADED": "Uploaded_files/" + file_name + ".txt",
     }
@@ -166,13 +167,16 @@ def get_logical_decision_file_path(benchmark_name, *args, **kwargs):
     # file_name = kwargs.get('file_name') if kwargs.get('file_name') is not None else ""
     switcher = {
         "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/LogicalDec_sharedVars.txt",
+        "ROSACE": "benchmark_traces/ROSACE/ROSACE_LogicalDec_sharedVars.txt",
+        "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_LogicalDec_sharedVars.txt"
     }
     return switcher.get(benchmark_name, "Invalid Value")
 
 
 def get_variable_file_path(benchmark_name):
     switcher = {
-        "ROSACE": "benchmark_traces/ROSACE/SharedVariablesRosace.txt",
+        "ROSACE": "benchmark_traces/ROSACE/ROSACE_SharedVariables.txt",
+        "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_SharedVariables.txt",
         "ThreadFourFunction":
             "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsSharedVariables.txt",
     }

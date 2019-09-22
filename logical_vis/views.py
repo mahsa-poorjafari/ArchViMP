@@ -269,7 +269,6 @@ def logical_data_l3(request):
 
 def ld_exe_path_l2(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
-
     shared_vars_names = get_all_shared_var_names(b_parameter)
     threads = get_threads(trace_file)
     thr_func_dict = {}
@@ -360,9 +359,11 @@ def time_line_view(request):
                         # [ts_op_var.append(a[v]) for a in activity_list]
                     ts_op_var = remove_dups(ts_op_var)
                     if len(ts_op_var) > 1:
-                        thr_ts_activity_list.update({v: 'PROCESS'})
+                        thr_ts_activity_list.update({v: 'Process'})
                     else:
-                        thr_ts_activity_list.update({v: ts_op_var[0]})
+                        var_op = 'Read' if ts_op_var[0] == 'LOAD' else 'Write' if ts_op_var[0] == 'STORE' else None
+
+                        thr_ts_activity_list.update({v: var_op})
                 # print(thr_ts_activity_list)
                 time_activity.update({ts: {t_ld_name: thr_ts_activity_list}})
 
@@ -415,7 +416,6 @@ def functions_ld_l2(request):
     [all_functions.remove(lc_f) if lc_f in all_functions else None for lc_f in lc_functions]
     nested_functions = all_functions
     variables_execution_block = get_vars_exe_block(logical_decision_file)
-
     logical_data_function = {}
     all_var_accessed = []
     all_lc_accessed_nested_function = []
@@ -423,8 +423,8 @@ def functions_ld_l2(request):
         function_access_var = []
         lc_of_nested_function = []
         [function_access_var.append(v['varName'].split(".")[0]+".") if "." in v['varName']
-                                      else function_access_var.append(v['varName'])
-         if f in v['funcitonList'] else None for k, v in variables_execution_block.items()]
+         else function_access_var.append(v['varName']) if f in v['funcitonList'] else None
+         for k, v in variables_execution_block.items()]
         all_var_accessed.extend(function_access_var)
         function_access_var = remove_dups(function_access_var)
 
@@ -442,13 +442,19 @@ def functions_ld_l2(request):
         }})
     all_var_accessed = remove_dups(all_var_accessed)
     all_lc_accessed_nested_function = remove_dups(all_lc_accessed_nested_function)
-    # print(all_var_accessed)
-    # print(logical_data_funciton)
+    total_elements = len(all_lc_accessed_nested_function) + len(logical_data_function.keys())
+    relation_list = []
+    [relation_list.append(len(kv)) if kx == "LogicalComponets" else None for k, v in logical_data_function.items()
+     for kx, kv in v.items()]
+
+    total_relations = sum(relation_list)
     return render(request, 'logical_data_l2_functions.html', {'title_name': which_way,
                                                               'logical_data_function': logical_data_function,
                                                               'all_var_accessed': all_var_accessed,
                                                               'all_lc_accessed_nested_function':
-                                                                  all_lc_accessed_nested_function
+                                                                  all_lc_accessed_nested_function,
+                                                              'total_elements': total_elements,
+                                                              'total_relations': total_relations
                                                               })
 
 
@@ -456,6 +462,7 @@ def logical_decision_ld_l2(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     logical_decision_file = get_logical_decision_file_path(b_parameter)
     logical_components = get_logical_components(logical_decision_file)
+    relation_list = []
     # all logical_decision that are exist
     all_logical_decisions = get_all_logical_decisions(logical_decision_file)
     all_shared_resources = get_all_shared_var_names(b_parameter)
@@ -467,14 +474,19 @@ def logical_decision_ld_l2(request):
     var_list_log_des = []
     [var_list_log_des.append(x.split('.')[0] + ".") if '.' in x else var_list_log_des.append(x) if k == 'variable_list'
      else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() for x in v]
+    # print(all_logical_decisions)
+    [relation_list.append(len(v)) if k == 'Logical_component_list'
+     else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() ]
+
     var_list_log_des = remove_dups(var_list_log_des)
     # print(var_list_log_des)
     # Logical component that access logical decision
     lc_list_log_des = []
-    total_relations = len(lc_list_log_des)
     [lc_list_log_des.append(x) if k == 'Logical_component_list' else None for des_k, des_v in all_logical_decisions.items()
      for k, v in des_v.items() for x in v]
     lc_list_log_des = remove_dups(lc_list_log_des)
+
+    total_relations = sum(relation_list)
     # print(lc_list_log_des)
     total_elements = len(lc_list_log_des) + len(all_logical_decisions.keys())
 

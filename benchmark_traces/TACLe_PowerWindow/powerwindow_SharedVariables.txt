@@ -1,0 +1,7 @@
+powerwindow_main_inputcyclecounter,{401299720},INT;CONSTANT;
+powerwindow_PW_Control_DRV_Y,{401431681},POINTER;POINTER;
+powerwindow_PW_Control_DRV_Y,{401431682},POINTER;POINTER;
+powerwindow_PW_Control_DRV_Y,{401431677},POINTER;POINTER;
+powerwindow_PW_Control_DRV_Y,{401431678},POINTER;POINTER;
+powerwindow_PW_Control_DRV_Y,{401431679},POINTER;POINTER;
+powerwindow_PW_Control_DRV_Y,{401431680},POINTER;POINTER;

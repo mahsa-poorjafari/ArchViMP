@@ -166,15 +166,15 @@ function timeLineL2(container, txt, ldName, ulrParam) {
                 let gVarNodeTypeOfOp = "";
                 switch (gVarOpType) {
 
-                    case "LOAD":
+                    case "Read":
                         gVarNodeTypeOfOp = gVarNodeType + "_R";
                         break;
 
-                    case "STORE":
+                    case "Write":
                         gVarNodeTypeOfOp = gVarNodeType + "_W";
                         break;
 
-                    case "PROCESS":
+                    case "Process":
                         gVarNodeTypeOfOp = gVarNodeType + "_P";
                         break;
 
@@ -191,19 +191,19 @@ function timeLineL2(container, txt, ldName, ulrParam) {
                 // let edgeValue = tsGName + "_" + gVarOpType + "_" + gVarNodeName;
                 let edgeValue = gVarOpType;
                 switch (gVarOpType) {
-                   case "LOAD":
+                   case "Read":
                        graph.insertEdge(parent, null, edgeValue, gVarNode, tsGNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
                        gVarNode.target = tsGNode;
                        tsGNode.source = gVarNode;
                        break;
-                   case "PROCESS":
+                   case "Process":
                        graph.insertEdge(parent, null, edgeValue, tsGNode, gVarNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;');
                        gVarNode.target = tsGNode;
                        gVarNode.source = tsGNode;
                        tsGNode.target = gVarNode;
                        tsGNode.source = gVarNode;
                        break;
-                   case "STORE":
+                   case "Write":
                        graph.insertEdge(parent, null, edgeValue, tsGNode, gVarNode, 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;endFill=1;');
                        gVarNode.source = tsGNode;
                        tsGNode.target = gVarNode;
