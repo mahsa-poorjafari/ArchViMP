@@ -602,7 +602,7 @@ function showLdL3(container, op, graph, parent, X, Y) {
 }
 
 function drawChildTimeLine(childList, timeStamp, graph, parent, childX) {
-    
+
     let nodeSize = {};
     let nodePosition = [];
     let benchmarkName = get_url_benchmark();

@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <h2>{{ title_name }} </h2>
             <h2> Logical Data - Level 2 </h2>
-            <h4> Operation of Functions</h4>
+            <h4> Nested Functions View</h4>
         </div>
     </nav>
     {% if not logical_data_function %}
@@ -62,11 +62,11 @@
             <div class="col-md-5">
                 <h4>
                     Total Number of Elements:
-                    <strong style="font-weight: bold">{{ total_elements }}</strong>
+                    <strong style="font-weight: bold" id="ElementsNo">{{ total_elements }}</strong>
                 </h4>
                 <h4>
                     Total Number of Relation:
-                    <strong style="font-weight: bold">{{ total_relations }}</strong>
+                    <strong style="font-weight: bold" id="RelationNo">{{ total_relations }}</strong>
                 </h4>
             </div>
         </div>

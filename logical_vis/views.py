@@ -440,15 +440,20 @@ def functions_ld_l2(request):
         [lc_of_nested_function.append(lc) if thr in thrIds else None
          for lc, thrIds in lc_for_threads.items() for thr in thread_access_function]
         lc_of_nested_function = remove_dups(lc_of_nested_function)
-        all_lc_accessed_nested_function.extend(lc_of_nested_function)
+        if len(function_access_var) > 0:
+            all_lc_accessed_nested_function.extend(lc_of_nested_function)
+            logical_data_function.update({f: {
+                "VarList": function_access_var,
+                "LogicalComponets": lc_of_nested_function
+            }})
 
-        logical_data_function.update({f: {
-            "VarList": function_access_var,
-            "LogicalComponets": lc_of_nested_function
-        }})
     all_var_accessed = remove_dups(all_var_accessed)
     all_lc_accessed_nested_function = remove_dups(all_lc_accessed_nested_function)
-    total_elements = len(all_lc_accessed_nested_function) + len(logical_data_function.keys())
+    if len(all_var_accessed) == 1:
+        total_elements = len(all_var_accessed) + len(logical_data_function.keys())
+    else:
+        total_elements = len(all_lc_accessed_nested_function) + len(logical_data_function.keys())
+
     relation_list = []
     [relation_list.append(len(kv)) if kx == "LogicalComponets" else None for k, v in logical_data_function.items()
      for kx, kv in v.items()]
@@ -482,7 +487,7 @@ def logical_decision_ld_l2(request):
      else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() for x in v]
     # print(all_logical_decisions)
     [relation_list.append(len(v)) if k == 'Logical_component_list'
-     else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() ]
+     else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items()]
 
     var_list_log_des = remove_dups(var_list_log_des)
     # print(var_list_log_des)
