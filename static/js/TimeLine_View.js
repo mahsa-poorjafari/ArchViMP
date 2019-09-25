@@ -6,6 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
     ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
     let timeLineTextContainer = document.getElementById("time_line_text");
     let timeLineViewContainer = document.getElementById('time_line_diagram');
+    let rawElementSum = 0;
+    let appElementSum = 0;
+    let elements = timeLineTextContainer.getElementsByClassName('list_level0')[0].getElementsByClassName('li-list_level0');
+    rawElementSum += elements.length;
+    appElementSum += elements.length;
+
+    for (let e of elements){
+        rawElementSum += e.getElementsByClassName('g_members').length;
+        appElementSum += e.getElementsByClassName('g_name').length;
+    }
+    document.getElementById('rawElementsNo').innerHTML = rawElementSum.toString();
+    document.getElementById('appElementsNo').innerHTML = appElementSum.toString();
     mainViewTimeLine(timeLineViewContainer, timeLineTextContainer, ldName, ulrParam);
     if (ldName !== null){
         document.getElementById('tab03').style.display = 'block';
