@@ -31,7 +31,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
     // Enables rubberband selection
     new mxRubberband(graph);
     var parent = graph.getDefaultParent();
-    graph.keepEdgesInBackground = true;
+    graph.keepEdgesInBackground = false;
     // Adds cells to the model in a single step
     graph.getModel().beginUpdate();
     configEdgeStyle(graph, "#000000");
@@ -122,7 +122,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 // console.log(funLcList);
                 mxCells.forEach(function (node) {
                     if(node['style'] === 'LogicalComp' && funLcList.includes(node['value'])){
-                        graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize=10;' + strokeColor);
+                        graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=oval;startArrow=oval;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=10;startSize=10;' + strokeColor);
                         node.source = funNode;
                         funNode.source = node;
                     }

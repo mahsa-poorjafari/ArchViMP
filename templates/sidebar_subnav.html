@@ -2,7 +2,7 @@
 <li class="row traceVisCollapse l1">
     <a href="#{{ href_id }}MainViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
         <i class="fa fa-window-maximize col-2 benchmark-icon" aria-hidden="true"></i>
-        <span class="col-7 mv-title">Structure View</span>
+        <span class="col-7 mv-title">Structural View</span>
         <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
 
     </a>
@@ -10,67 +10,42 @@
 
           <li class="row">
               <a  href="Logical_Data_L3?b={{ href_id }}">
-                  <span class="col-12"> Overall view - Level 3</span>
+                  <span class="col-12"> Overall view - Level 2</span>
               </a>
           </li>
-<!--        <li class="row">-->
-<!--              <a  href="#">-->
-<!--                  <span class="col-12"> Individual Threads - Level 2</span>-->
-<!--              </a>-->
-<!--          </li>-->
       </ul>
 </li>
 <li class="row traceVisCollapse l1">
-    <a href="#{{ href_id }}SubViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
+    <a href="#{{ href_id }}functionalViewsSubmenu" data-toggle="collapse" aria-expanded="false" >
         <i class="fab fa-deploydog col-2 benchmark-icon" aria-hidden="true"></i>
-        <span class="col-7 mv-title"> Data & Deployment</span>
+        <span class="col-7 mv-title"> Functional View </span>
         <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
 
     </a>
-    <ul class="collapse list-unstyled components dynamic-size" id="{{ href_id }}SubViewsSubmenu">
+    <ul class="collapse list-unstyled components dynamic-size" id="{{ href_id }}functionalViewsSubmenu">
         <li class="row">
-            <a  href="logical_comp?b={{ href_id }}">
-                <span class="col-12" style="height: 2.5em; padding-bottom: 0;"> Logical Component - Level 1</span>
-                <i style=" font-size: 0.7em;">Technical Component to Logical Component</i>
+            <a  href="operation_functions_L2?b={{ href_id }}">
+                <i class="fas fa-code col-2" aria-hidden="true"></i>
+                <span class="col-10"> Callee Functions</span>
             </a>
         </li>
-        <hr/>
+
         <li class="row">
-            <a  href="#ld_l2_Submenu" data-toggle="collapse" aria-expanded="false">
-                <span class="col-9 mv-title" style="height: 2.5em; padding-bottom: 0;"> Logical Data - Level 2 </span>
-                <i class="fa fa-chevron-down col-1 submenu-l2-arrow benchmark-icon" aria-hidden="true" style="height: 2em;"></i>
-                <i style=" font-size: 0.7em;">Technical & Logical Data to Logical Data</i>
+            <a  href="logical_decision_L2?b={{ href_id }}">
+                <i class="fas fa-map-signs col-2" aria-hidden="true"></i>
+                <span class="col-10"> Logical Decisions</span>
             </a>
-            <ul class="collapse list-unstyled components dynamic-size" id="ld_l2_Submenu" style="padding-bottom: 0;">
-{#                <li class="row">#}
-{#                    <a  href="LD_L2_unG?b={{ href_id }}">#}
-{#                        <i class="fas fa-long-arrow-alt-right col-2"></i>#}
-{#                        <span class="col-8"> Ungrouped</span>#}
-{#                        <i class="far fa-object-ungroup col-1"></i>#}
-{#                    </a>#}
-{#                </li>#}
-                <li class="row">
-                    <a  href="operation_functions_L2?b={{ href_id }}">
-                        <i class="fas fa-code col-2" aria-hidden="true"></i>
-                        <span class="col-10"> Nested Functions</span>
-                    </a>
-                </li>
-<!--                <li class="row">-->
-<!--{#                    <a  href="exe_path_L2?b={{ href_id }}">#}-->
-<!--                    <a  href="#">-->
-<!--                        <i class="fas fa-align-left col-2" aria-hidden="true"></i>-->
-<!--                        <span class="col-10"> Execution Path of Threads</span>-->
-<!--                    </a>-->
-<!--                </li>-->
-                <li class="row">
-                    <a  href="logical_decision_L2?b={{ href_id }}">
-                        <i class="fas fa-map-signs col-2" aria-hidden="true"></i>
-                        <span class="col-10"> Logical Decision of Threads</span>
-                    </a>
-                </li>
-            </ul>
         </li>
-        <hr/>
+    </ul>
+    <a href="#{{ href_id }}logicalViewSubmenu" data-toggle="collapse" aria-expanded="false" >
+        <i class="fab fa-deploydog col-2 benchmark-icon" aria-hidden="true"></i>
+        <span class="col-7 mv-title"> Logical View </span>
+        <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
+
+    </a>
+    <ul class="collapse list-unstyled components dynamic-size" id="{{ href_id }}logicalViewSubmenu">
+
+
         <li class="row">
             <a  href="Logical_Data_L1?b={{ href_id }}">
                 <span class="col-12" style="height: 2.5em; padding-bottom: 0;"> Logical Data - Level 1</span>
@@ -78,10 +53,34 @@
             </a>
         </li>
         <hr/>
+
+    </ul>
+    <a href="#{{ href_id }}technicalViewSubmenu" data-toggle="collapse" aria-expanded="false" >
+        <i class="fab fa-deploydog col-2 benchmark-icon" aria-hidden="true"></i>
+        <span class="col-7 mv-title"> Technical View</span>
+        <i class="fa fa-chevron-down col-1 submenu-l1-arrow benchmark-icon" aria-hidden="true"></i>
+
+    </a>
+    <ul class="collapse list-unstyled components dynamic-size" id="{{ href_id }}technicalViewSubmenu">
+        <li class="row">
+            <a  href="logical_comp?b={{ href_id }}">
+                <span class="col-12" style="height: 2.5em; padding-bottom: 0;"> Logical Component</span>
+                <i style=" font-size: 0.7em;">Technical Component to Logical Component</i>
+            </a>
+        </li>
+        <hr/>
+
+        <li class="row">
+            <a  href="Logical_Data_L1?b={{ href_id }}">
+                <span class="col-12" style="height: 2.5em; padding-bottom: 0;"> Logical Data</span>
+                <i style=" font-size: 0.7em;">Technical Data to Logical Data</i>
+            </a>
+        </li>
+        <hr/>
         <li class="row">
             <a  href="Logical_Data_L0?b={{ href_id }}">
-                <span class="col-12" style="height: 2.5em; padding-bottom: 0;"> Logical Data - Level 0</span>
-                <i style=" font-size: 0.7em;">Technical Data</i>
+                <span class="col-12" style="height: 2.5em; padding-bottom: 0;"> Data Type </span>
+                <i style=" font-size: 0.7em;">Technical Data Type</i>
             </a>
         </li>
         <hr/>

@@ -228,19 +228,73 @@ def logical_data_l3(request):
     shared_var_and_pointer = []
     [shared_var_and_pointer.append(p.replace("{", "").replace("}", "")) if "{" in p and "}" in p else
      shared_var_and_pointer.append(p) for p in shared_vars_names]
+    logical_decision_file = get_logical_decision_file_path(b_parameter)
+    thread_list = get_thread_ids(logical_decision_file)
+    logical_component_list = get_logical_components(logical_decision_file)
+    print(logical_component_list)
+    for t in thread_list:
+        thr_func = get_thread_function(t, logical_decision_file)
+        thr_func_dict.update(thr_func)
+    #if b_parameter == "ThreadFourFunction":
 
-    if b_parameter == "ThreadFourFunction":
-        logical_decision_file = get_logical_decision_file_path(b_parameter)
-        thread_list = get_thread_ids(logical_decision_file)
-        for t in thread_list:
-            thr_func = get_thread_function(t, logical_decision_file)
-            thr_func_dict.update(thr_func)
-    else:
-        thread_list = get_threads(trace_file)
-        for t in thread_list:
-            thr_func = get_first_function(t, trace_file)
-            thr_func_dict.update(thr_func)
+        # thread_list = get_thread_ids(logical_decision_file)
+
+    #else:
+     #   thread_list = get_threads(trace_file)
+     #   for t in thread_list:
+     #       thr_func = get_first_function(t, trace_file)
+     #       thr_func_dict.update(thr_func)
+
+    # print(thr_func_dict)
     print("\n++++++++++++++++++++++++++++\n")
+    # print(shared_var_and_pointer)
+    csv_reader = get_file_records(trace_file)
+    threads_and_variable_dict = {}
+
+    for parent_func, thread_id in logical_component_list.items():
+
+        if parent_func not in threads_and_variable_dict.keys():
+            #for t_id in thread_id:
+            # We assume that threads under one logical component follows the same funcitonality \
+            # So we only check the variables for one thread of the logical component.
+            t_id = thread_id[0]
+            each_thread_var_dict = {}
+            input_group = []
+            output_group = []
+            process_group = []
+            print("\n ------------", t_id, "-------", parent_func, "-------")
+            for v in shared_var_and_pointer:
+                thread_op_variable = []
+                [thread_op_variable.append(r[2]) if r[1] == t_id and r[2] in ['LOAD', 'STORE'] and r[3] == v else None
+                 for r in csv_reader]
+                thread_op_variable = remove_dups(thread_op_variable)
+                if len(thread_op_variable) == 1:
+                    input_group.append(v) if thread_op_variable[0] == "LOAD" else output_group.append(v)
+                    each_thread_var_dict.update({v: thread_op_variable})
+                elif len(thread_op_variable) == 2:
+                    process_group.append(v)
+                    each_thread_var_dict.update({v: ["PROCESS"]})
+
+            print("\n -----input_group-- \n ", input_group)
+            print("\n -----output_group-- \n ", output_group)
+            print("\n -----process_group-- \n ", process_group)
+
+            threads_and_variable_dict.update({
+                parent_func: {
+                    "Thread_ids": thread_id,
+                    "variable_groups": {
+                        "Input": input_group,
+                        "Output": output_group,
+                        "Process": process_group
+                    }
+                }
+            })
+    print(threads_and_variable_dict)
+    each_parent_function_var_dict = {}
+    parent_func_threads = []
+
+
+
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(thr_func_dict, ["LOAD"], trace_file, shared_var_and_pointer)
 

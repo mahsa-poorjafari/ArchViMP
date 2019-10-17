@@ -86,7 +86,7 @@ def get_var_names(var_list, op):
 
 
 def get_thread_var_op(thr_func_dict, op, trace_file, shared_var_and_pointer):
-    print("\n __________________", op, "___________")
+    # print("\n __________________", op, "___________")
     thread_var_op = {}
     # print("shared_var_and_pointer   ", shared_var_and_pointer)
     # What I need is?: To show the inputs-LD of each threads
@@ -96,6 +96,15 @@ def get_thread_var_op(thr_func_dict, op, trace_file, shared_var_and_pointer):
         thread_var_dict = {}
         # get the pure thread id
         t_id = tK.strip("Main_") if "Main_" in tK else tK
+
+        # print("------------", t_id, "--------------")
+        for v in shared_var_and_pointer:
+            # print(v)
+            thread_op_variable = []
+            [thread_op_variable.append(r[2]) if r[1] == t_id and r[2] in ['LOAD', 'STORE'] and r[3] == v else None for r in csv_reader]
+            thread_op_variable = remove_dups(thread_op_variable)
+            # print(thread_op_variable)
+
         # get all records for this thead from Trace file and Filter the records based on operation
         thread_records = filter(lambda row: row[1] == t_id and row[2] in op, csv_reader)
         thread_pointers_list = list(filter(lambda row: row[4] in shared_var_and_pointer or
@@ -410,8 +419,8 @@ def get_all_logical_decisions(logical_decision_file):
             if logical_decision_rows != 1:
                 for ld_indx, ld in enumerate(logical_decision_rows):
                     if ld[1] == "logicalDecision":
-                        # ld[1] = "LogicalDecision\n"
-                        ld[1] = "LogicalDecision"
+                        ld[1] = "LogicalDecision\n"
+                        #ld[1] = "LogicalDecision"
                         var_list, thread_list, file_name = get_logical_decision_vars(logical_decision_rows[ld_indx+1:])
                         log_dec_names.update({''.join(ld[1:]): {"START": ld[2],
                                                                     "END": ld[3],
@@ -463,8 +472,8 @@ def get_all_logical_decisions(logical_decision_file):
                 "Logical_component_list": lc_list,
             }})
         elif len(ld_variable_list) == 1:
-            logical_decision_dic.update({ld_variable_list[0]: {
-                "variable_list": [],
+            logical_decision_dic.update({"technical_data": {
+                "variable_list": ld_variable_list,
                 "thread_list": ld_thread_list,
                 "Logical_component_list": lc_list,
             }})

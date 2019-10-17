@@ -63,6 +63,7 @@ function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
                 // END
             }
             let lcListObj = Object.entries(lcDict);
+            let logCompNode = null;
             //console.table(lcDict);
             let mxCells = graph.getChildVertices(graph.getDefaultParent());
             for (let i=0; i < ldL2List.length; i++) {
@@ -70,36 +71,57 @@ function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
                 let varsList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName('variable_list')[0].getElementsByClassName('value');
                 let thread_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("thread_list")[0].getElementsByClassName('value');
                 let Logical_component_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("Logical_component_list")[0].getElementsByClassName('value');
-                // console.log(lDecText);
-                // console.log(Logical_component_list);
-                let lDecId = 'ldL2_Dec' + i;
-                if (ldName !== null && ldName !== lDecText) {
-                    styleIdNode = "LogicalDataInactive";
-                    strokeColor = "strokeColor=#ccc;";
-                } else {
-                    if (varsList.length === 0){
-                        styleIdNode = "variable";
-                    }else{
-                        styleIdNode = "logicalData";
+                console.log(lDecText);
+                console.log(varsList);
+                if (lDecText === "technical_data"){
+                    let variableName = varsList[0].innerHTML;
+                    nodeSize = setNodeSize(variableName, 'variable_P');
+                    nodeStyle(graph, nodeSize['nodeIdText']);
+
+                    let varNode = graph.insertVertex(parent, null, variableName, lDecX, 500, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+
+                    for (let lcForLd of Logical_component_list) {
+                        mxCells.forEach(function (logComp) {
+                            if (logComp['value'] === lcForLd.innerHTML) {
+                                logCompNode = logComp;
+                                graph.insertEdge(parent, null, null, logComp, varNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=8;startSize=10;');
+                                logComp.source = varNode;
+                                varNode.source = logComp;
+                            }
+                        });
                     }
-                    strokeColor = "strokeColor=#000000;";
+
                 }
-                nodeSize = setNodeSize(lDecText, styleIdNode);
-                nodeStyle(graph, nodeSize['nodeIdText']);
-                //console.table(lDecText + ' === ' + lDecX + ' === ===' + lDefY);
-                lDecX = (i+1)%2 === 0 ? lDecX2 : 10;
-                lDefY = (i+1)%2 === 0 ? lDefY : lDefY += 200;
-                let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+80, nodeSize['Height']+80, nodeSize['nodeIdText']);
-                let logCompNode = null;
-                for (let lcForLd of Logical_component_list){
-                    mxCells.forEach(function (logComp){
-                        if (logComp['value'] === lcForLd.innerHTML){
-                            logCompNode = logComp;
-                            graph.insertEdge(parent, null, null, logComp, stNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize=10;' + strokeColor);
-                            logComp.source = stNode;
-                            stNode.source = logComp;
-                        }
-                    });
+                else if (varsList.length > 0) {
+                    let lDecId = 'ldL2_Dec' + i;
+                    if (ldName !== null && ldName !== lDecText) {
+                        styleIdNode = "LogicalDataInactive";
+                        strokeColor = "strokeColor=#ccc;";
+                    } else {
+                        // if (varsList.length === 0){
+                        //  styleIdNode = "variable";
+                        // }else{
+                        styleIdNode = "logicalData";
+                        // }
+                        strokeColor = "strokeColor=#000000;";
+                    }
+                    nodeSize = setNodeSize(lDecText, styleIdNode);
+                    nodeStyle(graph, nodeSize['nodeIdText']);
+                    //console.table(lDecText + ' === ' + lDecX + ' === ===' + lDefY);
+                    lDecX = (i + 1) % 2 === 0 ? lDecX2 : 10;
+                    lDefY = (i + 1) % 2 === 0 ? lDefY : lDefY += 200;
+                    let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width'] + 80, nodeSize['Height'] + 80, nodeSize['nodeIdText']);
+
+                    for (let lcForLd of Logical_component_list) {
+                        mxCells.forEach(function (logComp) {
+                            if (logComp['value'] === lcForLd.innerHTML) {
+                                logCompNode = logComp;
+                                graph.insertEdge(parent, null, null, logComp, stNode, 'dashed=0;endArrow=oval;startArrow=oval;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=10;startSize=10;' + strokeColor);
+                                logComp.source = stNode;
+                                stNode.source = logComp;
+                            }
+                        });
+                    }
                 }
                 // Draw threads that run this Logical Decision
 

@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <nav class="navbar navbar-default">
+<nav class="navbar navbar-default" xmlns="http://www.w3.org/1999/html">
         <div class="container-fluid">
-                <h2>Visualization of MultiThreaded Programs.</h2>
-            <p>This is a Master's thesis for visualizing the execution trace data of a multithreaded program,
-                which contain the involving threads, their access to shared resources and their relationship.
+            <h2 class="col-md-12">ArchVi MP - Architectural Views of MultiThreaded Programs.</h2>
+
+            <p>This is the prototype of a Master's thesis with the topic of:
+                <p>Extracting Concurrency-Related Architectural Properties from Software Implementation</p>
             </p>
         </div>
     </nav>
@@ -21,7 +22,7 @@
                 {% csrf_token %}
                 <div class="invalid-feedback" id="empty-t-list">Please select a Trace Tile from the list.</div>
                 <div class="invalid-feedback" id="empty-shv-list">Please select a Shared Variable File from the list.</div>
-                <div class="col-md-3"></div>
+                <div class="col-md-4"></div>
                 <div class="col-md-6" >
                     <div class="form-group">
                         <select class="browser-default custom-select form-group select_tag_file" id="selected_trace_file" name="selected_trace_file">
@@ -40,7 +41,7 @@
 <!--                        </select>-->
 <!--                    </div>-->
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-1">
                     <button type="submit" class="btn btn-primary">Send</button>
                 </div>
 
@@ -62,12 +63,12 @@
             <h2>You can <strong  class="see_it">UPLOAD</strong> your files here:</h2>
             <form method="post" enctype="multipart/form-data" class="form-inline needs-validation trace_file_upload" id="trace_file_upload" novalidate>
                 {% csrf_token %}
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-4">
                     <input type="text" class="form-control program_name" placeholder="Enter Name of your Program" id="program_name" name="program_name">
                     <small id="programNameHelp" class="form-text text-muted">Make it short</small>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="input-group " id="trace-file">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroupFileAddon01">
