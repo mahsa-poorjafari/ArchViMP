@@ -64,17 +64,29 @@ function logicalDataL2Function(container, clientWidth, ldName) {
             let varLcList = [];
             let elm = functionContainer[i];
             let funcVarlist = elm.getElementsByClassName("list_level1")[0];
-            let funcVarElemts = funcVarlist.getElementsByClassName('VarList')[0].getElementsByClassName('value');
+            let funcVarElemts = funcVarlist.getElementsByClassName('VarList')[0].getElementsByClassName('Var_op_list');
             if (funcVarElemts.length === 1){
                 let funcThreadElemnts = funcVarlist.getElementsByClassName('LogicalComponets')[0].getElementsByClassName('value');
+                let lcVarType = funcVarElemts[0].getElementsByClassName('value')[0].innerHTML.replace(/ /g, '');
                 for (let r of funcThreadElemnts){
-                    varLcList.push(r.innerHTML.replace(/ /g, ''));
+                    varLcList.push([r.innerHTML.replace(/ /g, ''), lcVarType]);
                 }
-                let varName = funcVarElemts[0].innerHTML.replace(/ /g, '');
-                nodeSize = setNodeSize(varName, 'variable');
+                console.log("varLcList...", varLcList);
+                let varNameS = funcVarElemts[0].getElementsByClassName('key')[0].innerHTML.replace(/ /g, '');
+                let opTyp = funcVarElemts[0].getElementsByClassName('value')[0].innerHTML.replace(/ /g, '');
+                let varName = (varNameS.includes("."))? varNameS.split(".")[0]: varNameS;
+                let varTyp = (varNameS.includes("."))? "logicalData": "variable";
+                if (opTyp === "STORE"){
+                    varTyp += "_W";
+                }else if (opTyp === "LOAD"){
+                    varTyp += "_R";
+                }else if (opTyp === "PROCESS"){
+                    varTyp += "_P";
+                }
+                nodeSize = setNodeSize(varName, varTyp);
                 nodeStyle(graph, nodeSize['nodeIdText']);
                 varX = (i+1)%2 === 0 ? varX2 : 50;
-                varY += 150;
+                varY += 20;
                 let UpdatedCells = graph.getChildVertices(graph.getDefaultParent());
                 let count = 0;
                 let varNode = null;
@@ -87,13 +99,21 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 if (count === 0){
                     varNode = graph.insertVertex(parent, null, varName, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 }
-                mxCells.forEach(function (node) {
-                    if(node['style'] === 'LogicalComp' && varLcList.includes(node['value'])){
-                        graph.insertEdge(parent, null, null, node, varNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize=10;' + strokeColor);
-                        node.source = varNode;
-                        varNode.source = node;
-                    }
-                });
+                for (let item of varLcList){
+                    //console.log("item __________________  " + item);
+                    mxCells.forEach(function (node) {
+                        if(node['style'] === 'LogicalComp' &&  item[0] === node['value']){
+                            let endArrowStyle = (item[1] === "STORE" || item[1] === "PROCESS")? "classic" : "0";
+                            let startArrowStyle = (item[1] === "LOAD" || item[1] === "PROCESS")? "classic" : "0";
+                            let startSizeStyle = (item[1] === "PROCESS")? "10" : "7";
+
+                            graph.insertEdge(parent, null, null, node, varNode, 'dashed=0;endArrow='+ endArrowStyle +';startArrow='+ startArrowStyle +';sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize='+startSizeStyle+';' + strokeColor);
+                            node.source = varNode;
+                            varNode.source = node;
+
+                        }
+                    });
+                }
             }else if (funcVarElemts.length > 1){
                 let funLcList = [];
                 let fun_name = elm.getElementsByClassName('func_name')[0].innerHTML.replace(/ /g, '');
@@ -115,11 +135,12 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 nodeStyle(graph, nodeSize['nodeIdText']);
                 funX = (i+1)%2 === 0 ? funX2 : 50;
                 funY = (i+1)%2 === 0 ? funY : funY += 100;
+
                 let funNode = graph.insertVertex(parent, null, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // funY += 200;
                 // Connecting each function node to its logical components
 
-                // console.log(funLcList);
+                // console.log( fun_name + "  -----  " + funY);
                 mxCells.forEach(function (node) {
                     if(node['style'] === 'LogicalComp' && funLcList.includes(node['value'])){
                         graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=oval;startArrow=oval;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=10;startSize=10;' + strokeColor);
@@ -188,11 +209,12 @@ function logicalDataL1Function(container, clientWidth, ldName) {
         let fun_name = null;
         for (let elm of functionContainer) {
             fun_name = elm.getElementsByClassName('func_name')[0].innerHTML;
-            let funVarElements = elm.getElementsByClassName('list_level1')[0].getElementsByClassName('VarList')[0].getElementsByClassName('value');
+            let funVarElements = elm.getElementsByClassName('list_level1')[0].getElementsByClassName('VarList')[0].getElementsByClassName('Var_op_list');
             let funVarList = [];
-            for (let varName of funVarElements){
-                let varNameTyped = varName.innerHTML.replace(/ /g,'');
-                funVarList.push(varNameTyped.includes('.')? varNameTyped.split(".")[0]: varNameTyped);
+            for (let element of funVarElements){
+                let varName =  element.getElementsByClassName('key')[0].innerHTML.replace(/ /g,'');
+                let varAcessTyp =  element.getElementsByClassName('value')[0].innerHTML.replace(/ /g,'');
+                funVarList.push([varName.includes('.')? varName.split(".")[0]: varName, varAcessTyp]);
             }
             if (ldName !== null && ldName !== fun_name) {
                 styleIdNode = "LogicalDataInactive";
@@ -205,13 +227,21 @@ function logicalDataL1Function(container, clientWidth, ldName) {
             nodeStyle(graph, nodeSize['nodeIdText']);
             let funNode = graph.insertVertex(parent, 'function_ld_'+fun_name, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
             funY += 200;
-            mxCells.forEach(function (node){
-                if(funVarList.includes(node['value'])){
-                    graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;endFill=1;'+ strokeColor);
-                    node.source = funNode;
-                    funNode.source = node;
-                }
-            });
+            for (let item of funVarList){
+                mxCells.forEach(function (node){
+                    if(item[0] === node['value']){
+                        let endArrowStyle = (item[1] === "LOAD" || item[1] === "PROCESS")? "classic" : "0";
+                        let startArrowStyle = (item[1] === "STORE" || item[1] === "PROCESS")? "classic" : "0";
+                        let startSizeStyle = (item[1] === "PROCESS")? "10" : "7";
+                        let edgeVal = (ldName !== null && ldName !== fun_name) ? null : item[1];
+                        graph.insertEdge(parent, null, edgeVal, node, funNode, 'dashed=0;endArrow='+ endArrowStyle +';startArrow='+ startArrowStyle +';sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize='+startSizeStyle+';' + strokeColor);
+
+                        //graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;endFill=1;'+ strokeColor);
+                        node.source = funNode;
+                        funNode.source = node;
+                    }
+                });
+            }
             let tdUlrPath = "http://127.0.0.1:8000/Logical_Data_L1";
             let ldUrlPath = "http://127.0.0.1:8000/operation_functions_L2";
             ldTdGraphDoubleClickEvent(graph, tdUlrPath, ldUrlPath);

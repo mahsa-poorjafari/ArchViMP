@@ -535,7 +535,9 @@ def functions_ld_l2(request):
                                                               'all_lc_accessed_nested_function':
                                                                   all_lc_accessed_nested_function,
                                                               'total_elements': total_elements,
-                                                              'total_relations': total_relations
+                                                              'total_relations': total_relations,
+                                                              'VarList': "VarList",
+                                                              'LogicalComponets': "LogicalComponets"
                                                               })
 
 

@@ -18,6 +18,14 @@
                 {% endfor %}
             </ul>
         </div>
+
+    {% else %}
+        <div class="alert alert-danger " role="alert">
+            <i class="fas fa-times"></i>
+            No group for this level of Logical Data has been created.</br>
+            The list of data structures is Empty.
+        </div>
+        <div id="NoTab" class="tab-contents col-md-12"></div>
     {% endif %}
     <div class="tabs">
       <div class="tab-button-outer">

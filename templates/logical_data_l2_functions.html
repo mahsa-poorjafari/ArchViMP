@@ -83,13 +83,27 @@
                     <li class="li-list_level0 col-3" style="border-left: 1px solid #2e6da4;">
                     <span class="func_name" style="font-weight: bold ">{{ k }}</span>
                         <ul class="list_level1 {{ k }}">
-                            {% for key, val in v.items %}
-                                <li class="li-list_level1 {{ key }}" >
-                                    {% for v in val %}
-                                        <span class="value">{{ v }}</span>
-                                    {% endfor %}
-                                </li>
-                            {% endfor %}
+                                {% for key, val in v.items %}
+                                    {% if key == VarList %}
+                                        <li class="li-list_level1 {{ key }}" >
+                                            {% for k, v in val.items %}
+                                                <p class="Var_op_list">
+                                                    <span class="key">{{ k }}</span>
+                                                    <span class="value">{{ v }}</span>
+                                                </p>
+                                            {% endfor %}
+                                        </li>
+
+                                    {% elif key == LogicalComponets %}
+
+                                        <li class="li-list_level1 {{ key }}" >
+                                            {% for v in val %}
+                                                <span class="value">{{ v }}</span>
+                                            {% endfor %}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
                         </ul>
                     </li>
                 {% endfor %}

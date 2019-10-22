@@ -166,6 +166,7 @@ def get_trace_file_path(benchmark_name, *args, **kwargs):
         "ROSACE": "benchmark_traces/ROSACE/ROSACE_trace.txt",
         "OCEAN": "benchmark_traces/OCEAN/Splash2ocean_contiguous_partitions.txt",
         "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_trace.txt",
+        "Autonomous": "benchmark_traces/SA_Autonomous/trace_2019.10.22.17.14.31.txt",
         "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsLLVMWitFunctionsReturn.txt",
         "UPLOADED": "Uploaded_files/" + file_name + ".txt",
     }
@@ -177,6 +178,7 @@ def get_logical_decision_file_path(benchmark_name, *args, **kwargs):
     switcher = {
         "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/LogicalDec_sharedVars.txt",
         "ROSACE": "benchmark_traces/ROSACE/ROSACE_LogicalDec_sharedVars.txt",
+        "Autonomous": "benchmark_traces/SA_Autonomous/coverage_test.txt",
         "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_LogicalDec_sharedVars.txt"
     }
     return switcher.get(benchmark_name, "Invalid Value")
@@ -186,6 +188,7 @@ def get_variable_file_path(benchmark_name):
     switcher = {
         "ROSACE": "benchmark_traces/ROSACE/ROSACE_SharedVariables.txt",
         "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_SharedVariables.txt",
+        "Autonomous": "benchmark_traces/SA_Autonomous/shared_test.txt",
         "ThreadFourFunction":
             "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsSharedVariables.txt",
     }
@@ -342,51 +345,22 @@ def get_functions_with_body(trace_file, function_name, all_shared_resources):
     if len(func_var_list) > 0:
         for shared_var in all_shared_resources:
             var_op_list = []
+            shared_var_struct = shared_var.split(".")[0] + "." if "." in shared_var else shared_var
             a = list(filter(lambda r: r[0] == shared_var, func_var_list))
-            # print(a)
             if len(a) > 0:
-                [var_op_list.append(i[1]) for i in a]
+                # print("\n a------")
+                # print(a)
+                var_struct_list = []
+                [var_struct_list.append([i[0].split(".")[0] + ".", i[1]]) if "." in i[0] else var_struct_list.append(i) for i in a]
+                # print("\n var_struct_list ")
+                # print(var_struct_list)
+                [var_op_list.append(i[1]) for i in var_struct_list]
                 var_op_list = remove_dups(var_op_list)
                 thread_function_var_op.update({
-                    shared_var: "PROCESS" if len(var_op_list) > 1 else var_op_list[0]
+                    shared_var_struct: "PROCESS" if len(var_op_list) > 1 else var_op_list[0]
                 })
     # print(thread_function_var_op)
 
-
-
-    # The index of record are +1
-    # for k, f_list in thread_funciton_list.items():
-    #     [f_list.remove(i) for i in f_list if i in thr_func_list]
-    #     for f in f_list:
-    #         function_start_end = list(filter(lambda r: r[2] == k and r[4] == f and r[3] in ["FUNCTIONCALL", "FUNCTIONRETURN"]
-    #                                          , csv_reader_list))
-    #         for indx, elem in enumerate(function_start_end):
-    #             # print("elem--------------------")
-    #             # print(elem)
-    #             next_item_index = indx + 1
-    #             # print("next_item_index", next_item_index)
-    #             if len(function_start_end) > 1 and next_item_index < len(function_start_end):
-    #                 function_return_index = function_start_end[next_item_index][0] if \
-    #                     function_start_end[next_item_index][3] == "FUNCTIONRETURN" else \
-    #                     None
-    #
-    #                 function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
-    #                 print("function_call_index==>>  ", function_call_index)
-    #                 print("function_return_index==>>  ", function_return_index)
-    #                 distance = function_return_index - function_call_index if function_return_index is not None \
-    #                                                                           and function_call_index is not \
-    #                                                                           None else None
-    #
-    #                 if distance is not None and not distance <= 1:
-    #                     f_body = csv_reader_list[function_call_index+1:function_return_index]
-    #                     print("\n f_body   \n", f_body)
-    #                     funciton_body_list.update({f: csv_reader_list[function_call_index+1:
-    #                                                                   function_return_index]})
-    #                 if len(funciton_body_list) > 0:
-    #                     thread_funcitons.update({k: funciton_body_list})
-    #
-
-    # print("\n thread_funcitons          => ", thread_funcitons)
     return thread_function_var_op
 
 
