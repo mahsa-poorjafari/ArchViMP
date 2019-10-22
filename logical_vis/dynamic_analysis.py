@@ -211,7 +211,7 @@ def get_threads(file_path):
     # main_thread_filter = filter(lambda row: row[2].lstrip() == "FUNCTIONCALL" and row[3].lstrip() == "main", csv_reader)
     # main_thread_list = list(main_thread_filter)
     main_thread_list = csv_reader[0]
-    print(main_thread_list)
+    # print(main_thread_list)
     # print("\n main_thread_list", main_thread_list)
     main_thread_id = main_thread_list[0][1]
     # print("main_thread_id =>  ", main_thread_id)
@@ -306,71 +306,92 @@ def thread_per_vars(shared_variables, thread_ids):
     # print("\n => ", thread_vars)
     return thread_vars_op
 
-# Not needed, check first then remove this function
-def get_functions_with_body(trace_file, thread_list):
-    thread_funciton_list = {}
+
+def get_functions_with_body(trace_file, function_name, all_shared_resources):
+    thread_function_var_op = {}
+    # print("\n all_shared_resources", all_shared_resources)
     thread_funcitons = {}
     thr_func_list = []
+    func_var_list = []
+    funciton_body_list = []
+    thread_ids = get_threads(trace_file)
+    csv_reader_list = get_file_records(trace_file)
+    pure_thread_ids = []
+    [pure_thread_ids.append(tid.split("_")[1]) if "Main_" in tid else pure_thread_ids.append(tid) for tid in thread_ids]
+    # print(pure_thread_ids)
     f_avoid_dups = []
-    for t in thread_list:
-        funciton_body_list = {}
-        t_id = t.split("_")[1] if "Main_" in t else t
-        with open(trace_file, 'r') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            funciton_list = list(map(lambda r: r[3] if r[1] == t_id and r[2] == "FUNCTIONCALL" and "CONSTANT;" in r[5]
-                                 else None, csv_reader))
-            f_avoid_none = list(filter(partial(is_not, None), funciton_list))
-            f_avoid_dups = remove_dups(f_avoid_none)
+    [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
+    for t in pure_thread_ids:
+        function_start_end = list(filter(lambda r: r[2] == t and r[4] == function_name and r[3] in ["FUNCTIONCALL", "FUNCTIONRETURN"],
+                                         csv_reader_list))
+        if len(function_start_end) > 0:
+            start = function_start_end[0][0] if function_start_end[0][3] == "FUNCTIONCALL" else None
+            end = function_start_end[1][0] if function_start_end[1][3] == "FUNCTIONRETURN" else None
+            # print("\n Function:  ", function_name, " Start ==>>  ", start, "   End =>", end)
+            if start is not None and end is not None:
+                # print("csv_reader_list [Start] ==>> \n ", csv_reader_list[start])
+                # print("csv_reader_list [End] ==>> \n ", csv_reader_list[end])
+                for item in range(start+1, end):
+                    # print(csv_reader_list[item])
+                    if csv_reader_list[item][4] in all_shared_resources and csv_reader_list[item][3] in ["STORE", "LOAD"]:
+                        func_var_list.append([csv_reader_list[item][4], csv_reader_list[item][3]])
+                        thr_func_list.append(csv_reader_list[item][2])
+    # print(func_var_list)
+    thr_func_list = remove_dups(thr_func_list)
+    # print(thr_func_list)
+    if len(func_var_list) > 0:
+        for shared_var in all_shared_resources:
+            var_op_list = []
+            a = list(filter(lambda r: r[0] == shared_var, func_var_list))
+            # print(a)
+            if len(a) > 0:
+                [var_op_list.append(i[1]) for i in a]
+                var_op_list = remove_dups(var_op_list)
+                thread_function_var_op.update({
+                    shared_var: "PROCESS" if len(var_op_list) > 1 else var_op_list[0]
+                })
+    # print(thread_function_var_op)
 
-        csv_file.close()
-        thread_funciton_list.update({t_id: f_avoid_dups})
-        thr_func = get_first_function(t, trace_file)
-        thr_func_list.append(list(thr_func.values())[0])
 
-    with open(trace_file, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        csv_reader_list = list(csv_reader)
-        [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
-        # The index of record are +1
-        for k, f_list in thread_funciton_list.items():
-            [f_list.remove(i) for i in f_list if i in thr_func_list]
-            for f in f_list:
-                function_start_end = list(filter(lambda r: r[2] == k and r[4] == f and r[3] in ["FUNCTIONCALL", "FUNCTIONRETURN"]
-                                                 , csv_reader_list))
-                print("function_start_end==>>  ", function_start_end)
-                for indx, elem in enumerate(function_start_end):
-                    # print("elem--------------------")
-                    # print(elem)
-                    next_item_index = indx + 1
-                    # print("next_item_index", next_item_index)
-                    if len(function_start_end) > 1 and next_item_index < len(function_start_end):
-                        function_return_index = function_start_end[next_item_index][0] if \
-                            function_start_end[next_item_index][3] == "FUNCTIONRETURN" else \
-                            None
 
-                        function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
-                        print("function_call_index==>>  ", function_call_index)
-                        print("function_return_index==>>  ", function_return_index)
-                        distance = function_return_index - function_call_index if function_return_index is not None \
-                                                                                  and function_call_index is not \
-                                                                                  None else None
+    # The index of record are +1
+    # for k, f_list in thread_funciton_list.items():
+    #     [f_list.remove(i) for i in f_list if i in thr_func_list]
+    #     for f in f_list:
+    #         function_start_end = list(filter(lambda r: r[2] == k and r[4] == f and r[3] in ["FUNCTIONCALL", "FUNCTIONRETURN"]
+    #                                          , csv_reader_list))
+    #         for indx, elem in enumerate(function_start_end):
+    #             # print("elem--------------------")
+    #             # print(elem)
+    #             next_item_index = indx + 1
+    #             # print("next_item_index", next_item_index)
+    #             if len(function_start_end) > 1 and next_item_index < len(function_start_end):
+    #                 function_return_index = function_start_end[next_item_index][0] if \
+    #                     function_start_end[next_item_index][3] == "FUNCTIONRETURN" else \
+    #                     None
+    #
+    #                 function_call_index = elem[0] if elem[3] == "FUNCTIONCALL" else None
+    #                 print("function_call_index==>>  ", function_call_index)
+    #                 print("function_return_index==>>  ", function_return_index)
+    #                 distance = function_return_index - function_call_index if function_return_index is not None \
+    #                                                                           and function_call_index is not \
+    #                                                                           None else None
+    #
+    #                 if distance is not None and not distance <= 1:
+    #                     f_body = csv_reader_list[function_call_index+1:function_return_index]
+    #                     print("\n f_body   \n", f_body)
+    #                     funciton_body_list.update({f: csv_reader_list[function_call_index+1:
+    #                                                                   function_return_index]})
+    #                 if len(funciton_body_list) > 0:
+    #                     thread_funcitons.update({k: funciton_body_list})
+    #
 
-                        if distance is not None and not distance <= 1:
-                            f_body = csv_reader_list[function_call_index+1:function_return_index]
-                            print("\n f_body   \n", f_body)
-                            funciton_body_list.update({f: csv_reader_list[function_call_index+1:
-                                                                          function_return_index]})
-                        if len(funciton_body_list) > 0:
-                            thread_funcitons.update({k: funciton_body_list})
-
-            csv_file.seek(0, 0)
-        csv_file.close()
     # print("\n thread_funcitons          => ", thread_funcitons)
-    return thread_funcitons
+    return thread_function_var_op
 
 
-# Not needed, check first then remove this function
 def get_first_function_body(function_name, trace_file):
+    # Not needed, check first then remove this function
     csv_reader_list = get_file_records(trace_file)
     [record.insert(0, index) for index, record in enumerate(csv_reader_list)]
 
@@ -587,13 +608,13 @@ def get_thread_function(t, report_file):
 
 
 def get_thread_access_function(trace_file, nested_function_name):
-    print("\n -----------", nested_function_name, "-----------")
+    # print("\n -----------", nested_function_name, "-----------")
     csv_reader_list = get_file_records(trace_file)
     thread_list = []
     records_list = list(filter(lambda r: r[3] == nested_function_name, csv_reader_list))
     [thread_list.append(r[1]) for r in records_list]
     thread_list = remove_dups(thread_list)
-    print(thread_list)
+    # print(thread_list)
     return thread_list
 
 

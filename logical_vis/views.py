@@ -292,9 +292,6 @@ def logical_data_l3(request):
     print(threads_and_variable_dict)
     each_parent_function_var_dict = {}
     parent_func_threads = []
-
-
-
     # Get the variables that are threads Input
     thread_var_input = get_thread_var_op(thr_func_dict, ["LOAD"], trace_file, shared_var_and_pointer)
 
@@ -385,7 +382,7 @@ def time_line_view(request):
         t_id = t if "Main_" not in t else t.split("_")[1]
         # print(t_id)
         # thread_filter = filter(lambda row: row[2] in ["STORE", "LOAD"] and row[1] == t_id and
-                               #row[3] is not "" and "CONSTANT;" in row[5], csv_reader_list)
+                               # row[3] is not "" and "CONSTANT;" in row[5], csv_reader_list)
         # thread_list = list(thread_filter)
         [thread_list.append(r) if r[1] == t_id and r[3] in shared_vars_names else None for r in csv_reader_list]
 
@@ -464,32 +461,51 @@ def op_funcs_l2(request):
 def functions_ld_l2(request):
     b_parameter, trace_file, which_way, file_name = get_b_parameter(request)
     logical_decision_file = get_logical_decision_file_path(b_parameter)
-    trace_exe_file = get_trace_file_path(b_parameter)
-    # all funcitons that are exist
+    all_shared_resources = get_all_shared_var_names(b_parameter)
+    # trace_exe_file = get_trace_file_path(b_parameter)
+    # all functions that are exist
     all_functions = get_all_functions(logical_decision_file)
     # first functions that threads execute
     lc_functions = get_lc_functions(logical_decision_file)
     lc_for_threads = get_logical_components(logical_decision_file)
-    # print(lc_for_threads)
-
-    # list of nested functions
+    # list of callee (nested) functions
     [all_functions.remove(lc_f) if lc_f in all_functions else None for lc_f in lc_functions]
     nested_functions = all_functions
     variables_execution_block = get_vars_exe_block(logical_decision_file)
     logical_data_function = {}
     all_var_accessed = []
     all_lc_accessed_nested_function = []
+
+    # print(nested_functions)
     for f in nested_functions:
         function_access_var = []
         lc_of_nested_function = []
+        vars_of_callee_functions = {}
         [function_access_var.append(v['varName'].split(".")[0]+".") if "." in v['varName']
          else function_access_var.append(v['varName']) if f in v['funcitonList'] else None
          for k, v in variables_execution_block.items()]
+        vars_of_callee_functions = get_functions_with_body(trace_file, f, all_shared_resources)
+        # print(vars_of_callee_functions)
+
+        #     function_start_end.append(indx)
+        # elif r[0] == 'Function' and r[1] != f or r[0] in ["Thread", "Variable"]:
+        #     function_start_end.append(indx)
+
+        #     indx += 1
+        #     if csv_reader_list[indx][0] == "Accesses" or csv_reader_list[indx][0] == "logicalDecision":
+        #         indx += 1
+        #         if csv_reader_list[indx][0] not in ["Thread", "Function", "Variable", "Accesses", "logicalDecision"]:
+        #             vars_of_callee_functions.update({
+        #                 "callee_function": f,
+        #                 "var_access_records": csv_reader_list[indx]
+        #             })
+        # else:
+        #     pass
+        # print(function_start_end)
         all_var_accessed.extend(function_access_var)
         function_access_var = remove_dups(function_access_var)
-
         # Get threads that accessed this nested function
-        thread_access_function = get_thread_access_function(trace_exe_file, f)
+        thread_access_function = get_thread_access_function(trace_file, f)
         # retrieve logical components that access this nested function
         [lc_of_nested_function.append(lc) if thr in thrIds else None
          for lc, thrIds in lc_for_threads.items() for thr in thread_access_function]
@@ -497,10 +513,10 @@ def functions_ld_l2(request):
         if len(function_access_var) > 0:
             all_lc_accessed_nested_function.extend(lc_of_nested_function)
             logical_data_function.update({f: {
-                "VarList": function_access_var,
+                "VarList": vars_of_callee_functions,
                 "LogicalComponets": lc_of_nested_function
             }})
-
+    print(logical_data_function)
     all_var_accessed = remove_dups(all_var_accessed)
     all_lc_accessed_nested_function = remove_dups(all_lc_accessed_nested_function)
     if len(all_var_accessed) == 1:
@@ -511,7 +527,7 @@ def functions_ld_l2(request):
     relation_list = []
     [relation_list.append(len(kv)) if kx == "LogicalComponets" else None for k, v in logical_data_function.items()
      for kx, kv in v.items()]
-
+    # print(logical_data_function)
     total_relations = sum(relation_list)
     return render(request, 'logical_data_l2_functions.html', {'title_name': which_way,
                                                               'logical_data_function': logical_data_function,
