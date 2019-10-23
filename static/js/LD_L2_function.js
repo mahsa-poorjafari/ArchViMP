@@ -31,7 +31,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
     // Enables rubberband selection
     new mxRubberband(graph);
     var parent = graph.getDefaultParent();
-    graph.keepEdgesInBackground = false;
+    graph.keepEdgesInBackground = true;
     // Adds cells to the model in a single step
     graph.getModel().beginUpdate();
     configEdgeStyle(graph, "#000000");
@@ -53,9 +53,10 @@ function logicalDataL2Function(container, clientWidth, ldName) {
         for (let lc of lcContainer){
             let lcName = lc.innerHTML.replace(/ /g, '');
             nodeSize = setNodeSize(lcName, 'LogicalComp' );
-            nodeStyle(graph, 'LogicalComp');
+            nodeStyle(graph, nodeSize['nodeIdText']);
+            // console.table(nodeSize);
             graph.insertVertex(parent, null, lcName, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-            lcY += 100;
+            lcY += (lcName.length > 20)? 120 : 100;
         }
         let mxCells = graph.getChildVertices(graph.getDefaultParent());
         let lcName = null;
@@ -71,7 +72,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 for (let r of funcThreadElemnts){
                     varLcList.push([r.innerHTML.replace(/ /g, ''), lcVarType]);
                 }
-                console.log("varLcList...", varLcList);
+                // console.log("varLcList...", varLcList);
                 let varNameS = funcVarElemts[0].getElementsByClassName('key')[0].innerHTML.replace(/ /g, '');
                 let opTyp = funcVarElemts[0].getElementsByClassName('value')[0].innerHTML.replace(/ /g, '');
                 let varName = (varNameS.includes("."))? varNameS.split(".")[0]: varNameS;
@@ -85,6 +86,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 }
                 nodeSize = setNodeSize(varName, varTyp);
                 nodeStyle(graph, nodeSize['nodeIdText']);
+
                 varX = (i+1)%2 === 0 ? varX2 : 50;
                 varY += 20;
                 let UpdatedCells = graph.getChildVertices(graph.getDefaultParent());
@@ -102,7 +104,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 for (let item of varLcList){
                     //console.log("item __________________  " + item);
                     mxCells.forEach(function (node) {
-                        if(node['style'] === 'LogicalComp' &&  item[0] === node['value']){
+                        if(node['style'].includes('LogicalComp') &&  item[0] === node['value']){
                             let endArrowStyle = (item[1] === "STORE" || item[1] === "PROCESS")? "classic" : "0";
                             let startArrowStyle = (item[1] === "LOAD" || item[1] === "PROCESS")? "classic" : "0";
                             let startSizeStyle = (item[1] === "PROCESS")? "10" : "7";
@@ -133,16 +135,17 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                 }
                 nodeSize = setNodeSize(fun_name, styleIdNode );
                 nodeStyle(graph, nodeSize['nodeIdText']);
+
                 funX = (i+1)%2 === 0 ? funX2 : 50;
                 funY = (i+1)%2 === 0 ? funY : funY += 100;
 
-                let funNode = graph.insertVertex(parent, null, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                let funNode = graph.insertVertex(parent, null, fun_name + "()", funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 // funY += 200;
                 // Connecting each function node to its logical components
 
                 // console.log( fun_name + "  -----  " + funY);
                 mxCells.forEach(function (node) {
-                    if(node['style'] === 'LogicalComp' && funLcList.includes(node['value'])){
+                    if(node['style'].includes('LogicalComp') && funLcList.includes(node['value'])){
                         graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=oval;startArrow=oval;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=10;startSize=10;' + strokeColor);
                         node.source = funNode;
                         funNode.source = node;
@@ -216,7 +219,7 @@ function logicalDataL1Function(container, clientWidth, ldName) {
                 let varAcessTyp =  element.getElementsByClassName('value')[0].innerHTML.replace(/ /g,'');
                 funVarList.push([varName.includes('.')? varName.split(".")[0]: varName, varAcessTyp]);
             }
-            if (ldName !== null && ldName !== fun_name) {
+            if (ldName !== null && ldName !== fun_name + "()") {
                 styleIdNode = "LogicalDataInactive";
                 strokeColor = "strokeColor=#ccc;";
             } else {
@@ -225,15 +228,16 @@ function logicalDataL1Function(container, clientWidth, ldName) {
             }
             nodeSize = setNodeSize(fun_name, styleIdNode );
             nodeStyle(graph, nodeSize['nodeIdText']);
-            let funNode = graph.insertVertex(parent, 'function_ld_'+fun_name, fun_name, funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+            let funNode = graph.insertVertex(parent, 'function_ld_'+fun_name, fun_name + "()", funX, funY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
             funY += 200;
             for (let item of funVarList){
                 mxCells.forEach(function (node){
-                    if(item[0] === node['value']){
+                    let nodeValue = node['value'].split("(")[0];
+                    if(item[0] === nodeValue){
                         let endArrowStyle = (item[1] === "LOAD" || item[1] === "PROCESS")? "classic" : "0";
                         let startArrowStyle = (item[1] === "STORE" || item[1] === "PROCESS")? "classic" : "0";
                         let startSizeStyle = (item[1] === "PROCESS")? "10" : "7";
-                        let edgeVal = (ldName !== null && ldName !== fun_name) ? null : item[1];
+                        let edgeVal = (ldName !== null && ldName !== fun_name + "()") ? null : item[1];
                         graph.insertEdge(parent, null, edgeVal, node, funNode, 'dashed=0;endArrow='+ endArrowStyle +';startArrow='+ startArrowStyle +';sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=7;startSize='+startSizeStyle+';' + strokeColor);
 
                         //graph.insertEdge(parent, null, null, node, funNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;endFill=1;'+ strokeColor);
