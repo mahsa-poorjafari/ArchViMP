@@ -1,4 +1,4 @@
-# Architectural Views of Multithreaded Programs
+# Architectural Views of Multithreaded Programs (ArchViMP)
 
 This is a web framework for vizualizing the Trace Files of multithreaded programs into UML-based diagrams.
 
