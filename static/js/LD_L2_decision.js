@@ -71,14 +71,15 @@ function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
                 let varsList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName('variable_list')[0].getElementsByClassName('value');
                 let thread_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("thread_list")[0].getElementsByClassName('value');
                 let Logical_component_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("Logical_component_list")[0].getElementsByClassName('value');
-                console.log(lDecText);
-                console.log(varsList);
+                //console.log(lDecText);
+                //console.log(varsList);
                 if (lDecText === "technical_data"){
-                    let variableName = varsList[0].innerHTML;
-                    nodeSize = setNodeSize(variableName, 'variable_P');
+                    let rawVarName = varsList[0].innerHTML;
+                    let variableName =  (rawVarName.includes("."))? rawVarName.split(".")[0] : rawVarName;
+                    nodeSize = setNodeSize(variableName, 'logicalData_P');
                     nodeStyle(graph, nodeSize['nodeIdText']);
 
-                    let varNode = graph.insertVertex(parent, null, variableName, lDecX, 500, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                    let varNode = graph.insertVertex(parent, null, variableName, lDecX, 0, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
 
                     for (let lcForLd of Logical_component_list) {
                         mxCells.forEach(function (logComp) {
@@ -92,7 +93,7 @@ function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
                     }
 
                 }
-                else if (varsList.length > 0) {
+                else if (varsList.length > 0 && lDecText !== 'technical_data') {
                     let lDecId = 'ldL2_Dec' + i;
                     if (ldName !== null && ldName !== lDecText) {
                         styleIdNode = "LogicalDataInactive";
@@ -217,7 +218,7 @@ function logicalDataL1Decision(container, ldL2List, clientWidth, ldName) {
                 strokeColor = "strokeColor=#000000;";
             }
             // console.log(styleIdNode);
-            if (varList.length > 0){
+            if (varList.length > 0 && lDecText !== 'technical_data'){
 
                 nodeSize = setNodeSize(lDecText, styleIdNode);
                 nodeStyle(graph, nodeSize['nodeIdText']);

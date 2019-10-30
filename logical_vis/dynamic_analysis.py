@@ -472,7 +472,7 @@ def get_all_logical_decisions(logical_decision_file):
                 "thread_list": ld_thread_list,
                 "Logical_component_list": lc_list,
             }})
-    print(logical_decision_dic)
+    # print(logical_decision_dic)
     return logical_decision_dic
 
 

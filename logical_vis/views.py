@@ -555,14 +555,16 @@ def logical_decision_ld_l2(request):
     shared_variables_list = remove_dups(shared_variables_list)
     # all variables that accessed within logical decision
     var_list_log_des = []
+    print(all_logical_decisions)
     [var_list_log_des.append(x.split('.')[0] + ".") if '.' in x else var_list_log_des.append(x) if k == 'variable_list'
-     else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items() for x in v]
+     else None for des_k, des_v in all_logical_decisions.items()
+     for k, v in des_v.items() for x in v]
     # print(all_logical_decisions)
     [relation_list.append(len(v)) if k == 'Logical_component_list'
      else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items()]
 
     var_list_log_des = remove_dups(var_list_log_des)
-    # print(var_list_log_des)
+    print(var_list_log_des)
     # Logical component that access logical decision
     lc_list_log_des = []
     [lc_list_log_des.append(x) if k == 'Logical_component_list' else None for des_k, des_v in all_logical_decisions.items()
