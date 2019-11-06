@@ -82,10 +82,21 @@
                             <ul class="list_level1">
                                 {% for var, varList in v.items %}
                                     <li class="li-list_level1 {{ var }}">
-                                        <span class="key">{{ var }}</span>
-                                        {% for v in varList %}
-                                            <span class="value">{{ v }}</span>
-                                        {% endfor %}
+                                        {% if var == VarList %}
+                                            {% for item in varList %}
+                                                {% for itemK, itemV in item.items %}
+                                                    <p class="Var_op_list">
+                                                        <span class="key">{{ itemK }}</span>
+                                                        <span class="value">{{ itemV }}</span>
+                                                    </p>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for item in varList %}
+                                                <span class="key">{{ var }}</span>
+                                                <span class="value">{{ item }}</span>
+                                            {% endfor %}
+                                        {% endif %}
                                     </li>
                                 {% endfor %}
                             </ul>

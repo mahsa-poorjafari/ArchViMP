@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let clientWidth = document.getElementById('content').clientWidth;
     let ldName = get_node_name();
     if (ldName !== null){
+        ldName = ldName.split('START')[0] + '\nSTART' + ldName.split('START')[1];
+        console.log(ldName);
         document.getElementById('tab03').style.display = 'block';
         document.getElementById('tab01').style.display = 'none';
         document.getElementById('for_tab01').classList.remove("is-active");
@@ -68,24 +70,41 @@ function logicalDataL2Decision(container, ldL2List, clientWidth, ldName) {
             let mxCells = graph.getChildVertices(graph.getDefaultParent());
             for (let i=0; i < ldL2List.length; i++) {
                 let lDecText = ldL2List[i].firstElementChild.innerHTML.replace(/ /g, '');
-                let varsList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName('variable_list')[0].getElementsByClassName('value');
+                let varsList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName('variable_list')[0].getElementsByClassName('Var_op_list');
                 let thread_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("thread_list")[0].getElementsByClassName('value');
                 let Logical_component_list = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("Logical_component_list")[0].getElementsByClassName('value');
                 //console.log(lDecText);
                 //console.log(varsList);
                 if (lDecText === "technical_data"){
-                    let rawVarName = varsList[0].innerHTML;
+                    let rawVarName = varsList[0].getElementsByClassName('key')[0].innerHTML;
+                    let VarOpType = varsList[0].getElementsByClassName('value')[0].innerHTML;
                     let variableName =  (rawVarName.includes("."))? rawVarName.split(".")[0] : rawVarName;
-                    nodeSize = setNodeSize(variableName, 'logicalData_P');
-                    nodeStyle(graph, nodeSize['nodeIdText']);
-
-                    let varNode = graph.insertVertex(parent, null, variableName, lDecX, 0, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
+                    let nodeType =  (rawVarName.includes("."))? 'logicalData' : 'variable';
+                    let edgeStyle = null;
+                    switch (VarOpType) {
+                        case "STORE":
+                            nodeType += '_W';
+                            edgeStyle = 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;endFill=1;endSize=8;';
+                            break;
+                        case "LOAD":
+                            nodeType += '_R';
+                            edgeStyle = 'dashed=0;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;startSize=8;';
+                            break;
+                        case "PROCESS":
+                            nodeType += '_P';
+                            edgeStyle = 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=8;startSize=10;';
+                            break;
+                    }
+                    nodeSize = setNodeSize(variableName, nodeType);
+                    nodeStyle(graph, nodeType);
+                    console.log(nodeType);
+                    let varNode = graph.insertVertex(parent, null, variableName, lDecX, 0, nodeSize['Width'], nodeSize['Height'], nodeType);
 
                     for (let lcForLd of Logical_component_list) {
                         mxCells.forEach(function (logComp) {
                             if (logComp['value'] === lcForLd.innerHTML) {
                                 logCompNode = logComp;
-                                graph.insertEdge(parent, null, null, logComp, varNode, 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=8;startSize=10;');
+                                graph.insertEdge(parent, null, null, logComp, varNode, edgeStyle);
                                 logComp.source = varNode;
                                 varNode.source = logComp;
                             }
@@ -199,12 +218,13 @@ function logicalDataL1Decision(container, ldL2List, clientWidth, ldName) {
         for (let i=0; i < ldL2List.length; i++) {
             let logDesVarList = [];
             let lDecText = ldL2List[i].firstElementChild.innerHTML.replace(/ /g, '');
-            let varList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("variable_list")[0].getElementsByClassName('value');
+            let varList = ldL2List[i].getElementsByClassName("list_level1")[0].getElementsByClassName("variable_list")[0].getElementsByClassName('Var_op_list');
 
             for (let logDesVar of varList){
-                let varName = logDesVar.innerHTML.includes(".") ? logDesVar.innerHTML.split(".")[0] : logDesVar.innerHTML ;
+                let varName = logDesVar.getElementsByClassName('key')[0].innerHTML.includes(".") ? logDesVar.innerHTML.split(".")[0] : logDesVar.innerHTML;
+                let VarOpType = logDesVar.getElementsByClassName('value')[0].innerHTML;
                 if (!logDesVarList.includes(varName)){
-                    logDesVarList.push(varName);
+                    logDesVarList.push([varName, VarOpType]);
                 }
             };
             //console.log(lDecText);
@@ -219,18 +239,33 @@ function logicalDataL1Decision(container, ldL2List, clientWidth, ldName) {
             }
             // console.log(styleIdNode);
             if (varList.length > 0 && lDecText !== 'technical_data'){
-
                 nodeSize = setNodeSize(lDecText, styleIdNode);
                 nodeStyle(graph, nodeSize['nodeIdText']);
                 let stNode = graph.insertVertex(parent, lDecId, lDecText, lDecX, lDefY, nodeSize['Width']+80, nodeSize['Height']+80, nodeSize['nodeIdText']);
                 lDefY += 200;
-                mxCells.forEach(function (node) {
-                    if ( logDesVarList.includes(node['value']) ){
-                        graph.insertEdge(parent, null, null, node, stNode, 'dashed=0;endArrow=diamondThin;sourcePerimeterSpacing=0;endFill=1;'+ strokeColor);
-                        node.source = stNode;
-                        stNode.source = node;
+                let edgeStyle = null;
+
+
+                for (let item of logDesVarList){
+                    switch (item[1]) {
+                        case "STORE":
+                            edgeStyle = 'dashed=0;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;startSize=8;endFill=0;endSize=0;';
+                            break;
+                        case "LOAD":
+                            edgeStyle = 'dashed=0;endArrow=classic;sourcePerimeterSpacing=0;startFill=0;startSize=0;endFill=1;endSize=8;';
+                            break;
+                        case "PROCESS":
+                            edgeStyle = 'dashed=0;endArrow=classic;startArrow=classic;sourcePerimeterSpacing=0;startFill=1;endFill=1;endSize=8;startSize=10;';
+                            break;
                     }
-                });
+                    let edgeVal = (ldName !== null && ldName !== lDecText) ? null : item[1];
+
+                    mxCells.forEach(function (node) {
+                        if ( item[0].includes(node['value']) ){
+                            graph.insertEdge(parent, null, edgeVal, node, stNode, edgeStyle + strokeColor);
+                        }
+                    });
+                }
             }
         }
         let tdUlrPath = "http://127.0.0.1:8000/Logical_Data_L1";

@@ -289,7 +289,7 @@ def logical_data_l3(request):
                     }
                 }
             })
-    print(threads_and_variable_dict)
+    # print(threads_and_variable_dict)
     each_parent_function_var_dict = {}
     parent_func_threads = []
     # Get the variables that are threads Input
@@ -516,7 +516,7 @@ def functions_ld_l2(request):
                 "VarList": vars_of_callee_functions,
                 "LogicalComponets": lc_of_nested_function
             }})
-    print(logical_data_function)
+    # print(logical_data_function)
     all_var_accessed = remove_dups(all_var_accessed)
     all_lc_accessed_nested_function = remove_dups(all_lc_accessed_nested_function)
     if len(all_var_accessed) == 1:
@@ -555,16 +555,26 @@ def logical_decision_ld_l2(request):
     shared_variables_list = remove_dups(shared_variables_list)
     # all variables that accessed within logical decision
     var_list_log_des = []
-    print(all_logical_decisions)
-    [var_list_log_des.append(x.split('.')[0] + ".") if '.' in x else var_list_log_des.append(x) if k == 'variable_list'
-     else None for des_k, des_v in all_logical_decisions.items()
-     for k, v in des_v.items() for x in v]
+    # print(all_logical_decisions)
+    for iK, iV in all_logical_decisions.items():
+        print(iK)
+        if iK != "technical_data":
+            for jK, jV in iV.items():
+                # print(jK, "\n jK --- jjjjjjjjjjjjj =--- ", jV)
+                if jK == 'variable_list':
+                    for elm in jV:
+                        # print("\n elm --- ", elm)
+                        for k, v in elm.items():
+                            var_list_log_des.append(k.split('.')[0] + "." if '.' in k else k)
+    # [var_list_log_des.append(x.split('.')[0] + ".") if '.' in x else var_list_log_des.append(x) if k == 'variable_list'
+    # else None for des_k, des_v in all_logical_decisions.items()
+    # for k, v in des_v.items() for x in v]
     # print(all_logical_decisions)
     [relation_list.append(len(v)) if k == 'Logical_component_list'
      else None for des_k, des_v in all_logical_decisions.items() for k, v in des_v.items()]
 
     var_list_log_des = remove_dups(var_list_log_des)
-    print(var_list_log_des)
+    # print(var_list_log_des)
     # Logical component that access logical decision
     lc_list_log_des = []
     [lc_list_log_des.append(x) if k == 'Logical_component_list' else None for des_k, des_v in all_logical_decisions.items()
@@ -572,8 +582,8 @@ def logical_decision_ld_l2(request):
     lc_list_log_des = remove_dups(lc_list_log_des)
 
     total_relations = sum(relation_list)
-    # print(lc_list_log_des)
     total_elements = len(lc_list_log_des) + len(all_logical_decisions.keys())
+    print(var_list_log_des)
 
     return render(request, 'logical_data_l2_decision.html', {'title_name': which_way,
                                                              'logical_data_decision': all_logical_decisions,
@@ -582,6 +592,7 @@ def logical_decision_ld_l2(request):
                                                              'var_list_log_des': var_list_log_des,
                                                              'shared_variables_list': shared_variables_list,
                                                              'total_elements': total_elements,
+                                                             'VarList': "variable_list",
                                                              'total_relations': total_relations
                                                              })
 

@@ -398,13 +398,43 @@ def get_all_functions(logical_decision_file):
     return all_function_list
 
 
+def var_with_op(logdic_dict):
+    print("var_with_op \n ")
+    # print(logDic_dict)
+    for ldec in logdic_dict:
+        for ldK, ldV in ldec.items():
+            var_op_access = {}
+            # print(ldV)
+            ld_var_list = ldV.get('var_list')
+            if len(ld_var_list) == 1:
+                var_op_access.update({ld_var_list[0][0]: ld_var_list[0][1]})
+            else:
+                var_op_access.update({ld_var_list[0][0]: "PROCESS"})
+
+            ldV['var_list'] = var_op_access
+            # print(ldV)
+            # ldec_vals = ldec.values()
+        # print(ldec_vals['var_list'])
+
+    # print(logdic_dict)
+    return logdic_dict
+
+
+def remove_op_dups(ld_variable_list):
+    ld_Op_var_dict = []
+    for ld_var in ld_variable_list:
+        if ld_var not in ld_Op_var_dict:
+            ld_Op_var_dict.append(ld_var)
+    return ld_Op_var_dict
+
+
 def get_all_logical_decisions(logical_decision_file):
     csv_reader_list = get_file_records(logical_decision_file)
     [r.insert(0, indx) for indx, r in enumerate(csv_reader_list)]
     logical_decision_dic = {}
     log_dec_list = []
     logical_components = get_logical_components(logical_decision_file)
-    print('------logComp_list------------\n')
+    print('------Logical Decision List------------\n')
 
     for indx, r in enumerate(csv_reader_list):
         log_dec_names = {}
@@ -413,21 +443,28 @@ def get_all_logical_decisions(logical_decision_file):
             logical_decision_rows = logical_decision_block(csv_reader_list[row_number:])
             if logical_decision_rows != 1:
                 for ld_indx, ld in enumerate(logical_decision_rows):
+                    var_op_dict = {}
                     if ld[1] == "logicalDecision":
                         ld[1] = "LogicalDecision\n"
                         #ld[1] = "LogicalDecision"
                         var_list, thread_list, file_name = get_logical_decision_vars(logical_decision_rows[ld_indx+1:])
+                        # print(var_list)
+                        # for variable in var_list:
+                        #     print("\n", variable)
+                        #     var_op_dict.update({variable[0]: variable[1]})
+                        # print("\n var_op_dict =======  ", var_op_dict)
                         log_dec_names.update({''.join(ld[1:]): {"START": ld[2],
-                                                                    "END": ld[3],
-                                                                    "var_list": var_list,
-                                                                    "thread_list": thread_list,
-                                                                    "file_name": file_name
-                                                                  }
+                                                                "END": ld[3],
+                                                                "var_list": var_list,
+                                                                "thread_list": thread_list,
+                                                                "file_name": file_name
+                                                                }
                                               })
 
-                #print(log_dec_names)
+                # print("\n log_dec_names---- \n", log_dec_names)
                 log_dec_list.append(log_dec_names)
     # print("log_dec_list =>  ", log_dec_list)
+    log_dec_list_var_on_order = var_with_op(log_dec_list)
     Gnames = []
     [Gnames.append(list(ld_item.keys())[0] if len(list(ld_item.keys())) == 1 else list(ld_item.keys())[0])
      for ld_item in log_dec_list]
@@ -439,18 +476,22 @@ def get_all_logical_decisions(logical_decision_file):
         ld_thread_list = []
         ld_file_name_list = []
         # print("\n ld_gname : ", ld_gname)
-        for ld in log_dec_list:
+        for ld in log_dec_list_var_on_order:
+            # print(ld)
             if list(ld.keys())[0] == ld_gname:
-                ld_variable_list.append(list(ld.values())[0]['var_list'][0]
-                                        if len(list(ld.values())[0]['var_list']) == 1
-                                        else list(ld.values())[0]['var_list'])
+                # ld_variable_list.append(list(ld.values())[0]['var_list'][0]
+                #                         if len(list(ld.values())[0]['var_list']) == 1
+                #                         else list(ld.values())[0]['var_list'])
+                ld_variable_list.append(list(ld.values())[0]['var_list'])
+
                 ld_thread_list.append(list(ld.values())[0]['thread_list'][0]
                                       if len(list(ld.values())[0]['thread_list']) == 1
                                       else list(ld.values())[0]['thread_list'])
                 ld_file_name_list.append(list(ld.values())[0]['file_name'][0]
                                          if len(list(ld.values())[0]['file_name']) == 1
                                          else list(ld.values())[0]['file_name'])
-        ld_variable_list = remove_dups(ld_variable_list)
+        ld_variable_list = remove_op_dups(ld_variable_list)
+        # print(ld_variable_list)
 
         ld_thread_list = remove_dups(ld_thread_list)
         ld_file_name_list = remove_dups(ld_file_name_list)
@@ -472,7 +513,7 @@ def get_all_logical_decisions(logical_decision_file):
                 "thread_list": ld_thread_list,
                 "Logical_component_list": lc_list,
             }})
-    # print(logical_decision_dic)
+    # print("\n logical_decision_dic \n", logical_decision_dic)
     return logical_decision_dic
 
 
@@ -492,10 +533,11 @@ def get_logical_decision_vars(ld_list):
     var_list = []
     thread_list = []
     file_name = []
-    [var_list.append(item[4]) if item[1] not in ["Conditional", "logicalDecision"] else None for item in ld_list]
+    [var_list.append([item[4], item[3]]) if item[1] not in ["Conditional", "logicalDecision"] else None for item in ld_list]
+    # print(var_list)
     [thread_list.append(item[2]) if item[1] not in ["Conditional", "logicalDecision"] else None for item in ld_list]
     [file_name.append(item[8]) if item[1] not in ["Conditional", "logicalDecision"] else None for item in ld_list]
-    var_list = remove_dups(var_list)
+    # var_list = remove_dups(var_list)
     thread_list = remove_dups(thread_list)
     file_name = remove_dups(file_name)
     return var_list, thread_list, file_name
