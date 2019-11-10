@@ -417,6 +417,7 @@ function connect_LD_to_related_LC(graph, parent, inputGroup, X, Y, op) {
         let inG = inputNode.firstElementChild.innerHTML;
         nodeSize = setNodeSize(inG,  'logicalData_' + op);
         nodeStyle(graph,  nodeSize['nodeIdText']);
+
         let ldInNode = graph.insertVertex(parent, null, inG, X, Y, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
         let allTabContentsDivs = document.getElementsByClassName('tab-contents');
         graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){

@@ -8,7 +8,7 @@ from itertools import cycle
 
 def get_b_parameter(request):
     file_name = None
-    b_parameter = request.GET.get('b', "ThreadFourFunction")
+    b_parameter = request.GET.get('b')
     if b_parameter == "UPLOADED":
         file_name = request.GET.get('FileName')
         trace_file = get_trace_file_path(b_parameter, file_name=file_name)
@@ -167,7 +167,8 @@ def get_trace_file_path(benchmark_name, *args, **kwargs):
         "OCEAN": "benchmark_traces/OCEAN/Splash2ocean_contiguous_partitions.txt",
         "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_trace.txt",
         "Autonomous": "benchmark_traces/SA_Autonomous/trace_2019.10.22.17.14.31.txt",
-        "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsLLVMWitFunctionsReturn.txt",
+        "Autonomous_v2": "benchmark_traces/SA_Autonomous_v2/trace.txt",
+        "ThreadCreator": "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsLLVMWitFunctionsReturn.txt",
         "UPLOADED": "Uploaded_files/" + file_name + ".txt",
     }
     return switcher.get(benchmark_name, "Invalid Value")
@@ -176,9 +177,10 @@ def get_trace_file_path(benchmark_name, *args, **kwargs):
 def get_logical_decision_file_path(benchmark_name, *args, **kwargs):
     # file_name = kwargs.get('file_name') if kwargs.get('file_name') is not None else ""
     switcher = {
-        "ThreadFourFunction": "benchmark_traces/ThreadFourFunction/LogicalDec_sharedVars.txt",
+        "ThreadCreator": "benchmark_traces/ThreadFourFunction/LogicalDec_sharedVars.txt",
         "ROSACE": "benchmark_traces/ROSACE/ROSACE_LogicalDec_sharedVars.txt",
         "Autonomous": "benchmark_traces/SA_Autonomous/coverage_test.txt",
+        "Autonomous_v2": "benchmark_traces/SA_Autonomous_v2/coverage_test.txt",
         "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_LogicalDec_sharedVars.txt"
     }
     return switcher.get(benchmark_name, "Invalid Value")
@@ -189,7 +191,8 @@ def get_variable_file_path(benchmark_name):
         "ROSACE": "benchmark_traces/ROSACE/ROSACE_SharedVariables.txt",
         "powerwindow": "benchmark_traces/TACLe_PowerWindow/powerwindow_SharedVariables.txt",
         "Autonomous": "benchmark_traces/SA_Autonomous/shared_test.txt",
-        "ThreadFourFunction":
+        "Autonomous_v2": "benchmark_traces/SA_Autonomous_v2/shared_test.txt",
+        "ThreadCreator":
             "benchmark_traces/ThreadFourFunction/ThreadFourFunctionsSharedVariables.txt",
     }
     return switcher.get(benchmark_name, "Invalid Value")

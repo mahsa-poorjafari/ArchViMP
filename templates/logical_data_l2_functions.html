@@ -4,8 +4,8 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <h2>{{ title_name }} </h2>
-            <h2> Functional Concurrency - Level 2 </h2>
-            <h4> Callee Functions </h4>
+            <h2> Functional View </h2>
+            <h4> Callee Functions Rule</h4>
         </div>
     </nav>
     {% if not logical_data_function %}
@@ -33,7 +33,7 @@
                                                                                 border-radius:3px 0 0 3px; ">
                     Level 2</a></li>
 
-                <li id="for_tab04" class="col-md-3" style="padding-right:0; padding-left: 0 ">
+                <li id="for_tab04" class="col-md-3" style="padding-right:0; padding-left: 0;">
                     <a href="#tab04" class="btn-info"
                        style="display: block; border-radius:0 0 0 0;
                        border-right: 1px solid #337ab7; border-left: 1px solid #337ab7;">
@@ -42,7 +42,7 @@
                                                                                style="display: block;
                                                                                border-radius:0 3px 3px 0;">
                     Circular Diagram</a></li>
-                <li id="for_tab02" class="col-md-3"><a href="#tab02" class="btn-info" style="display: block">Textual</a></li>
+                <li id="for_tab02" class="col-md-3"><a href="#tab02" class="btn-info" style="display: none">Textual</a></li>
             </ul>
             </div>
             <div class="tab-select-outer">
@@ -55,7 +55,7 @@
     <div id="tab01" class="tab-contents" style="display: none">
         <div class="col-md-12 well diagram_container" id="function_circular_diagram"></div>
     </div>
-    <div id="tab03" class="tab-contents">
+    <div id="tab03" class="tab-contents" style="display: none">
         <div class="alert alert-info col-md-12" role="alert">
             <div class="col-md-1" style="text-align: center">
                 <i class="fas fa-info-circle" style="color: #17a2b8; font-size:30px" aria-hidden="true"></i>
@@ -73,7 +73,7 @@
         </div>
         <div class="col-md-12 well diagram_container" id="logical_data_l2_function_diagram"></div>
     </div>
-    <div id="tab04" class="tab-contents" style="display: none">
+    <div id="tab04" class="tab-contents" style="display: block">
         <div class="col-md-12 well diagram_container" id="logical_data_l1_function_diagram"></div>
     </div>
     <div id="tab02" class="tab-contents" style="display: none">

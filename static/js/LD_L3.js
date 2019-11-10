@@ -208,7 +208,6 @@ function mainGrouped(container, txt, op) {
                 let lcList = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');
                 nodeStyle(graph,  nodeSize['nodeIdText']);
                 lcY += 300;
-
                 let ldNode = graph.insertVertex(parent, lcId, lcText, lcX, lcY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
                 let benchmarkName = get_url_benchmark();
                 let fileName = get_url_fileName();
@@ -252,84 +251,6 @@ function mainGrouped(container, txt, op) {
 }
 
 
-function allLogicalDataLevel1(container, InContainer, OutContainer, PContainer) {
-    // Checks if the browser is supported
-    if (!mxClient.isBrowserSupported())
-    {
-        // Displays an error message if the browser is not supported.
-        mxUtils.error('Browser is not supported!', 200, false);
-    }
-    else
-    {
-        // Disables the built-in context menu
-        mxEvent.disableContextMenu(container);
-
-        // Creates the graph inside the given container
-        var graph = new mxGraph(container);
-        // Enables rubberband selection
-        new mxRubberband(graph);
-
-        // Disables basic selection and cell handling
-        // configureStylesheet(graph);
-
-        // Gets the default parent for inserting new cells. This
-        // is normally the first child of the root (ie. layer 0).
-        let parent = graph.getDefaultParent();
-        graph.keepEdgesInBackground = true;
-        // Highlights the vertices when the mouse enters
-        let highlight = new mxCellTracker(graph, '#337ab7');
-
-        // Adds cells to the model in a single step
-        graph.getModel().beginUpdate();
-        try {
-            let varX = 500;
-            let varY = 50;
-            let nodeSize = {};
-            let benchmarkName = get_url_benchmark();
-            let fileName = get_url_fileName();
-            let ulrParam = [benchmarkName];
-            ulrParam.push((benchmarkName === "UPLOADED" && fileName) ? fileName : null);
-            configEdgeStyle(graph, "#000000");
-            let childList = document.getElementById("shared_vars_holder").getElementsByClassName("shared_var_list")[0].getElementsByClassName("li-list_level2");
-
-            for (let v of childList){
-                let vText = v.firstElementChild.innerHTML.replace(/(\r\n)/g,'');
-
-                if (vText !== "variables"){
-                    nodeSize = setNodeSize(vText, 'logicalData');
-                    nodeStyle(graph,  nodeSize['nodeIdText']);
-                    graph.insertVertex(parent, null, vText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                    graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt){
-                        let cell = evt.getProperty('cell');
-                        if (cell['style'].includes("logicalData")){
-                            window.location = "http://127.0.0.1:8000/Logical_Data_L1?node="+cell['value']+"&b=" + ulrParam[0] + (ulrParam[1] ? "&FileName="+ulrParam[1] : "");
-                        }
-                        evt.consume();
-                    });
-                    varY += 200;
-                }else{
-                    let sharedVarList = v.getElementsByClassName('list_level1')[0].getElementsByClassName('li-list_level0');
-                    for (let tD of sharedVarList){
-                        let tDText = tD.innerText;
-                        nodeSize = setNodeSize(vText, 'variable');
-                        nodeStyle(graph,  nodeSize['nodeIdText']);
-                        graph.insertVertex(parent, null, tDText, varX, varY, nodeSize['Width'], nodeSize['Height'], nodeSize['nodeIdText']);
-                        varY += 200;
-                    }
-                }
-                // varY += 200;
-            }
-
-            getLdL1AllVars(InContainer, "R", graph, parent, 10, 200);
-            getLdL1AllVars(PContainer, "P", graph, parent, 900, 400);
-            getLdL1AllVars(OutContainer, "W", graph, parent, 1200, 100);
-
-        }finally {
-            graph.getModel().endUpdate();
-        }
-    }
-
-}
 
 function showAllL3GroupContainer(container, InContainer, OutContainer, PContainer) {
     // Checks if the browser is supported
@@ -424,7 +345,7 @@ function logicalDataLevel1(container, txt, op) {
                 let lcId = 'LDL2_' + op + '_' + i;
                 let lcFirstElement = ldL2[i].firstElementChild;
                 let lcText = lcFirstElement.innerHTML;
-                // console.log("ZZZZZZZZZZ   " + lcText);
+                console.log("ZZZZZZZZZZ   " + lcText);
                 nodeSize = setNodeSize(lcText, 'logicalData_' + op);
                 let lcAccessList = ldL2[i].getElementsByClassName("list_level1")[0].getElementsByClassName('group_members');
                 let ldL2List = lcAccessList[0].getElementsByClassName('list_level2')[0].getElementsByTagName('li');

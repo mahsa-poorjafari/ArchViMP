@@ -3,7 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Displays an error message if the browser is not supported.
         mxUtils.error('Browser is not supported!', 200, false);
     }
-    document.getElementById('tab03').style.display = 'block';
+    document.getElementById('tab04').style.display = 'block';
+    document.getElementById('for_tab04').classList.add("is-active");
+    document.getElementById('for_tab03').classList.remove("is-active");
     let ldL2GraphContainer = document.getElementById('logical_data_l2_function_diagram');
     let ldL1GraphContainer = document.getElementById('logical_data_l1_function_diagram');
     let circularGraphContainer = document.getElementById('function_circular_diagram');
@@ -66,7 +68,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
             let elm = functionContainer[i];
             let funcVarlist = elm.getElementsByClassName("list_level1")[0];
             let funcVarElemts = funcVarlist.getElementsByClassName('VarList')[0].getElementsByClassName('Var_op_list');
-            if (funcVarElemts.length === 1){
+            if (funcVarElemts.length === 0){
                 let funcThreadElemnts = funcVarlist.getElementsByClassName('LogicalComponets')[0].getElementsByClassName('value');
                 let lcVarType = funcVarElemts[0].getElementsByClassName('value')[0].innerHTML.replace(/ /g, '');
                 for (let r of funcThreadElemnts){
@@ -116,7 +118,7 @@ function logicalDataL2Function(container, clientWidth, ldName) {
                         }
                     });
                 }
-            }else if (funcVarElemts.length > 1){
+            }else if (funcVarElemts.length > 0){
                 let funLcList = [];
                 let fun_name = elm.getElementsByClassName('func_name')[0].innerHTML.replace(/ /g, '');
                 let funLcTags = elm.getElementsByClassName('list_level1')[0].getElementsByClassName('LogicalComponets')[0].getElementsByClassName('value');

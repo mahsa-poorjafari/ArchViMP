@@ -1,53 +1,623 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
+<nav class="navbar navbar-default" xmlns="http://www.w3.org/1999/html" style="margin-bottom: 1em">
+        <div class="container-fluid">
+            <h2 class="col-md-12">ArchVi MP - Architectural Views of MultiThreaded Programs.</h2>
 
-    <!-- Page Content Holder -->
-    <div id="content">
-
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-
-
-
-                <h4>Interactive design space exploration of multithreaded software deployment properties with visualization techniques</h4>
-            </div>
-        </nav>
-        <!-- Page Content Put Here -->
-        <h4 >
-            This prototype visualization engine generates interactive graphs from execution logs of complex multi-threaded systems.
-        </h4>
-
-        <div align="center" style="padding: 10px 10px 10px 10px">
-            <form action="/code_html">
-            <h3>Upload Trace files Manually</h3>
-            <input type="submit" value="Try it out" class="btn btn-primary btn-lg btn-block">
-            </form>
+            <p>This is the prototype of a Master's thesis with the topic of:
+                <p>Extracting Concurrency-Related Architectural Properties from Software Implementation</p>
+            </p>
         </div>
+</nav>
 
-        <div align="center" style="padding: 10px 10px 10px 10px">
-            <form action="pintocore">
-            <h3>Schedule schemes and get traces from Server</h3>
-            <input type="submit" value="Schedule Schemes" class="btn btn-primary btn-lg btn-block">
-            </form>
+<div class="col-md-12 home-boxes">
+    <div class="col-md-12">
+        <h2>Source Code </h2>
+        <pre style="height: 300px; overflow-y: scroll; border: #383d41 1px solid; background-color: #fff">
+            <code>
+            // TreadCreator.c
+            #include &lt;pthread.h&gt;
+            // Mutex
+            pthread_mutex_t mutex1;
+            pthread_mutex_t mutex2;
+            // Global vars
+            int result=0;
+            int sharedVar1=1;
+            int sharedVar2=1;
+            void emptyFunction()
+            {
+
+            }
+
+            int intVoidFunction()
+            {
+            return 10;
+            }
+
+            void voidIntFunction(int temp)
+            {
+            int temp1=temp;
+            }
+            void sum() {
+
+            int a=5;
+            int b=5;
+            emptyFunction();
+            intVoidFunction();
+            voidIntFunction(a);
+            pthread_mutex_lock(&mutex1);
+            sharedVar1++;
+            pthread_mutex_unlock(&mutex1);
+
+            pthread_mutex_lock(&mutex2);
+            sharedVar2++;
+            pthread_mutex_unlock(&mutex2);
+            pthread_mutex_lock(&mutex1);
+            result = a+b;;
+            pthread_mutex_unlock(&mutex1);
+            result = a+b;
+            pthread_mutex_lock(&mutex1);
+            sharedVar1++;
+            pthread_mutex_unlock(&mutex1);
+
+            pthread_mutex_lock(&mutex1);
+            sharedVar1++;
+            pthread_mutex_unlock(&mutex1);
+
+            pthread_mutex_lock(&mutex1);
+            sharedVar1++;
+            pthread_mutex_unlock(&mutex1);
+            //cout << "result from 1st thread is" << result &lt;&lt;endl;
+            printf("sum::result = %d.", result);
+            //pthread_exit(NULL);
+            }
+
+            void sumPlus() {
+            int a=5;
+            int b=5;
+            pthread_mutex_lock(&mutex1);
+            result = a+b;
+            pthread_mutex_unlock(&mutex1);
+            result = a+b;
+            //cout << "result from 1st thread is" << result &lt;&lt;endl;
+            printf("sum::result = %d.", result);
+            //pthread_exit(NULL);
+            }
+
+
+            void diff() {
+
+            pthread_mutex_lock(&mutex2);
+            sharedVar2++;
+            pthread_mutex_unlock(&mutex2);
+            int a=5;
+            int b=5;
+            b=a+b;
+            pthread_mutex_lock(&mutex2);
+            result = a-b;
+            pthread_mutex_unlock(&mutex2);
+
+            sharedVar2++;
+
+            pthread_mutex_lock(&mutex2);
+            sharedVar2++;
+            pthread_mutex_unlock(&mutex2);
+
+            sharedVar1++;
+
+            //cout << "result from 2nd thread is" << result &lt;&lt;endl;
+            //pthread_exit(NULL);
+            }
+
+
+            void incrementSharedVars() {
+
+            pthread_mutex_lock(&mutex2);
+            sharedVar2++;
+            pthread_mutex_unlock(&mutex2);
+            sharedVar1;
+            }
+
+
+            int main () {
+            pthread_t thread1 , thread2, thread3, thread4;
+
+            int rc;
+            int i;
+            pthread_mutex_init(&mutex1, NULL);
+            pthread_mutex_init(&mutex2, NULL);
+            printf("MAIN::result = %d.", result);
+            rc = pthread_create(&thread1, NULL, sum, NULL);
+            if (rc) {
+            printf("Error in thread creation.");
+            exit(-1);
+            }
+            pthread_join(thread1,NULL);
+
+            rc = pthread_create(&thread3, NULL, sumPlus, NULL);
+            if (rc) {
+            printf("Error in thread creation.");
+            exit(-1);
+            }
+            pthread_join(thread3,NULL);
+
+
+            rc = pthread_create(&thread2, NULL, (void * (*)(void *))(diff), NULL);
+            if (rc) {
+            printf("Error in thread creation.");
+            exit(-1);
+            }
+            pthread_join(thread2,NULL);
+            rc = pthread_create(&thread4, NULL, (void * (*)(void *))(incrementSharedVars), NULL);
+            if (rc) {
+            printf("Error in thread creation.");
+            exit(-1);
+            }
+            pthread_join(thread4,NULL);
+
+            //pthread_exit(NULL);
+            return 0;
+            }
+            </code>
+        </pre>
+    </div>
+    <div class="col-md-12">
+        <h2>Trace Analysis</h2>
+        <pre style="height: 300px; overflow-y: scroll; border: #383d41 1px solid; background-color: #fff">
+            <code>
+                12.15.04.154,6245422,FUNCTIONCALL,main,0,,,,0
+                12:15:04:681,6245422,STORE,,406474160,INT;LOCAL;,0,,0
+                12:15:04:682,6245422,LOAD,,0,INT;,4,threadFourFunctions_V3.c,222
+                12:15:04:682,6245422,LOAD,,0,INT;INT;,1,threadFourFunctions_V3.c,222
+                12:15:04:682,6245422,LOAD,,0,INT;INT;INT;,60,threadFourFunctions_V3.c,222
+                12:15:04:682,6245422,LOAD,,0,INT;INT;INT;INT;,30,threadFourFunctions_V3.c,222
+                12:15:04:682,6245422,LOAD,,0,INT;INT;INT;INT;INT;,16,threadFourFunctions_V3.c,222
+                12:15:04:682,6245422,LOAD,,0,INT;INT;INT;INT;INT;INT;,16,threadFourFunctions_V3.c,222
+                12:15:04:682,6245422,FUNCTIONCALL,addNewMajor,0,INT;INT;INT;INT;INT;INT;CONSTANT;,,threadFourFunctions_V3.c,222
+                12:15:04:682,6245422,STORE,majorCode,406474304,INT;LOCAL;,4,,0
+                12:15:04:682,6245422,STORE,degreeLevel,406474064,INT;LOCAL;,1,,0
+                12:15:04:692,6245422,STORE,specializationCredit,406474048,INT;LOCAL;,60,,0
+                12:15:04:692,6245422,STORE,supplementCredit,406474112,INT;LOCAL;,30,,0
+                12:15:04:692,6245422,STORE,theoryCredit,406474080,INT;LOCAL;,16,,0
+                12:15:04:692,6245422,STORE,thesisCredit,406474272,INT;LOCAL;,16,,0
+                12:15:04:692,6245422,LOAD,,406474304,INT;LOCAL;,4,threadFourFunctions_V3.c,97
+                12:15:04:700,6245422,STORE,major.majorCode,406911264,INT;CONSTANT;,4,threadFourFunctions_V3.c,97
+                12:15:04:700,6245422,LOAD,,406474064,INT;LOCAL;,1,threadFourFunctions_V3.c,98
+                12:15:04:700,6245422,STORE,major.degreeLevel,406911268,INT;CONSTANT;,1,threadFourFunctions_V3.c,98
+                12:15:04:700,6245422,LOAD,,406474048,INT;LOCAL;,60,threadFourFunctions_V3.c,99
+                12:15:04:700,6245422,STORE,major.specializationCredit,406911272,INT;CONSTANT;,60,threadFourFunctions_V3.c,99
+                12:15:04:700,6245422,LOAD,,406474112,INT;LOCAL;,30,threadFourFunctions_V3.c,100
+                12:15:04:700,6245422,STORE,major.supplementCredit,406911276,INT;CONSTANT;,30,threadFourFunctions_V3.c,100
+                12:15:04:700,6245422,LOAD,,406474080,INT;LOCAL;,16,threadFourFunctions_V3.c,101
+                12:15:04:700,6245422,STORE,major.theoryCredit,406911284,INT;CONSTANT;,16,threadFourFunctions_V3.c,101
+                12:15:04:700,6245422,LOAD,,406474272,INT;LOCAL;,16,threadFourFunctions_V3.c,102
+                12:15:04:710,6245422,STORE,major.thesisCredit,406911288,INT;CONSTANT;,16,threadFourFunctions_V3.c,102
+                12:15:04:710,6245422,FUNCTIONRETURN,addNewMajor,0,CONSTANT;,,threadFourFunctions_V3.c,103
+                12:15:04:710,6245422,STORE,temp1,406832912,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,223
+                12:15:04:710,6245422,FUNCTIONCALL,getYear,0,CONSTANT;,,,0
+                12:15:04:710,6245422,LOAD,leapYear,406833904,INT;CONSTANT;,0,threadFourFunctions_V3.c,75
+                12:15:04:710,6245422,BRANCH,getYear,406542008,LOCAL;,,threadFourFunctions_V3.c,78
+                12:15:04:710,6245422,STORE,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,78
+                12:15:04:710,6245422,BRANCH,getYear,406541816,CONSTANT;,,threadFourFunctions_V3.c,79
+                12:15:04:710,6245422,FUNCTIONCALL,dummyFunction,0,CONSTANT;,,,0
+                12:15:04:719,6245422,LOAD,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,59
+                12:15:04:719,6245422,BRANCH,dummyFunction,406540952,LOCAL;,,threadFourFunctions_V3.c,59
+                12:15:04:719,6245422,LOAD,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,59
+                12:15:04:719,6245422,BRANCH,dummyFunction,406541048,CONSTANT;,,threadFourFunctions_V3.c,59
+                12:15:04:719,6245422,STORE,leapYear,406833904,INT;CONSTANT;,0,threadFourFunctions_V3.c,59
+                12:15:04:725,6245422,STORE,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,60
+                12:15:04:725,6245422,BRANCH,dummyFunction,406540904,CONSTANT;,,threadFourFunctions_V3.c,61
+                12:15:04:725,6245422,LOAD,leapYear,406833904,INT;CONSTANT;,0,threadFourFunctions_V3.c,61
+                12:15:04:725,6245422,BRANCH,dummyFunction,406541192,LOCAL;,,threadFourFunctions_V3.c,69
+                12:15:04:725,6245422,STORE,status.passed,406792164,INT;CONSTANT;,1,threadFourFunctions_V3.c,69
+                12:15:04:725,6245422,FUNCTIONRETURN,dummyFunction,0,CONSTANT;,,threadFourFunctions_V3.c,70
+                12:15:04:725,6245422,LOAD,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,80
+                12:15:04:725,6245422,FUNCTIONRETURN,getYear,0,CONSTANT;,,threadFourFunctions_V3.c,80
+                12:15:04:725,6245422,STORE,yearNo,406474256,INT;LOCAL;,2013,threadFourFunctions_V3.c,224
+                12:15:04:736,6245422,LOAD,yearNo,406474256,INT;LOCAL;,2013,threadFourFunctions_V3.c,225
+                12:15:04:736,6245422,LOAD,.str1,0,POINTER;,0x183f2bf8,threadFourFunctions_V3.c,225
+                12:15:04:736,6245422,LOAD,,0,POINTER;INT;,2013,threadFourFunctions_V3.c,225
+                12:15:04:736,6245422,FUNCTIONCALL,printf,0,POINTER;INT;CONSTANT;,,threadFourFunctions_V3.c,225
+                12:15:04:736,6245422,FUNCTIONRETURN,printf,0,,,threadFourFunctions_V3.c,225
+                12:15:04:736,6245422,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,226
+                12:15:04:736,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,226
+                12:15:04:736,6245422,FUNCTIONCALL,pthread_mutex_init,0,POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,226
+                12:15:04:736,6245422,FUNCTIONRETURN,pthread_mutex_init,0,,0,threadFourFunctions_V3.c,226
+                12:15:04:736,6245422,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,227
+                12:15:04:736,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,227
+                12:15:04:736,6245422,FUNCTIONCALL,pthread_mutex_init,0,POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,227
+                12:15:04:736,6245422,FUNCTIONRETURN,pthread_mutex_init,0,,0,threadFourFunctions_V3.c,227
+                12:15:04:736,6245422,LOAD,result,406833584,INT;CONSTANT;,0,threadFourFunctions_V3.c,228
+                12:15:04:736,6245422,LOAD,.str2,0,POINTER;,0x183f2b68,threadFourFunctions_V3.c,228
+                12:15:04:736,6245422,LOAD,,0,POINTER;INT;,0,threadFourFunctions_V3.c,228
+                12:15:04:736,6245422,FUNCTIONCALL,printf,0,POINTER;INT;CONSTANT;,,threadFourFunctions_V3.c,228
+                12:15:04:736,6245422,FUNCTIONRETURN,printf,0,,,threadFourFunctions_V3.c,228
+                12:15:04:736,6245422,LOAD,thread1,0,POINTER;,0x183a4da0,threadFourFunctions_V3.c,229
+                12:15:04:736,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,229
+                12:15:04:736,6245422,LOAD,sum,0,POINTER;POINTER;POINTER;,0x183ad010,threadFourFunctions_V3.c,229
+                12:15:04:736,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,229
+                12:15:04:736,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,229
+                12:15:04:736,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,229
+                12:15:04:736,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,229
+                12:15:04:736,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,230
+                12:15:04:767,6245422,BRANCH,main,406707840,LOCAL;,,threadFourFunctions_V3.c,234
+                12:15:04:767,6245422,LOAD,thread1,406474144,INT;LOCAL;,1,threadFourFunctions_V3.c,234
+                12:15:04:767,6245422,LOAD,,0,INT;,1,threadFourFunctions_V3.c,234
+                12:15:04:767,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,234
+                12:15:04:767,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,234
+                12:15:04:767,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,234
+                12:15:04:767,6245422,LOAD,thread1,0,POINTER;,0x183a4da0,threadFourFunctions_V3.c,235
+                12:15:04:767,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,235
+                12:15:04:767,6245422,LOAD,holdOn,0,POINTER;POINTER;POINTER;,0x183acc00,threadFourFunctions_V3.c,235
+                12:15:04:767,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,235
+                12:15:04:767,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,235
+                12:15:04:767,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,235
+                12:15:04:767,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,235
+                12:15:04:767,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,236
+                12:15:04:767,6245422,BRANCH,main,406706976,LOCAL;,,threadFourFunctions_V3.c,240
+                12:15:04:767,6245422,LOAD,thread1,406474144,INT;LOCAL;,1,threadFourFunctions_V3.c,240
+                12:15:04:767,6245422,LOAD,,0,INT;,1,threadFourFunctions_V3.c,240
+                12:15:04:767,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,240
+                12:15:04:767,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,240
+                12:15:04:767,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,240
+                12:15:04:784,6245422,LOAD,thread3,0,POINTER;,0x183a4d20,threadFourFunctions_V3.c,243
+                12:15:04:784,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,243
+                12:15:04:784,6245422,LOAD,sumPlus,0,POINTER;POINTER;POINTER;,0x183ad760,threadFourFunctions_V3.c,243
+                12:15:04:784,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,243
+                12:15:04:784,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,243
+                12:15:04:784,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,243
+                12:15:04:784,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,243
+                12:15:04:784,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,244
+                12:15:04:784,6245422,BRANCH,main,406707648,LOCAL;,,threadFourFunctions_V3.c,248
+                12:15:04:784,6245422,LOAD,thread3,406474016,INT;LOCAL;,406474160,threadFourFunctions_V3.c,248
+                12:15:04:784,6245422,LOAD,,0,INT;,406474160,threadFourFunctions_V3.c,248
+                12:15:04:784,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,248
+                12:15:04:784,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,248
+                12:15:04:784,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,248
+                12:15:04:784,6245422,LOAD,thread2,0,POINTER;,0x183a4de0,threadFourFunctions_V3.c,249
+                12:15:04:784,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,249
+                12:15:04:784,6245422,LOAD,diff,0,POINTER;POINTER;POINTER;,0x183accd0,threadFourFunctions_V3.c,249
+                12:15:04:784,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,249
+                12:15:04:784,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,249
+                12:15:04:784,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,249
+                12:15:04:784,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,249
+                12:15:04:784,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,250
+                12:15:04:803,6245422,BRANCH,main,406707504,LOCAL;,,threadFourFunctions_V3.c,254
+                12:15:04:803,6245422,LOAD,thread2,406474208,INT;LOCAL;,0,threadFourFunctions_V3.c,254
+                12:15:04:803,6245422,LOAD,,0,INT;,0,threadFourFunctions_V3.c,254
+                12:15:04:803,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,254
+                12:15:04:803,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,254
+                12:15:04:803,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,254
+                12:15:04:803,6245422,LOAD,thread3,0,POINTER;,0x183a4d20,threadFourFunctions_V3.c,255
+                12:15:04:803,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,255
+                12:15:04:803,6245422,LOAD,turnOn,0,POINTER;POINTER;POINTER;,0x183eb858,threadFourFunctions_V3.c,255
+                12:15:04:803,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,255
+                12:15:04:803,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,255
+                12:15:04:803,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,255
+                12:15:04:803,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,255
+                12:15:04:803,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,256
+                12:15:04:803,6245422,BRANCH,main,406707696,LOCAL;,,threadFourFunctions_V3.c,260
+                12:15:04:803,6245422,LOAD,thread3,406474016,INT;LOCAL;,406474160,threadFourFunctions_V3.c,260
+                12:15:04:818,6245422,LOAD,,0,INT;,406474160,threadFourFunctions_V3.c,260
+                12:15:04:818,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,260
+                12:15:04:818,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,260
+                12:15:04:818,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,260
+                12:15:04:818,6245422,LOAD,thread3,0,POINTER;,0x183a4d20,threadFourFunctions_V3.c,261
+                12:15:04:818,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,261
+                12:15:04:818,6245422,LOAD,turnOff,0,POINTER;POINTER;POINTER;,0x183ebc00,threadFourFunctions_V3.c,261
+                12:15:04:818,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,261
+                12:15:04:818,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,261
+                12:15:04:818,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,261
+                12:15:04:818,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,261
+                12:15:04:818,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,262
+                12:15:04:818,6245422,BRANCH,main,406707120,LOCAL;,,threadFourFunctions_V3.c,266
+                12:15:04:818,6245422,LOAD,thread3,406474016,INT;LOCAL;,406474160,threadFourFunctions_V3.c,266
+                12:15:04:818,6245422,LOAD,,0,INT;,406474160,threadFourFunctions_V3.c,266
+                12:15:04:818,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,266
+                12:15:04:818,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,266
+                12:15:04:818,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,266
+                12:15:04:818,6245422,LOAD,thread4,0,POINTER;,0x183a4df0,threadFourFunctions_V3.c,267
+                12:15:04:818,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,267
+                12:15:04:818,6245422,LOAD,incrementSharedVars,0,POINTER;POINTER;POINTER;,0x183acda0,threadFourFunctions_V3.c,267
+                12:15:04:818,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,267
+                12:15:04:818,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,267
+                12:15:04:818,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,267
+                12:15:04:818,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,267
+                12:15:04:841,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,268
+                12:15:04:841,6245422,BRANCH,main,406706784,LOCAL;,,threadFourFunctions_V3.c,272
+                12:15:04:841,6245422,LOAD,thread4,406474224,INT;LOCAL;,4,threadFourFunctions_V3.c,272
+                12:15:04:841,6245422,LOAD,,0,INT;,4,threadFourFunctions_V3.c,272
+                12:15:04:841,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,272
+                12:15:04:841,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,272
+                12:15:04:841,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,272
+                12:15:04:841,6245422,LOAD,t5,0,POINTER;,0x183a4c50,threadFourFunctions_V3.c,274
+                12:15:04:841,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,274
+                12:15:04:841,6245422,LOAD,diff,0,POINTER;POINTER;POINTER;,0x183accd0,threadFourFunctions_V3.c,274
+                12:15:04:841,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,274
+                12:15:04:841,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,274
+                12:15:04:841,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,274
+                12:15:04:841,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,274
+                12:15:04:841,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,275
+                12:15:04:841,6245422,BRANCH,main,406706880,LOCAL;,,threadFourFunctions_V3.c,279
+                12:15:04:853,6245422,LOAD,t5,406473808,INT;LOCAL;,4,threadFourFunctions_V3.c,279
+                12:15:04:853,6245422,LOAD,,0,INT;,4,threadFourFunctions_V3.c,279
+                12:15:04:853,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,279
+                12:15:04:853,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,279
+                12:15:04:853,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,279
+                12:15:04:853,6245422,LOAD,t6,0,POINTER;,0x183a4cd0,threadFourFunctions_V3.c,280
+                12:15:04:853,6245422,LOAD,,0,POINTER;POINTER;,0,threadFourFunctions_V3.c,280
+                12:15:04:853,6245422,LOAD,diff,0,POINTER;POINTER;POINTER;,0x183accd0,threadFourFunctions_V3.c,280
+                12:15:04:853,6245422,LOAD,,0,POINTER;POINTER;POINTER;POINTER;,0,threadFourFunctions_V3.c,280
+                12:15:04:853,6245422,FUNCTIONCALL,pthread_create,0,POINTER;POINTER;POINTER;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,280
+                12:15:04:853,6245422,FUNCTIONRETURN,pthread_create,0,,0,threadFourFunctions_V3.c,280
+                12:15:04:853,6245422,STORE,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,280
+                12:15:04:853,6245422,LOAD,rc,406473952,INT;LOCAL;,0,threadFourFunctions_V3.c,281
+                12:15:04:853,6245422,BRANCH,main,406707216,LOCAL;,,threadFourFunctions_V3.c,285
+                12:15:04:853,6245422,LOAD,t6,406473936,INT;LOCAL;,0,threadFourFunctions_V3.c,285
+                12:15:04:853,6245422,LOAD,,0,INT;,0,threadFourFunctions_V3.c,285
+                12:15:04:853,6245422,LOAD,,0,INT;POINTER;,0,threadFourFunctions_V3.c,285
+                12:15:04:853,6245422,FUNCTIONCALL,pthread_join,0,INT;POINTER;FUNCTION_SKIP;,0,threadFourFunctions_V3.c,285
+                12:15:04:853,6245422,FUNCTIONRETURN,pthread_join,0,,0,threadFourFunctions_V3.c,285
+                12:15:04:853,6245422,FUNCTIONRETURN,main,0,CONSTANT;,,threadFourFunctions_V3.c,288
+                12:15:04:853,6800315,FUNCTIONCALL,sum,0,CONSTANT;CONSTANT;,,,0
+                12:15:04:876,6800315,STORE,a,406474160,INT;LOCAL;,5,threadFourFunctions_V3.c,106
+                12:15:04:876,6800315,STORE,b,406474224,INT;LOCAL;,5,threadFourFunctions_V3.c,107
+                12:15:04:876,6800315,LOAD,,0,INT;,4,threadFourFunctions_V3.c,108
+                12:15:04:876,6800315,FUNCTIONCALL,getAverage,0,INT;CONSTANT;,,threadFourFunctions_V3.c,108
+                12:15:04:876,6800315,STORE,majorCode,406474288,INT;LOCAL;,4,,0
+                12:15:04:882,6800315,LOAD,,406474288,INT;LOCAL;,4,threadFourFunctions_V3.c,85
+                12:15:04:882,6800315,BRANCH,getAverage,406541672,LOCAL;,,threadFourFunctions_V3.c,85
+                12:15:04:882,6800315,LOAD,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,85
+                12:15:04:882,6800315,BRANCH,getAverage,406542056,LOCAL;,,threadFourFunctions_V3.c,86
+                12:15:04:882,6800315,LOAD,major.theoryCredit,406911284,INT;CONSTANT;,16,threadFourFunctions_V3.c,86
+                12:15:04:882,6800315,LOAD,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,86
+                12:15:04:886,6800315,STORE,average,406833520,FLOAT;CONSTANT;,19.4,threadFourFunctions_V3.c,86
+                12:15:04:886,6800315,BRANCH,getAverage,406422216,CONSTANT;,,threadFourFunctions_V3.c,87
+                12:15:04:886,6800315,LOAD,,406474288,INT;LOCAL;,4,threadFourFunctions_V3.c,87
+                12:15:04:886,6800315,BRANCH,getAverage,406421112,LOCAL;,,threadFourFunctions_V3.c,89
+                12:15:04:886,6800315,LOAD,,406474288,INT;LOCAL;,4,threadFourFunctions_V3.c,89
+                12:15:04:886,6800315,BRANCH,getAverage,406421352,LOCAL;,,threadFourFunctions_V3.c,91
+                12:15:04:895,6800315,LOAD,,406474288,INT;LOCAL;,4,threadFourFunctions_V3.c,91
+                12:15:04:895,6800315,BRANCH,getAverage,406421544,LOCAL;,,threadFourFunctions_V3.c,92
+                12:15:04:895,6800315,LOAD,major.specializationCredit,406911272,INT;CONSTANT;,60,threadFourFunctions_V3.c,92
+                12:15:04:895,6800315,LOAD,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,92
+                12:15:04:895,6800315,STORE,average,406833520,FLOAT;CONSTANT;,74,threadFourFunctions_V3.c,92
+                12:15:04:900,6800315,BRANCH,getAverage,406421880,CONSTANT;,,threadFourFunctions_V3.c,93
+                12:15:04:900,6800315,FUNCTIONRETURN,getAverage,0,CONSTANT;,,threadFourFunctions_V3.c,93
+                12:15:04:900,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,110
+                12:15:04:900,6800315,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,110
+                12:15:04:900,6800315,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2928,threadFourFunctions_V3.c,110
+                12:15:04:900,6800315,LOAD,sharedVar1,406833680,INT;CONSTANT;,1,threadFourFunctions_V3.c,111
+                12:15:04:900,6800315,STORE,sharedVar1,406833680,INT;CONSTANT;,2,threadFourFunctions_V3.c,111
+                12:15:04:900,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,112
+                12:15:04:900,6800315,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,112
+                12:15:04:900,6800315,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2928,threadFourFunctions_V3.c,112
+                12:15:04:900,6800315,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,114
+                12:15:04:900,6800315,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,114
+                12:15:04:900,6800315,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2a48,threadFourFunctions_V3.c,114
+                12:15:04:900,6800315,LOAD,sharedVar2,406834064,INT;CONSTANT;,1,threadFourFunctions_V3.c,115
+                12:15:04:912,6800315,STORE,sharedVar2,406834064,INT;CONSTANT;,2,threadFourFunctions_V3.c,115
+                12:15:04:912,6800315,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,116
+                12:15:04:912,6800315,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,116
+                12:15:04:912,6800315,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2a48,threadFourFunctions_V3.c,116
+                12:15:04:912,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,118
+                12:15:04:912,6800315,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,118
+                12:15:04:912,6800315,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2928,threadFourFunctions_V3.c,118
+                12:15:04:912,6800315,LOAD,sharedVar2,406834064,INT;CONSTANT;,2,threadFourFunctions_V3.c,119
+                12:15:04:912,6800315,LOAD,sharedVar1,406833680,INT;CONSTANT;,2,threadFourFunctions_V3.c,119
+                12:15:04:912,6800315,STORE,result,406833584,INT;CONSTANT;,4,threadFourFunctions_V3.c,119
+                12:15:04:912,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,120
+                12:15:04:912,6800315,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,120
+                12:15:04:912,6800315,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2928,threadFourFunctions_V3.c,120
+                12:15:04:912,6800315,LOAD,temp1,406832912,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,121
+                12:15:04:912,6800315,LOAD,a,406474160,INT;LOCAL;,5,threadFourFunctions_V3.c,121
+                12:15:04:927,6800315,LOAD,b,406474224,INT;LOCAL;,5,threadFourFunctions_V3.c,121
+                12:15:04:927,6800315,STORE,result,406833584,INT;CONSTANT;,5,threadFourFunctions_V3.c,121
+                12:15:04:927,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,122
+                12:15:04:927,6800315,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,122
+                12:15:04:927,6800315,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2928,threadFourFunctions_V3.c,122
+                12:15:04:927,6800315,LOAD,sharedVar1,406833680,INT;CONSTANT;,2,threadFourFunctions_V3.c,123
+                12:15:04:933,6800315,STORE,sharedVar1,406833680,INT;CONSTANT;,3,threadFourFunctions_V3.c,123
+                12:15:04:933,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,124
+                12:15:04:933,6800315,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,124
+                12:15:04:933,6800315,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2928,threadFourFunctions_V3.c,124
+                12:15:04:933,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,126
+                12:15:04:933,6800315,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,126
+                12:15:04:933,6800315,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2928,threadFourFunctions_V3.c,126
+                12:15:04:933,6800315,LOAD,sharedVar1,406833680,INT;CONSTANT;,3,threadFourFunctions_V3.c,127
+                12:15:04:933,6800315,STORE,sharedVar1,406833680,INT;CONSTANT;,4,threadFourFunctions_V3.c,127
+                12:15:04:933,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,128
+                12:15:04:933,6800315,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,128
+                12:15:04:933,6800315,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2928,threadFourFunctions_V3.c,128
+                12:15:04:933,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,130
+                12:15:04:933,6800315,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,130
+                12:15:04:933,6800315,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2928,threadFourFunctions_V3.c,130
+                12:15:04:933,6800315,LOAD,sharedVar1,406833680,INT;CONSTANT;,4,threadFourFunctions_V3.c,131
+                12:15:04:947,6800315,STORE,sharedVar1,406833680,INT;CONSTANT;,5,threadFourFunctions_V3.c,131
+                12:15:04:947,6800315,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,132
+                12:15:04:947,6800315,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,132
+                12:15:04:947,6800315,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2928,threadFourFunctions_V3.c,132
+                12:15:04:947,6800315,LOAD,result,406833584,INT;CONSTANT;,5,threadFourFunctions_V3.c,134
+                12:15:04:947,6800315,LOAD,.str,0,POINTER;,0x183f2a78,threadFourFunctions_V3.c,134
+                12:15:04:947,6800315,LOAD,,0,POINTER;INT;,5,threadFourFunctions_V3.c,134
+                12:15:04:947,6800315,FUNCTIONCALL,printf,0,POINTER;INT;CONSTANT;,,threadFourFunctions_V3.c,134
+                12:15:04:947,6800315,FUNCTIONRETURN,printf,0,,,threadFourFunctions_V3.c,134
+                12:15:04:947,6800315,STORE,price,406832976,FLOAT;CONSTANT;,50,threadFourFunctions_V3.c,135
+                12:15:04:947,6800315,LOAD,result,406833584,INT;CONSTANT;,5,threadFourFunctions_V3.c,136
+                12:15:04:947,6800315,BRANCH,sum,406471992,LOCAL;,,threadFourFunctions_V3.c,137
+                12:15:04:947,6800315,STORE,loyalCostomer,406833296,INT;CONSTANT;,1,threadFourFunctions_V3.c,137
+                12:15:04:947,6800315,BRANCH,sum,406472088,CONSTANT;,,threadFourFunctions_V3.c,140
+                12:15:04:958,6800315,FUNCTIONRETURN,sum,0,CONSTANT;,,threadFourFunctions_V3.c,140
+                12:15:04:958,27329553,FUNCTIONCALL,holdOn,0,CONSTANT;CONSTANT;,,,0
+                12:15:04:961,27329553,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,379
+                12:15:04:961,27329553,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,379
+                12:15:04:961,27329553,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2a48,threadFourFunctions_V3.c,379
+                12:15:04:961,27329553,LOAD,price,406832976,FLOAT;CONSTANT;,50,threadFourFunctions_V3.c,380
+                12:15:04:961,27329553,STORE,price,406832976,FLOAT;CONSTANT;,100,threadFourFunctions_V3.c,380
+                12:15:04:961,27329553,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,381
+                12:15:04:961,27329553,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,381
+                12:15:04:961,27329553,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2a48,threadFourFunctions_V3.c,381
+                12:15:04:961,27329553,STORE,x,406473936,INT;LOCAL;,10,threadFourFunctions_V3.c,382
+                12:15:04:968,27329553,STORE,y,406474016,INT;LOCAL;,20,threadFourFunctions_V3.c,383
+                12:15:04:968,27329553,LOAD,x,406473936,INT;LOCAL;,10,threadFourFunctions_V3.c,384
+                12:15:04:968,27329553,LOAD,y,406474016,INT;LOCAL;,20,threadFourFunctions_V3.c,384
+                12:15:04:968,27329553,STORE,temp1,406832912,FLOAT;CONSTANT;,30,threadFourFunctions_V3.c,384
+                12:15:04:968,27329553,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,385
+                12:15:04:968,27329553,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,385
+                12:15:04:968,27329553,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2a48,threadFourFunctions_V3.c,385
+                12:15:04:968,27329553,LOAD,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,386
+                12:15:04:968,27329553,LOAD,temp1,406832912,FLOAT;CONSTANT;,30,threadFourFunctions_V3.c,386
+                12:15:04:975,27329553,LOAD,y,406474016,INT;LOCAL;,20,threadFourFunctions_V3.c,386
+                12:15:04:975,27329553,STORE,temp1,406832912,FLOAT;CONSTANT;,52.3,threadFourFunctions_V3.c,386
+                12:15:04:975,27329553,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,387
+                12:15:04:975,27329553,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,387
+                12:15:04:975,27329553,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2a48,threadFourFunctions_V3.c,387
+                12:15:04:975,27329553,LOAD,sharedVar2,406834064,INT;CONSTANT;,2,threadFourFunctions_V3.c,388
+                12:15:04:975,27329553,LOAD,sharedVar1,406833680,INT;CONSTANT;,5,threadFourFunctions_V3.c,388
+                12:15:04:975,27329553,STORE,result,406833584,INT;CONSTANT;,7,threadFourFunctions_V3.c,388
+                12:15:04:975,27329553,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,389
+                12:15:04:975,27329553,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,389
+                12:15:04:975,27329553,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2a48,threadFourFunctions_V3.c,389
+                12:15:04:983,27329553,LOAD,sharedVar1,406833680,INT;CONSTANT;,5,threadFourFunctions_V3.c,390
+                12:15:04:983,27329553,STORE,sharedVar1,406833680,INT;CONSTANT;,6,threadFourFunctions_V3.c,390
+                12:15:04:983,27329553,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,391
+                12:15:04:983,27329553,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,391
+                12:15:04:983,27329553,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2a48,threadFourFunctions_V3.c,391
+                12:15:04:983,27329553,FUNCTIONCALL,dummyFunction,0,CONSTANT;,,,0
+                12:15:04:983,27329553,LOAD,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,59
+                12:15:04:983,27329553,BRANCH,dummyFunction,406540952,LOCAL;,,threadFourFunctions_V3.c,59
+                12:15:04:983,27329553,LOAD,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,59
+                12:15:04:991,27329553,BRANCH,dummyFunction,406541048,CONSTANT;,,threadFourFunctions_V3.c,59
+                12:15:04:991,27329553,STORE,leapYear,406833904,INT;CONSTANT;,0,threadFourFunctions_V3.c,59
+                12:15:04:991,27329553,STORE,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,60
+                12:15:04:991,27329553,BRANCH,dummyFunction,406540904,CONSTANT;,,threadFourFunctions_V3.c,61
+                12:15:04:991,27329553,LOAD,leapYear,406833904,INT;CONSTANT;,0,threadFourFunctions_V3.c,61
+                12:15:04:991,27329553,BRANCH,dummyFunction,406541192,LOCAL;,,threadFourFunctions_V3.c,69
+                12:15:04:996,27329553,STORE,status.passed,406792164,INT;CONSTANT;,1,threadFourFunctions_V3.c,69
+                12:15:04:996,27329553,FUNCTIONRETURN,dummyFunction,0,CONSTANT;,,threadFourFunctions_V3.c,70
+                12:15:04:996,27329553,FUNCTIONRETURN,holdOn,0,CONSTANT;,,threadFourFunctions_V3.c,395
+                12:15:04:996,16249706,FUNCTIONCALL,sumPlus,0,CONSTANT;CONSTANT;,,,0
+                12:15:05:000,16249706,STORE,a,406474160,INT;LOCAL;,5,threadFourFunctions_V3.c,143
+                12:15:05:000,16249706,STORE,b,406474288,INT;LOCAL;,5,threadFourFunctions_V3.c,144
+                12:15:05:000,16249706,FUNCTIONCALL,dummyFunction,0,CONSTANT;,,,0
+                12:15:05:000,16249706,LOAD,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,59
+                12:15:05:003,16249706,BRANCH,dummyFunction,406540952,LOCAL;,,threadFourFunctions_V3.c,59
+                12:15:05:003,16249706,LOAD,year,406833136,INT;CONSTANT;,2013,threadFourFunctions_V3.c,59
+                12:15:05:003,16249706,BRANCH,dummyFunction,406541048,CONSTANT;,,threadFourFunctions_V3.c,59
+                12:15:05:003,16249706,STORE,leapYear,406833904,INT;CONSTANT;,0,threadFourFunctions_V3.c,59
+                12:15:05:003,16249706,STORE,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,60
+                12:15:05:003,16249706,BRANCH,dummyFunction,406540904,CONSTANT;,,threadFourFunctions_V3.c,61
+                12:15:05:003,16249706,LOAD,leapYear,406833904,INT;CONSTANT;,0,threadFourFunctions_V3.c,61
+                12:15:05:009,16249706,BRANCH,dummyFunction,406541192,LOCAL;,,threadFourFunctions_V3.c,69
+                12:15:05:009,16249706,STORE,status.passed,406792164,INT;CONSTANT;,1,threadFourFunctions_V3.c,69
+                12:15:05:009,16249706,FUNCTIONRETURN,dummyFunction,0,CONSTANT;,,threadFourFunctions_V3.c,70
+                12:15:05:009,16249706,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,146
+                12:15:05:009,16249706,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,146
+                12:15:05:009,16249706,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2928,threadFourFunctions_V3.c,146
+                12:15:05:009,16249706,LOAD,sharedVar2,406834064,INT;CONSTANT;,2,threadFourFunctions_V3.c,147
+                12:15:05:009,16249706,LOAD,sharedVar1,406833680,INT;CONSTANT;,6,threadFourFunctions_V3.c,147
+                12:15:05:009,16249706,STORE,result,406833584,INT;CONSTANT;,8,threadFourFunctions_V3.c,147
+                12:15:05:009,16249706,LOAD,mutex1,0,POINTER;,0x183f2928,threadFourFunctions_V3.c,148
+                12:15:05:009,16249706,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2928,threadFourFunctions_V3.c,148
+                12:15:05:009,16249706,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2928,threadFourFunctions_V3.c,148
+                12:15:05:018,16249706,STORE,grade,406833392,FLOAT;CONSTANT;,2.3,threadFourFunctions_V3.c,149
+                12:15:05:018,16249706,LOAD,result,406833584,INT;CONSTANT;,8,threadFourFunctions_V3.c,150
+                12:15:05:018,16249706,BRANCH,sumPlus,406498016,LOCAL;,,threadFourFunctions_V3.c,154
+                12:15:05:018,16249706,LOAD,result,406833584,INT;CONSTANT;,8,threadFourFunctions_V3.c,154
+                12:15:05:018,16249706,BRANCH,sumPlus,406497824,LOCAL;,,threadFourFunctions_V3.c,155
+                12:15:05:018,16249706,STORE,grade,406833392,FLOAT;CONSTANT;,1.3,threadFourFunctions_V3.c,155
+                12:15:05:018,16249706,STORE,sharedVar2,406834064,INT;CONSTANT;,3,threadFourFunctions_V3.c,156
+                12:15:05:018,16249706,BRANCH,sumPlus,406497776,CONSTANT;,,threadFourFunctions_V3.c,158
+                12:15:05:027,16249706,LOAD,result,406833584,INT;CONSTANT;,8,threadFourFunctions_V3.c,158
+                12:15:05:027,16249706,BRANCH,sumPlus,406498064,LOCAL;,,threadFourFunctions_V3.c,160
+                12:15:05:027,16249706,LOAD,result,406833584,INT;CONSTANT;,8,threadFourFunctions_V3.c,160
+                12:15:05:027,16249706,BRANCH,sumPlus,406497152,LOCAL;,,threadFourFunctions_V3.c,162
+                12:15:05:027,16249706,LOAD,result,406833584,INT;CONSTANT;,8,threadFourFunctions_V3.c,162
+                12:15:05:027,16249706,BRANCH,sumPlus,406401648,LOCAL;,,threadFourFunctions_V3.c,163
+                12:15:05:027,16249706,STORE,grade,406833392,FLOAT;CONSTANT;,5,threadFourFunctions_V3.c,163
+                12:15:05:035,16249706,BRANCH,sumPlus,406704640,CONSTANT;,,threadFourFunctions_V3.c,165
+                12:15:05:035,16249706,LOAD,result,406833584,INT;CONSTANT;,8,threadFourFunctions_V3.c,165
+                12:15:05:035,16249706,LOAD,.str,0,POINTER;,0x183f2a78,threadFourFunctions_V3.c,165
+                12:15:05:035,16249706,LOAD,,0,POINTER;INT;,8,threadFourFunctions_V3.c,165
+                12:15:05:035,16249706,FUNCTIONCALL,printf,0,POINTER;INT;CONSTANT;,,threadFourFunctions_V3.c,165
+                12:15:05:035,16249706,FUNCTIONRETURN,printf,0,,,threadFourFunctions_V3.c,165
+                12:15:05:035,16249706,FUNCTIONCALL,calculateDiscount,0,CONSTANT;,,,0
+                12:15:05:035,16249706,LOAD,loyalCostomer,406833296,INT;CONSTANT;,1,threadFourFunctions_V3.c,325
+                12:15:05:035,16249706,BRANCH,calculateDiscount,406707360,LOCAL;,,threadFourFunctions_V3.c,326
+                12:15:05:035,16249706,LOAD,discount,406832592,FLOAT;CONSTANT;,0,threadFourFunctions_V3.c,326
+                12:15:05:035,16249706,BRANCH,calculateDiscount,406706448,LOCAL;,,threadFourFunctions_V3.c,330
+                12:15:05:045,16249706,BRANCH,calculateDiscount,406706496,LOCAL;,,threadFourFunctions_V3.c,334
+                12:15:05:045,16249706,FUNCTIONRETURN,calculateDiscount,0,LOCAL;,,threadFourFunctions_V3.c,334
+                12:15:05:045,16249706,FUNCTIONRETURN,sumPlus,0,LOCAL;,,threadFourFunctions_V3.c,168
+                12:15:05:045,11567059,FUNCTIONCALL,diff,0,LOCAL;LOCAL;,,,0
+                12:15:05:049,11567059,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,171
+                12:15:05:049,11567059,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,171
+                12:15:05:049,11567059,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2a48,threadFourFunctions_V3.c,171
+                12:15:05:049,11567059,LOAD,sharedVar2,406834064,INT;CONSTANT;,3,threadFourFunctions_V3.c,172
+                12:15:05:049,11567059,STORE,sharedVar2,406834064,INT;CONSTANT;,4,threadFourFunctions_V3.c,172
+                12:15:05:049,11567059,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,173
+                12:15:05:049,11567059,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,173
+                12:15:05:049,11567059,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2a48,threadFourFunctions_V3.c,173
+                12:15:05:049,11567059,STORE,a,406474272,INT;LOCAL;,5,threadFourFunctions_V3.c,174
+                12:15:05:057,11567059,STORE,b,406474048,INT;LOCAL;,5,threadFourFunctions_V3.c,175
+                12:15:05:057,11567059,LOAD,a,406474272,INT;LOCAL;,5,threadFourFunctions_V3.c,176
+                12:15:05:057,11567059,LOAD,b,406474048,INT;LOCAL;,5,threadFourFunctions_V3.c,176
+                12:15:05:057,11567059,STORE,temp1,406832912,FLOAT;CONSTANT;,10,threadFourFunctions_V3.c,176
+                12:15:05:057,11567059,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,177
+                12:15:05:057,11567059,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,177
+                12:15:05:057,11567059,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2a48,threadFourFunctions_V3.c,177
+                12:15:05:057,11567059,LOAD,sharedVar2,406834064,INT;CONSTANT;,4,threadFourFunctions_V3.c,178
+                12:15:05:057,11567059,LOAD,sharedVar1,406833680,INT;CONSTANT;,6,threadFourFunctions_V3.c,178
+                12:15:05:065,11567059,STORE,result,406833584,INT;CONSTANT;,-2,threadFourFunctions_V3.c,178
+                12:15:05:065,11567059,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,179
+                12:15:05:065,11567059,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,179
+                12:15:05:065,11567059,FUNCTIONRETURN,pthread_mutex_unlock,0,,0x183f2a48,threadFourFunctions_V3.c,179
+                12:15:05:065,11567059,LOAD,sharedVar2,406834064,INT;CONSTANT;,4,threadFourFunctions_V3.c,180
+                12:15:05:065,11567059,STORE,sharedVar2,406834064,INT;CONSTANT;,5,threadFourFunctions_V3.c,180
+                12:15:05:065,11567059,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,181
+                12:15:05:065,11567059,FUNCTIONCALL,pthread_mutex_lock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,181
+                12:15:05:065,11567059,FUNCTIONRETURN,pthread_mutex_lock,0,,0x183f2a48,threadFourFunctions_V3.c,181
+                12:15:05:065,11567059,LOAD,sharedVar2,406834064,INT;CONSTANT;,5,threadFourFunctions_V3.c,182
+                12:15:05:065,11567059,STORE,sharedVar2,406834064,INT;CONSTANT;,6,threadFourFunctions_V3.c,182
+                12:15:05:065,11567059,LOAD,mutex2,0,POINTER;,0x183f2a48,threadFourFunctions_V3.c,183
+                12:15:05:065,11567059,FUNCTIONCALL,pthread_mutex_unlock,0,POINTER;FUNCTION_SKIP;,0x183f2a48,threadFourFunctions_V3.c,183
+
+            </code>
+        </pre>
+    </div>
+    <div class="col-md-12">
+        <h2>Shared Variables</h2>
+        <pre style="height: 300px; overflow-y: scroll; border: #383d41 1px solid; background-color: #fff">
+            <code>
+                major.majorCode,406911264,INT;CONSTANT;
+                major.degreeLevel,406911268,INT;CONSTANT;
+                major.specializationCredit,406911272,INT;CONSTANT;
+                major.supplementCredit,406911276,INT;CONSTANT;
+                major.theoryCredit,406911284,INT;CONSTANT;
+                major.thesisCredit,406911288,INT;CONSTANT;
+                temp1,406832912,FLOAT;CONSTANT;
+                leapYear,406833904,INT;CONSTANT;
+                year,406833136,INT;CONSTANT;
+                grade,406833392,FLOAT;CONSTANT;
+                status.passed,406792164,INT;CONSTANT;
+                result,406833584,INT;CONSTANT;
+                average,406833520,FLOAT;CONSTANT;
+                sharedVar1,406833680,INT;CONSTANT;
+                sharedVar2,406834064,INT;CONSTANT;
+                price,406832976,FLOAT;CONSTANT;
+                loyalCostomer,406833296,INT;CONSTANT;
+                discount,406832592,FLOAT;CONSTANT;
+                status.insufficient,406792168,INT;CONSTANT;
+            </code>
+        </pre>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+             <a href="RawVis?b=ThreadCreator" class="btn btn-primary col-md-12">Raw Vis.</a>
         </div>
-    <!-- Page Content End Here -->
-     </div>
-
-    <!-- jQuery CDN -->
-
-    <script src="{% static 'js/SOA_vis_js/jquery-1.12.0.min.js'%} " type="text/javascript"></script>
-    <!-- Bootstrap Js CDN -->
-
-    <script src="{% static 'js/SOA_vis_js/bootstrap.js'%} " type="text/javascript"></script>
-
-    <script type="text/javascript">
-     $(document).ready(function () {
-         $('#sidebarCollapse').on('click', function () {
-             $('#sidebar').toggleClass('active');
-         });
-     });
-    </script>
-    <script src="{% static 'js/SOA_vis_js/main.js'%} " type="text/javascript"></script>
-	
+        <div class="col-md-4"></div>
+    </div>
+</div>
 {% endblock %}
