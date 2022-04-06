@@ -99,7 +99,7 @@ system-service==0.3
 systemd-python==234
 testresources==2.0.0
 traceback2==1.4.0
-Twisted==19.2.1
+Twisted==22.2.0
 txaio==18.8.1
 ubuntu-drivers-common==0.0.0
 ufw==0.35
